@@ -8,6 +8,11 @@ use Auth;
 use Excel;
 use Input;
 use Session;
+use App\Tbl_counter;
+use App\Tbl_sticker;
+use App\Tbl_visa_type;
+use App\Tbl_center_info;
+use App\Tbl_ivac_service;
 
 
 class ForeignPassportController extends Controller
@@ -19,20 +24,46 @@ class ForeignPassportController extends Controller
      */
     public function index()
     {
-        $data = array();
-        $data['sticker'] = DB::table('tbl_sticker_mapping')
+        $datas = array();
+        $datas['sticker'] = DB::table('tbl_sticker_mapping')
             ->get();
-        $data['visa_type'] = DB::table('tbl_visa_type')
+        $datas['visa_type'] = DB::table('tbl_visa_type')
             ->get();
-        $data['duration'] = DB::table('tbl_duration')
+        $datas['duration'] = DB::table('tbl_duration')
             ->get();
-        $data['entry_type'] = DB::table('tbl_entry_type')
+        $datas['entry_type'] = DB::table('tbl_entry_type')
             ->get();
-        $data['book_no'] = DB::table('tbl_money_receive')
+        $datas['book_no'] = DB::table('tbl_money_receive')
             ->where('center_name', Auth::user()->center_name)
             ->orderBy('id', 'desc')
             ->first();
-        return view('foreign.receive_foreign_passport', $data);
+        // return view('foreign.countercall', $data);
+        $hostname = gethostbyaddr($_SERVER['REMOTE_ADDR']);
+
+        // $hostname = gethostname();
+        $ip = getHostByName(getHostName());
+
+
+        $counter = Tbl_counter::where('hostname',$hostname)->first();
+
+
+        if($counter){
+            $datas['counter_no'] = $counter->counter_no;
+            $datas['floor_id'] = $counter->floor_id;
+            $datas['counter_services'] = explode(',',$counter->svc_name);
+        }
+
+
+        $datas['user_id'] = Auth::user()->user_id;
+        $datas['stickers'] = Tbl_sticker::all();
+        $datas['visa_types'] = Tbl_visa_type::all();
+        $datas['center_name'] = Tbl_center_info::where('active',1)->first();
+        $datas['ivac_svc_fee'] = Tbl_ivac_service::where('Service', 'Regular Passport')->first();
+
+        $datas['tdd_list'] = Tbl_visa_type::all();
+
+//        return redirect('readyat-center');
+        return view('foreign.countercall',$datas);
     }
 
     public function after_submit($stkr, $form, $to, $id)
