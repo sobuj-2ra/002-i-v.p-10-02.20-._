@@ -25,7 +25,7 @@ class ForeignPassportController extends Controller
     public function index()
     {
         $datas = array();
-        $datas['sticker'] = DB::table('tbl_sticker_mapping')
+        $datas['stickers'] = DB::table('tbl_sticker_mapping')
             ->get();
         $datas['visa_type'] = DB::table('tbl_visa_type')
             ->get();
@@ -55,7 +55,7 @@ class ForeignPassportController extends Controller
 
 
         $datas['user_id'] = Auth::user()->user_id;
-        $datas['stickers'] = Tbl_sticker::all();
+        // $datas['stickers'] = Tbl_sticker::all();
         $datas['visa_types'] = Tbl_visa_type::all();
         $datas['center_name'] = Tbl_center_info::where('active',1)->first();
         $datas['ivac_svc_fee'] = Tbl_ivac_service::where('Service', 'Regular Passport')->first();
@@ -63,7 +63,7 @@ class ForeignPassportController extends Controller
         $datas['tdd_list'] = Tbl_visa_type::all();
 
 //        return redirect('readyat-center');
-        return view('foreign.countercall',$datas);
+        return view('foreign.foreign_call',$datas);
     }
 
     public function after_submit($stkr, $form, $to, $id)

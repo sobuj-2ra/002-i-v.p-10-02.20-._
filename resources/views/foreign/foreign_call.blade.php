@@ -123,7 +123,7 @@
                                                                         <select name="" id="sticker_type" class="" style="width:100px;height:26px" required>
                                                                             <option value=""> </option>
                                                                             @foreach($stickers as $sticker)
-                                                                                <option value="{{$sticker->StickerSymbol}}">{{$sticker->StickerSymbol}}</option>
+                                                                                <option value="{{$sticker->sticker}}">{{$sticker->sticker}}</option>
                                                                             @endforeach
                                                                         </select>
                                                                     </td>
@@ -251,6 +251,24 @@
                                                                     </div> --}}
                                                                     
                                                                         <div class="row">
+                                                                            <div class="col-md-1" style="padding-right: 0px">
+                                                                                <h4>GRATIS:</h4>
+                                                                            </div>
+                                                                            <div class="col-md-1" style="padding-right: 0px;padding-left: 0px">
+                                                                                <div class="checkbox">
+                                                                                    <label>
+                                                                                        <input type="radio" name="gratis_status1" id="gratiseYes" value="yes"
+                                                                                               required> Yes
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-1" style="padding-left: 0px;">
+                                                                                <div class="checkbox">
+                                                                                    <label>
+                                                                                        <input type="radio" name="gratis_status1" id="gratiseNo" value="no"> No
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>
                                                                             <div class="col-md-2">
                                                                                 <div class="form-group">
                                                                                     <input class="form-control"
@@ -267,8 +285,12 @@
                                                                             </div>
                                                                             <div class="col-md-2">
                                                                                 <div class="form-group">
-                                                                                    <input class="form-control" name="receive_no" id="receive"
-                                                                                        placeholder="Receipt No" autocomplete="off" required>
+                                                                                    <input class="form-control" name="receive_no" id="receive" placeholder="Receipt No" autocomplete="off" required>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-2">
+                                                                                <div class="form-group">
+                                                                                    <input type="number" name="validStkr" id="validStkr" class="form-control" placeholder="Sticker Number" required   autocomplete="off">
                                                                                 </div>
                                                                             </div>
                                         
@@ -276,19 +298,20 @@
                                                                     <div class="row">
                                                                         <div class="col-md-4">
                                                                             <div class="form-group">
-                                                                                <input class="form-control passport" name="passport[]" placeholder="Passport"
-                                                                                    id="passport" autocomplete="off" required>
+                                                                                <label id="passport_show"></label>
+                                                                                <input class="form-control passport" name="passportNo" placeholder="Passport" id="passportNo" autocomplete="off" required>
                                                                             </div>
                                                                         </div>
                                                                         <div class="col-md-4">
                                                                             <div class="form-group">
-                                                                                <input class="form-control " id="name" name="app_name[]"
-                                                                                    placeholder="Name of Applicant" autocomplete="off" required>
+                                                                                <label for=""></label>
+                                                                                <input class="form-control " id="name" name="name" placeholder="Name of Applicant" autocomplete="off" required>
                                                                             </div>
                                                                         </div>
                                                                         <div class="col-md-4">
                                                                             <div class="form-group">
-                                                                                <input class="form-control" name="contact[]" id="contact" pattern=".{10}" title="Minimum  & Maximum 10 digit" placeholder="Contact (1XXXXXXXXX)"
+                                                                                <label for=""></label>
+                                                                                <input class="form-control" name="contact" id="contact" pattern=".{10}" title="Minimum  & Maximum 10 digit" placeholder="Contact (1XXXXXXXXX)"
                                                                                     autocomplete="off" required>
                                                                             </div>
                                                                         </div>
@@ -296,13 +319,12 @@
                                                                     <div class="row">
                                                                         <div class="col-md-4">
                                                                             <div class="form-group">
-                                                                                <input class="form-control" id="web" name="web_file_no[]"
-                                                                                    placeholder="Web file number" autocomplete="off" required>
+                                                                                <input class="form-control" id="web_file_no" name="web_file_no" placeholder="Web file number" autocomplete="off" required>
                                                                             </div>
                                                                         </div>
                                                                         <div class="col-md-4">
                                                                             <div class="form-group">
-                                                                                <input class="form-control" name="nationality[]" placeholder="Nationality"
+                                                                                <input class="form-control" name="nationality" placeholder="Nationality"
                                                                                     autocomplete="off" required>
                                                                             </div>
                                                                         </div>
@@ -318,7 +340,8 @@
                                                                     <div class="row">
                                                                         <div class="col-md-4">
                                                                             <div class="form-group">
-                                                                                <select class="form-control" name="duration[]" required>
+                                                                                <label for=""></label>
+                                                                                <select class="form-control" name="duration" required>
                                                                                     <option value="">Select Duration</option>
                                                                                     <?php foreach ($duration as $item) { ?>
                                                                                     <option value="<?php  echo $item->duration; ?>"><?php  echo $item->duration; ?></option>
@@ -329,7 +352,8 @@
                                                                         </div>
                                                                         <div class="col-md-4">
                                                                             <div class="form-group">
-                                                                                <select class="form-control" name="entry_type[]" required>
+                                                                                <label for=""></label>
+                                                                                <select class="form-control" name="entry_type" required>
                                                                                     <option value="">Entry Type</option>
                                                                                     <?php foreach ($entry_type as $item) { ?>
                                                                                     <option value="<?php  echo $item->entry_type; ?>"><?php  echo $item->entry_type; ?></option>
@@ -340,7 +364,9 @@
                                                                         </div>
                                                                         <div class="col-md-4">
                                                                             <div class="form-group">
-                                                                                <select class="form-control" name="visa_type[]" required>
+                                                                                <label for=""><span  style="height:10px;display: inline-block;">@{{ttdDelDate}}</span> </label>
+                                                                                <input id="ttdDelDate" type="hidden" :value="ttdDelDate">
+                                                                                <select class="form-control" @change="visaTypeOnChange" name="visa_type" id="visa_type" required>
                                                                                     <option value="">Visa Type</option>
                                                                                     <?php foreach ($visa_type as $item) { ?>
                                                                                     <option value="<?php  echo $item->visa_type; ?>"><?php  echo $item->visa_type; ?></option>
@@ -354,8 +380,7 @@
                                                                         <div class="row">
                                                                             <div class="col-md-4">
                                                                                 <div class="input-group">
-                                                                                    <input type="text" class="form-control" name="visa_fee[]" id="visaFee"
-                                                                                        placeholder="Visa Fee" required autocomplete="off">
+                                                                                <input @keyup="TotalFeeFunc" v-model="vasa_feeF"  type="text" class="form-control" name="visa_fee" id="visaFee" placeholder="Visa Fee" required autocomplete="off">
                                                                                     <span class="input-group-addon">Taka</span>
                                                                                 </div>
                                                                                 {{--<div class="form-group">--}}
@@ -365,83 +390,139 @@
                                                                             </div>
                                                                             <div class="col-md-4">
                                                                                 <div class="input-group">
-                                                                                    <input class="form-control" name="fax_trans_charge[]" id="faxCharge"
+                                                                                    <input @keyup="TotalFeeFunc" v-model="faxTnsChargeFee"  class="form-control" name="fax_trans_charge" id="faxCharge"
                                                                                         placeholder="Fax Trans. Charge" required>
                                                                                     <span class="input-group-addon">Taka</span>
                                                                                 </div>
                                                                             </div>
                                                                             <div class="col-md-4">
                                                                                 <div class="input-group">
-                                                                                    <input class="form-control" name="icwf[]" id="icwf" placeholder="ICWF"
+                                                                                    <input @keyup="TotalFeeFunc" v-model="icwfFee" class="form-control" name="icwf" id="icwf" placeholder="ICWF"
                                                                                         required>
                                                                                     <span class="input-group-addon">Taka</span>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
                                                                         <br>
-                                                                        <div class="row">
-                                                                            <div class="col-md-4">
-                                                                                <div class="input-group">
-                                                                                    <input class="form-control" name="visa_app_charge[]" id="appCharge"
-                                                                                        placeholder="Visa App. Charge">
-                                                                                    <span class="input-group-addon">Taka</span>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="col-md-4">
-                                                                                <div class="form-group">
-                                                                                    <input class="form-control" name="" id="total_disable"
-                                                                                        placeholder="Total Amount" disabled>
-                                                                                    <input type="hidden" class="form-control" id="total" name="total_amount[]"
-                                                                                        value="0">
-                                                                                    <input type="hidden" class="form-control" id="total1" name="" value="0">
-                                                                                    <input type="hidden" class="form-control" id="total2" name="" value="0">
-                                                                                    <input type="hidden" class="form-control" id="total3" name="" value="0">
-                                                                                    <input type="hidden" class="form-control" id="total4" name="" value="0">
-                                                                                </div>
-                                                                            </div>
-                                        
-                                                                        </div>
-                                                                    </div>
+                                                                        
                                                                     <div class="row ">
-                                                                        <div class="col-md-3">
-                                                                            <div class="form-group">
-                                                                                <input required class="form-control" name="old_passport_qty[]"
-                                                                                    placeholder="Old Passport Quantity">
+                                                                        <div class="col-md-8">
+                                                                            <div class="row">
+                                                                                <div class="col-md-6">
+                                                                                    <div class="input-group">
+                                                                                        <input @keyup="TotalFeeFunc" v-model="visaAppChargeFee" class="form-control" name="visa_app_charge" id="appCharge"
+                                                                                            placeholder="Visa App. Charge">
+                                                                                        <span class="input-group-addon">Taka</span>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-md-6">
+                                                                                    <div class="form-group">
+                                                                                        <input class="form-control" name="" id="total_fee_disable"  placeholder="Total Amount" disabled>
+                                                                                        <input type="hidden" class="form-control" id="total" name="total_amount" value="0">
+                                                                                        <input type="hidden" class="form-control" id="total1" name="" value="0">
+                                                                                        <input type="hidden" class="form-control" id="total2" name="" value="0">
+                                                                                        <input type="hidden" class="form-control" id="total3" name="" value="0">
+                                                                                        <input type="hidden" class="form-control" id="total4" name="" value="0">
+                                                                                    </div>
+                                                                                </div>
+                                                                                
                                                                             </div>
-                                                                        </div>
-                                                                        <br>
-                                                                        <br>
-                                                                        <div class="col-md-9">
-                                                                                   
-                                                                                    <button @click="rejectBtnFunc" class="btn btn-danger" data-toggle="modal" data-target="#rejectModal">Reject</button>
-                                                                               
-                                                                                <!-- Modal -->
-                                                                                <div v-show="rejectModalShow" class="custom-modal-area">
-                                                                                    <div class="custom-modal">
-                                                                                        <div class="custom-modal-header">
-                                                                                            <p>SELECT REJECT CAUSES</p>
-                                                                                        </div>
-                                                                                        <div class="custom-modal-body">
-                                                                                            <div  class="reject-cause-area">
-                                                                                                <p><input id="reject-select-all" @click="selectRejectAllFunc" v-model="selectRejectAll" type="checkbox"> <label for="reject-select-all">SELECT ALL</label></p>
-                                                                                                <div class="reject-box">
-                                                                                                    <p v-for="item in rejectCauseData"><input :id="item.Sl"  type="checkbox" v-model="rejectItem" :value="item.reason"> <label :for="item.Sl">@{{ item.reason }}</label></p>
+                                                                            <div class="row">
+                                                                                <div class="col-md-3">
+                                                                                    <div class="form-group">
+                                                                                        <input required class="form-control" name="old_pass" id="old_pass"  placeholder="Old Passport Quantity">
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-md-3">
+                                                                                    <div class="form-group">
+                                                                                        <select name="paytype" id="paytype" class="form-control" placeholder="Pay Type">
+                                                                                            <option value="">Pay Type</option>
+                                                                                        </select>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-md-3">
+                                                                                    <div class="form-group">
+                                                                                        <input id="proc_fee" class="form-control" type="text" value="0.00"  autocomplete="off">
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-md-3">
+                                                                                    <div v-show="webfileData" class="reject_button-here">
+                                                                                        <button @click="rejectBtnFunc" class="btn btn-danger" data-toggle="modal" data-target="#rejectModal"  style="margin-left:20px;">Reject</button>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <br>
+                                                                                <br>
+                                                                                <div class="col-md-12">
+                                                                                    <div v-show="webfileData" class="webfile-submit-area">
+                                                                                        <button v-if="submitBtn" @click="submitFunc" type="button" class="btn btn-info" data-toggle="modal" data-target="#submitModal">Submit</button> <button v-if="cleanBtn" @click="clearBtnFunc" type="button" class="btn btn-warning" style="margin-left:20px;">Clear</button>
+                                                                                        <!-- Modal -->
+                                                                                        <div v-show="submitModalShow" class="custom-modal-area">
+                                                                                            <div class="custom-modal">
+                                                                                                <div class="custom-modal-header">
+                                                                                                    <p>CHECK BEFORE THE SUBMIT</p>
+                                                                                                </div>
+                                                                                                <div class="custom-modal-body">
+                                                                                                    <table>
+                                                                                                        <tr v-for="vcItem in visaChecklist">
+                                                                                                            <td><span>@{{ vcItem.parameter }}</span></td>
+                                                                                                        </tr>
+                                                                                                    </table>
+                            
+                                                                                                </div>
+                                                                                                <div class="custom-modal-footer">
+                                                                                                    <button @click="DataSubmitFunc" class="btn btn-info float-left">YES</button>
+                                                                                                    <button @click="submitModalShow = !submitModalShow" class="btn btn-warning float-right">Cance</button>
                                                                                                 </div>
                                                                                             </div>
-
                                                                                         </div>
-                                                                                        <div class="custom-modal-footer">
-                                                                                            <button @click="rejectSubmitFunc" class="btn btn-danger float-left">Reject</button>
-                                                                                            <button @click="rejectModalShow = !rejectModalShow" class="btn btn-warning float-right">Cancel</button>
+                                                                                    </div>
+                                                                                    <div v-show="webfileData" class="reject-area">
+                                                                                       
+                                                                                        <!-- Modal -->
+                                                                                        <div v-show="rejectModalShow" class="custom-modal-area">
+                                                                                            <div class="custom-modal">
+                                                                                                <div class="custom-modal-header">
+                                                                                                    <p>SELECT REJECT CAUSES</p>
+                                                                                                </div>
+                                                                                                <div class="custom-modal-body">
+                                                                                                    <div  class="reject-cause-area">
+                                                                                                        <p><input id="reject-select-all" @click="selectRejectAllFunc" v-model="selectRejectAll" type="checkbox"> <label for="reject-select-all">SELECT ALL</label></p>
+                                                                                                        <div class="reject-box">
+                                                                                                            <p v-for="item in rejectCauseData"><input :id="item.Sl"  type="checkbox" v-model="rejectItem" :value="item.reason"> <label :for="item.Sl">@{{ item.reason }}</label></p>
+                                                                                                        </div>
+                                                                                                    </div>
+        
+                                                                                                </div>
+                                                                                                <div class="custom-modal-footer">
+                                                                                                    <button @click="rejectSubmitFunc" class="btn btn-danger float-left">Reject</button>
+                                                                                                    <button @click="rejectModalShow = !rejectModalShow" class="btn btn-warning float-right">Cancel</button>
+                                                                                                </div>
+                                                                                            </div>
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
+                                                                                <div class="col-md-12">
+                                                                                    <div v-if="webfileData" class="sslapi-res-area">
+                                                                                        <h4><b>@{{ sslResMessage }}</b></h4>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
                                                                         </div>
+                                                                        <div class="col-md-4">
+                                                                            
+                                                                            <div class="col-md-12">
+                                                                                <div v-if="webfileData" class="correction-area">
+                                                                                    <p><input @click="correctionShowFunc" id="correction-box" type="checkbox"> <label for="correction-box">CORRECTION</label></p>
+                                                                                    <div v-if="correctionShow" class="correction-box">
+                                                                                        <p v-for="correctionItem in correctionList"><input :id="correctionItem.Correction"  type="checkbox" v-model="corItem" :value="correctionItem.Correction"> <label :for="correctionItem.Correction">@{{ correctionItem.Correction }}</label></p>
+                                                                                    </div>
+                                                                                    <p v-if="correctionShow" ><input id="correction-all-select" @click="corrSelectAllFunc" v-model="corAllSelected" type="checkbox"> <label for="correction-all-select">SELECT ALL</label></p>
+                                                                                </div>
+                                                                            </div>
+                                                                            
+                                                                        </div>
+
                                                                     </div>
-
-
-
-
 
                                                                 </div>
                                                             </div>
@@ -455,11 +536,7 @@
                                                         </div>
                                                     </div>
                                                     
-                                                    <div class="col-md-12">
-                                                        <div v-if="webfileData" class="sslapi-res-area">
-                                                            <h4><b>@{{ sslResMessage }}</b></h4>
-                                                        </div>
-                                                    </div>
+                                                    
                                                 </div>
                                             </div>
                                         </div>
@@ -524,6 +601,11 @@
                 selectedTokenQty:'',
                 styleRelative:'relative',
                 styleIndex:'-2',
+                vasa_feeF:'',
+                faxTnsChargeFee:'',
+                icwfFee:'',
+                visaAppChargeFee:'',
+                totalFeeValue:0,
 
             },
             methods: {
@@ -637,19 +719,19 @@
                     this.correctionShow = false;
                     this.corItem = [];
                     this.corAllSelected = false;
-                    // document.getElementById('visa_type').value = '';
-                    // document.getElementById('name').value = '';
-                    // document.getElementById('passportNo').value = '';
-                    // document.getElementById('validStkr').value = '';
-                    // document.getElementById('proc_fee').value = '';
+                    document.getElementById('visa_type').value = '';
+                    document.getElementById('name').value = '';
+                    document.getElementById('passportNo').value = '';
+                    document.getElementById('validStkr').value = '';
+                    document.getElementById('proc_fee').value = '';
                     // document.getElementById('Spfee').value = '';
                     // document.getElementById('visa_type').value = '';
-                    // document.getElementById('contact').value = '';
-                    // this.txnNumber = '';
-                    // this.txnDate = '';
-                    // this.ttdDelDate = '';
-                    // document.getElementById('old_pass').value = '';
-                    // document.getElementById('paytype').value = '';
+                    document.getElementById('contact').value = '';
+                    this.txnNumber = '';
+                    this.txnDate = '';
+                    this.ttdDelDate = '';
+                    document.getElementById('old_pass').value = '';
+                    document.getElementById('paytype').value = '';
                     var service_type = document.getElementById('service_type').value;
 
 
@@ -702,14 +784,15 @@
                                             _this.cleanBtn = true;
 
                                             document.getElementById('webfile').value = res.data.webfileData.WebFile_no;
-                                            // document.getElementById('name').value = res.data.webfileData.Applicant_name;
-                                            // document.getElementById('passport_show').innerText = res.data.webfileData.Passport;
-                                            // document.getElementById('contact').value = res.data.webfileData.Contact;
-                                            // document.getElementById('paytype').value = res.data.webfileData.Applicant_name;
+                                            document.getElementById('web_file_no').value = res.data.webfileData.WebFile_no;
+                                            document.getElementById('name').value = res.data.webfileData.Applicant_name;
+                                            document.getElementById('passport_show').innerText = res.data.webfileData.Passport;
+                                            document.getElementById('contact').value = res.data.webfileData.Contact;
+                                            document.getElementById('paytype').value = res.data.paytype;
 
 
                                             var ssldata = res.data.sllData.split(',');
-                                            // document.getElementById('paytype').innerHTML = res.data.paytype;
+                                            document.getElementById('paytype').innerHTML = res.data.paytype;
 
                                             _this.txnNumber = ssldata[3];
                                             _this.txnDate = ssldata[4];
@@ -887,6 +970,26 @@
                         }
                     }
                 },
+                TotalFeeFunc:function(){
+                    this.totalFeeValue = Number(this.vasa_feeF)+Number(this.faxTnsChargeFee)+Number(this.icwfFee)+Number(this.visaAppChargeFee);
+                    document.getElementById('total_fee_disable').value = this.totalFeeValue;
+                },
+                corrSelectAllFunc: function () {
+                    this.corItem = [];
+                    if (!this.corAllSelected) {
+                        for (item in this.correctionList) {
+                            this.corItem.push(this.correctionList[item].Correction);
+                            console.log(this.correctionList[item].Correction)
+                        }
+                    }
+                },
+                correctionShowFunc: function () {
+                    this.correctionShow = !this.correctionShow;
+                    if (!this.correctionShow) {
+                        this.corItem = [];
+                        this.corAllSelected = false;
+                    }
+                },
                 
                 selectRejectAllFunc: function () {
                     this.rejectItem = [];
@@ -939,27 +1042,29 @@
                     //console.log(showPass);
                     if (passNo == showPass)
                     {
-                        var old_pass = document.getElementById('old_pass').value;
-                        if(!old_pass == '')
+                        
+                        var visa_type = document.getElementById('visa_type').value;
+                        if (!visa_type == '')
                         {
-                            var visa_type = document.getElementById('visa_type').value;
-                            if (!visa_type == '')
+
+                            var contact_num = document.getElementById('contact').value;
+                            if(contact_num.length == 10)
                             {
-                                var contact_num = document.getElementById('contact').value;
-                                if(contact_num.length == 10)
+                                var paytype = document.getElementById('paytype').value;
+                                if (!paytype == '')
                                 {
-                                    var paytype = document.getElementById('paytype').value;
-                                    if (!paytype == '')
-                                    {
+                                    var old_pass = document.getElementById('old_pass').value;
+                                        if(!old_pass == '')
+                                        {
 
                                         var curSvcFee = document.getElementById('curSvcFee').value;
-                                        var proc_fee = document.getElementById('proc_fee').value;
-                                        var Spfee = document.getElementById('Spfee').value;
+                                        // var proc_fee = document.getElementById('proc_fee').value;
+                                        // var Spfee = document.getElementById('Spfee').value;
                                         curSvcFee = Number(curSvcFee);
-                                        proc_fee = Number(proc_fee);
-                                        Spfee = Number(Spfee);
+                                        // proc_fee = Number(proc_fee);
+                                        // Spfee = Number(Spfee);
                                         var old_svc = 0;
-                                        old_svc = (proc_fee + Spfee);
+                                        // old_svc = (proc_fee + Spfee);
 
                                         if(curSvcFee == old_svc)
                                         {
@@ -1011,24 +1116,27 @@
                                     }
                                     else
                                     {
-                                        this.submitModalShow = false;
-                                        alert('Please Select Payment Type');
+                                        alert('Please Enter Old Passport Qty');
+                                       
                                     }
                                 }
                                 else
                                 {
-                                    alert('Please Enter Valid Contact Number');
+                                    this.submitModalShow = false;
+                                    alert('Please Select Payment Type');
+                                    
                                 }
                             }
                             else
-                            {
-                                this.submitModalShow = false;
-                                alert('Please Select Visa Type');
+                            {   
+                                alert('Please Enter Valid Contact Number');
+                               
                             }
                         }
                         else
                         {
-                            alert('Please Enter Old Passport Qty');
+                            this.submitModalShow = false;
+                            alert('Please Select Visa Type');
                         }
 
                     }
@@ -1124,18 +1232,18 @@
                         this.webfile2Value = '';
 
                     }
-                    // document.getElementById('name').value = '';
-                    // document.getElementById('passportNo').value = '';
-                    // document.getElementById('validStkr').value = '';
+                    document.getElementById('name').value = '';
+                    document.getElementById('passportNo').value = '';
+                    document.getElementById('validStkr').value = '';
                     // document.getElementById('proc_fee').value = '';
                     // document.getElementById('Spfee').value = '';
-                    // document.getElementById('visa_type').value = '';
-                    // document.getElementById('contact').value = '';
+                    document.getElementById('visa_type').value = '';
+                    document.getElementById('contact').value = '';
                     this.txnNumber = '';
                     this.txnDate = '';
-                    // document.getElementById('ttdDelDate').value = '';
-                    // document.getElementById('old_pass').value = '';
-                    // document.getElementById('paytype').value = '';
+                    document.getElementById('ttdDelDate').value = '';
+                    document.getElementById('old_pass').value = '';
+                    document.getElementById('paytype').value = '';
 
 
                     this.webfileData = false;
@@ -1286,7 +1394,9 @@
                 })
                 .catch(function(error){
                     console.log(error);
+                    location.reload(true);
                 })
+                
             }
 
         });

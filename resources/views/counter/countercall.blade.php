@@ -241,7 +241,6 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
-
                                                         </div>
                                                     </div>
                                                     <br>
@@ -537,7 +536,7 @@
                                             document.getElementById('name').value = res.data.webfileData.Applicant_name;
                                             document.getElementById('passport_show').innerText = res.data.webfileData.Passport;
                                             document.getElementById('contact').value = res.data.webfileData.Contact;
-                                            document.getElementById('paytype').value = res.data.webfileData.Applicant_name;
+                                            document.getElementById('paytype').value = res.data.paytype;
 
 
                                             var ssldata = res.data.sllData.split(',');
