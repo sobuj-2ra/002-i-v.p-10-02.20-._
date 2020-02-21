@@ -436,6 +436,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/onload-delivery-center-datas', 'CounterController@OnloadDeliveryCenter');
     Route::post('/delivery-center-passport-datas', 'CounterController@deliveryCenterStoreData');
     Route::get('/check_valid_sticker_axios', 'CounterController@ValidStickerCheck');
+    Route::get('/check_foreign_valid_sticker_axios', 'CounterController@ValidForeignStickerCheck');
 
     /// edit passport recive center //
     Route::get('/edit-receive-passport', 'CounterController@EditViewPassportReceive');

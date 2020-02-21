@@ -174,6 +174,29 @@ class CounterController extends Controller
         }
     }
 
+    // public function ValidForeignStickerCheck(Request $request){
+    //     // $request->validStkr;
+    //     $curDate = Date('Y-m-d');
+    //     $StkCheck = Tbl_fp_served::select('strk_no')
+    //                         ->whereDate('Service_Date',$curDate)
+    //                         ->where('Sticker_type',$request->validStikerType)
+    //                         ->where('RoundSticker', $request->validSticker)
+    //                         ->get();
+
+    //     if($StkCheck > 0)
+    //     {   
+    //         $StkCheckArr = explode('-',$StkCheck->strk_no);
+    //         $StkCheck   = $StkCheckArr[1];
+    //         if()
+
+    //         return response()->json(['validStatus'=>'No','stikerNum'=>$request->validSticker]);
+    //     }
+    //     else
+    //     {
+    //         return response()->json(['validStatus'=>'Yes']);
+    //     }
+    // }
+
     public function getDataOnload(Request $request){
         $rejectCause = Tbl_rejectcause::all();
         $correctionFee = Tbl_correctionfee::select('Correction')->get();

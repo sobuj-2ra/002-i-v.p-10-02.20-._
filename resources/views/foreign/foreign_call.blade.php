@@ -1040,9 +1040,11 @@
                     getShowPass = getShowPass.trim();
                     var showPass = getShowPass.split(' ').join('');
                     //console.log(showPass);
+
+                    var gratisVal = $("input[name='gratis_status1']:checked").val();
+                //    console.log(gratisVal);
                     if (passNo == showPass)
                     {
-                        
                         var visa_type = document.getElementById('visa_type').value;
                         if (!visa_type == '')
                         {
@@ -1083,19 +1085,19 @@
                                                     var validSticker = document.getElementById('validStkr').value;
                                                     var validStikerType = document.getElementById('sticker_type').value;
                                                     _this = this;
-                                                    axios.get('check_valid_sticker_axios',{params:{validSticker:validSticker,validStikerType:validStikerType}})
-                                                        .then(function(res){
-                                                            console.log(res.data.validStatus);
-                                                            if(res.data.validStatus == 'Yes'){
+                                                    // axios.get('check_foreign_valid_sticker_axios',{params:{validSticker:validSticker,validStikerType:validStikerType}})
+                                                    //     .then(function(res){
+                                                    //         console.log(res.data.validStatus);
+                                                    //         if(res.data.validStatus == 'Yes'){
                                                                 _this.submitModalShow = true;
-                                                            }
-                                                            else{
-                                                                alert('This sticker number already used');
-                                                            }
-                                                        })
-                                                        .catch(function(error){
-                                                            console.log(error);
-                                                        })
+                                                    //         }
+                                                    //         else{
+                                                    //             alert('This sticker number already used');
+                                                    //         }
+                                                    //     })
+                                                    //     .catch(function(error){
+                                                    //         console.log(error);
+                                                    //     })
                                                 }
                                                 else
                                                 {
