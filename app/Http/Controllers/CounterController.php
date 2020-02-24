@@ -16,6 +16,7 @@ use App\Tbl_sticker;
 use App\Tbl_center_info;
 use App\Tbl_visa_type;
 use App\Tbl_visacheck;
+use App\Tbl_fp_served;
 use App\Tbl_del_operation;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -174,28 +175,27 @@ class CounterController extends Controller
         }
     }
 
-    // public function ValidForeignStickerCheck(Request $request){
-    //     // $request->validStkr;
-    //     $curDate = Date('Y-m-d');
-    //     $StkCheck = Tbl_fp_served::select('strk_no')
-    //                         ->whereDate('Service_Date',$curDate)
-    //                         ->where('Sticker_type',$request->validStikerType)
-    //                         ->where('RoundSticker', $request->validSticker)
-    //                         ->get();
-
-    //     if($StkCheck > 0)
-    //     {   
-    //         $StkCheckArr = explode('-',$StkCheck->strk_no);
-    //         $StkCheck   = $StkCheckArr[1];
-    //         if()
-
-    //         return response()->json(['validStatus'=>'No','stikerNum'=>$request->validSticker]);
-    //     }
-    //     else
-    //     {
-    //         return response()->json(['validStatus'=>'Yes']);
-    //     }
-    // }
+    public function ValidForeignStickerCheck(Request $request){
+        $request->validStkr;
+        $curDate = Date('Y-m-d');
+        $tempArr = [];
+        $StkData = Tbl_fp_served::whereDate('rec_cen_time',$curDate)->get();
+        foreach($StkData as $item){
+            $exData = explode('-',$item->strk_no);
+            if($exData[0] == $request->validStikerType && $exData[1] == $request->validSticker){
+                array_push($tempArr,'a');
+            }
+        }
+        if(count($tempArr) > 0)
+        {   
+           
+            return response()->json(['validStatus'=>'No','stikerNum'=>$request->validSticker]);
+        }
+        else
+        {
+            return response()->json(['validStatus'=>'Yes','data'=>$StkData]);
+        }
+    }
 
     public function getDataOnload(Request $request){
         $rejectCause = Tbl_rejectcause::all();
@@ -263,6 +263,29 @@ class CounterController extends Controller
 
         $visaCheckType = Tbl_visacheck::select('parameter')->where('Visa_type',$visaType)->get();
         return response()->json(['visaChecklist'=>$visaCheckType]);
+    }
+
+    public function VisaForeignCheckList(Request $request){
+        // $visaType = $request->visa_type;
+        // foreach($visaType as $vt){
+        //     echo $vt->visa_type;
+        // }
+        $datas = $request->all();
+        $arrTemp = [];
+        $checkDataArr = [];
+        foreach($request->visa_type as $index=>$row)
+        {
+            $arrTemp[$index]['visa_type'] = $datas['visa_type'][$index];
+        }
+        foreach($arrTemp as $item){
+            $checkData = Tbl_visacheck::select('parameter')->where('Visa_type',$item['visa_type'])->get();
+            foreach($checkData as $para){
+                array_push($checkDataArr,$para->parameter);
+            }
+        }
+        $checkDataArr = array_unique($checkDataArr);
+        // $visaCheckType = Tbl_visacheck::select('parameter')->where('Visa_type',$visaType)->get();
+        return response()->json(['visaChecklist'=>$checkDataArr]);
     }
     // public function WebfileDataSave(Request $request){
     //     $userId = Auth::user()->user_id;
