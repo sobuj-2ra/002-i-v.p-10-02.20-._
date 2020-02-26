@@ -446,6 +446,10 @@ class CounterController extends Controller
 
     }
 
+    public function ForeignwebfileDataStore(Request $r){
+       return  $r->all();
+    }
+
 
 
     public function PassReceivePrint($id){

@@ -427,6 +427,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/visatype-check-axios', 'CounterController@VisaCheckList');
     Route::post('/visatype-foreign-check-axios', 'CounterController@VisaForeignCheckList');
     Route::get('/webfile-data-save-axios', 'CounterController@webfileDataStore');
+    Route::post('/foreign-webfile-data-save-axios', 'CounterController@ForeignwebfileDataStore');
     Route::get('/send-token-to-waiting-axios', 'CounterController@TokenSentWaiting');
     Route::get('/send-token-to-recall-axios', 'CounterController@TokenSentRecall');
     Route::get('/pass-receive-print/{id}', 'CounterController@PassReceivePrint');

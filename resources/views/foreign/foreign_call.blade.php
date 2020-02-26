@@ -220,7 +220,7 @@
                                                                         <div class="col-md-1" style="padding-right: 0px;padding-left: 0px">
                                                                             <div class="checkbox">
                                                                                 <label>
-                                                                                    <input type="radio" name="gratis_status1" id="gratiseYes" value="yes"
+                                                                                    <input type="radio" name="gratis_status1" :id="'gratiseYes'+i" value="yes"
                                                                                             required> Yes
                                                                                 </label>
                                                                             </div>
@@ -228,7 +228,7 @@
                                                                         <div class="col-md-1" style="padding-left: 0px;">
                                                                             <div class="checkbox">
                                                                                 <label>
-                                                                                    <input type="radio" name="gratis_status1" id="gratiseNo" value="no"> No
+                                                                                    <input type="radio" name="gratis_status1" :id="'gratiseNo'+i" value="no"> No
                                                                                 </label>
                                                                             </div>
                                                                         </div>
@@ -241,16 +241,18 @@
                                                                     </div>
                                                                     <div class="row">
                                                                         <div class="col-md-4">
-                                                                            {{-- <div class="form-group">
-                                                                                <input class="form-control" id="web_file_no" name="web_file_no" placeholder="Web file number" autocomplete="off" required>
-                                                                            </div> --}}
-                                                                            <span>
-                                                                                <p v-if="passportSearch == false"><input @keyup.enter="webfileSubmit" name="webfile[]" :id="'webfile'+i" :data-id="i" class="form-control input_values" placeholder="Enter Webfile" required autocomplete="off"></p>
-                                                                                <p v-show="passportSearch">Passport: <input  name="PassportNo2" id="PassportNo2" style="width:200px" required autocomplete="off" class="input_values"></p>
-                                                                            </span>
-                                                                            <span >
-                                                                                <p v-bind:style="{position:styleRelative,zIndex:styleIndex}" >Webfile: <input @keyup.enter="webfileSubmit2" v-model="webfile2Value" name="webfile2" id="webfileNo2" style="width:200px;background:#ffff87" class="input_values" required autocomplete="off"></p>
-                                                                            </span>
+                                                                            <div class="form-group">
+                                                                                {{-- <input class="form-control" id="web_file_no" name="web_file_no" placeholder="Web file number" autocomplete="off" required> --}}
+                                                                            
+                                                                                <span>
+                                                                                    <label for=""></label>
+                                                                                    <p v-if="passportSearch == false"><input @keyup.enter="webfileSubmit" name="webfile[]" :id="'webfile'+i" :data-id="i" class="form-control input_values" placeholder="Enter Webfile" required autocomplete="off"></p>
+                                                                                    {{-- <p v-show="passportSearch">Passport: <input  name="PassportNo2" id="PassportNo2" style="width:200px" required autocomplete="off" class="input_values"></p> --}}
+                                                                                </span>
+                                                                                <span >
+                                                                                    {{-- <p v-bind:style="{position:styleRelative,zIndex:styleIndex}" >Webfile: <input @keyup.enter="webfileSubmit2" v-model="webfile2Value" name="webfile2" id="webfileNo2" style="width:200px;background:#ffff87" class="input_values" required autocomplete="off"></p> --}}
+                                                                                </span>
+                                                                            </div>
                                                                         </div>
                                                                         <div class="col-md-4">
                                                                             <div class="form-group">
@@ -276,11 +278,13 @@
                                                                         </div>
                                                                         <div class="col-md-4">
                                                                             <div class="form-group">
+                                                                                <label for=""></label>
                                                                                 <input class="form-control input_values" name="nationality[]" :id="'nationality'+i" :data-id="i" placeholder="Nationality" autocomplete="off" required>
                                                                             </div>
                                                                         </div>
                                                                         <div class="col-md-4">
                                                                             <div class="form-group">
+                                                                                <label for=""></label>
                                                                                 <input class="form-control input_values datepicker" value="<?php echo date('d-m-Y'); ?>" name="date_of_checking[]" :id="'check_date'+i" :data-id="i" placeholder="Date of Checking" required>
                                                                             </div>
                                                                         </div>
@@ -436,12 +440,15 @@
                                                                             </div>
                                                                             <div class="col-md-4">
                                                                                 <div class="col-md-12">
-                                                                                    <div v-if="webfileData" class="correction-area">
-                                                                                        <p><input @click="correctionShowFunc" id="correction-box" type="checkbox"> <label for="correction-box">CORRECTION</label></p>
-                                                                                        <div v-if="correctionShow" class="correction-box">
-                                                                                            <p v-for="correctionItem in correctionList"><input :id="correctionItem.Correction"  type="checkbox" v-model="corItem" :value="correctionItem.Correction"> <label :for="correctionItem.Correction">@{{ correctionItem.Correction }}</label></p>
+                                                                                    <div class="correction-area">
+                                                                                        <p><input @click="correctionShowFunc"  :id="'correction-box-show'+i" :data-id="i" type="checkbox" > <label  :for="'correction-box-show'+i" >CORRECTION</label></p>
+                                                                                        <div :id="'correction-box'+i" class="correction-box" style="display: none;">
+                                                                                            <p v-for="(correctionItem,i_in) in correctionList">
+                                                                                                <input class="input_values" name="correction_name[]" :id="'signle-cor-item'+i+i_in"  type="checkbox" :value="correctionItem.Correction"> 
+                                                                                                <label :for="'signle-cor-item'+i+i_in">@{{ correctionItem.Correction }}</label>
+                                                                                            </p>
                                                                                         </div>
-                                                                                        <p v-if="correctionShow" ><input id="correction-all-select" @click="corrSelectAllFunc" v-model="corAllSelected" type="checkbox"> <label for="correction-all-select">SELECT ALL</label></p>
+                                                                                        <p :id="'correction-box-select-all'+i" style="display: none;" ><input :id="'correction-all-select'+i" :data-id="i" @click="corrSelectAllFunc"  type="checkbox"> <label :for="'correction-all-select'+i">SELECT ALL</label></p>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
@@ -461,7 +468,7 @@
                                                 </div>
                                                 <div class="col-md-12">
                                                     <button @click="addMoreButtonFunc" class="btn btn-info btn-sm"><i class="fa fa-plus"></i></button>
-                                                    <button @click="clearButtonFunc" class="btn btn-default btn-sm">Clear</button>
+                                                    <button @click="clearButtonFunc" class="btn btn-default btn-sm">Remove</button>
                                                 </div>
                                                 <div class="col-md-12">
                                                     <div  class="webfile-submit-area">
@@ -502,7 +509,7 @@
     </div>
 
     <script>
-
+        
         var app = new Vue({
             el:'#app1',
             data:{
@@ -559,6 +566,7 @@
                 addMoreButtonArr:[1],
                 addMoreBtn:-1,
                 is_all_data_valid:false,
+                not_all_data_valid:true,
 
             },
             methods: {
@@ -674,7 +682,6 @@
                     document.getElementById('visa_type'+id_index).value = '';
                     document.getElementById('name'+id_index).value = '';
                     document.getElementById('passportNo'+id_index).value = '';
-                    document.getElementById('validStkr'+id_index).value = '';
                     document.getElementById('proc_fee'+id_index).value = '';
                     // document.getElementById('Spfee').value = '';
                     // document.getElementById('visa_type').value = '';
@@ -685,7 +692,9 @@
                     document.getElementById('old_pass'+id_index).value = '';
                     document.getElementById('paytype'+id_index).value = '';
                     var service_type = document.getElementById('service_type').value;
-
+                    var gratiseYes = document.getElementById('gratiseYes'+id_index);
+                    var gratiseNo = document.getElementById('gratiseNo'+id_index);
+                    var validStkr = document.getElementById('validStkr'+id_index);
 
                     _this = this;
                     var sticker = document.getElementById('sticker_type').value;
@@ -709,6 +718,12 @@
                     }
                     else if (book_rcvpt_no == '') {
                         alert('Please Input Book Receipt No');
+                    }
+                    else if(gratiseYes.checked === false && gratiseNo.checked === false){
+                        alert('Please Select a GRATIS');
+                    }
+                    else if(validStkr == ''){
+                        alert('Please Enter Sticker Number');
                     }
                     else {
                         var webfile = document.getElementById('webfile'+id_index).value;
@@ -936,21 +951,54 @@
                     // $('#total_fee_disable'+id_index).val() = totalFeeSum;
                     // this.totalFeeValue = Number(this.vasa_feeF)+Number(this.faxTnsChargeFee)+Number(this.icwfFee)+Number(this.visaAppChargeFee);
                 },
-                corrSelectAllFunc: function () {
-                    this.corItem = [];
-                    if (!this.corAllSelected) {
-                        for (item in this.correctionList) {
-                            this.corItem.push(this.correctionList[item].Correction);
-                            console.log(this.correctionList[item].Correction)
+                corrSelectAllFunc: function (event) {
+                    var id_name = event.target.getAttribute('id');
+                    var id_index = event.target.getAttribute('data-id');
+                    var corSelectAll = document.getElementById(id_name);
+
+                    if(corSelectAll.checked === true){
+                        for(var j=0; j < this.correctionList.length; j++){
+                            var single_select_all = document.getElementById("signle-cor-item"+id_index+j);
+                            if(single_select_all.checked === false){
+                                single_select_all.checked = true;
+                            }
                         }
                     }
-                },
-                correctionShowFunc: function () {
-                    this.correctionShow = !this.correctionShow;
-                    if (!this.correctionShow) {
-                        this.corItem = [];
-                        this.corAllSelected = false;
+                    else if(corSelectAll.checked === false){
+                        for(var j=0; j < this.correctionList.length; j++){
+                            var single_select_all = document.getElementById("signle-cor-item"+id_index+j);
+                            if(single_select_all.checked === true){
+                                single_select_all.checked = false;
+                            }
+                        }
                     }
+
+                },
+                correctionShowFunc: function (event) {
+                    var id_name = event.target.getAttribute('id');
+                    var id_index = event.target.getAttribute('data-id');
+                    var curBoxShow = document.getElementById(id_name);
+
+                    if(curBoxShow.checked === true){
+                        $('#correction-box'+id_index).show();
+                        $('#correction-box-select-all'+id_index).show();
+                        document.getElementById(id_name).checked = true;
+                    }
+                    else if(curBoxShow.checked === false){
+                        $('#correction-box'+id_index).hide();
+                        $('#correction-box-select-all'+id_index).hide();
+                        document.getElementById(id_name).checked = false;
+
+                        for(var j=0; j < this.correctionList.length; j++){
+                            var single_select_all = document.getElementById("signle-cor-item"+id_index+j);
+                            if(single_select_all.checked === true){
+                                single_select_all.checked = false;
+                            }
+                        }
+                        document.getElementById("correction-all-select"+id_index).checked = false;
+
+                    }
+                    
                 },
                 
                 selectRejectAllFunc: function () {
@@ -997,85 +1045,104 @@
 
                 submitFunc: function (event) {
                     this.submitModalShow = false;
-                    var id_index = 0;
-                    var getPass = document.getElementById('passportNo'+id_index).value;
-                    var passNo = getPass.trim();
-                    passNo = passNo.toUpperCase();
-                    passNo = passNo.split(' ').join('');
-                    //console.log(passNo);
+                    this.not_all_data_valid = true;
 
-                    var getShowPass = document.getElementById('passport_show'+id_index).innerText;
-                    getShowPass = getShowPass.trim();
-                    var showPass = getShowPass.split(' ').join('');
-                    //console.log(showPass);
-
-                    var gratisVal = $("input[name='gratis_status1']:checked").val();
-                //    console.log(gratisVal);
-                    var visa_type = document.getElementById('visa_type'+id_index).value;
-                    var contact_num = document.getElementById('contact'+id_index).value;
-                    var paytype = document.getElementById('paytype'+id_index).value;
-                    var old_pass = document.getElementById('old_pass'+id_index).value;
-                    var validStkr = document.getElementById('validStkr'+id_index).value;
-                    var validStkrF = Number(validStkr);
-                    var inputTSt = Number(this.stkr_str);
-                    var validStkr2 = document.getElementById('validStkr'+id_index).value;
-                    var validStkr2F = Number(validStkr2);
-                    var InputTE = Number(this.stkr_end);
-                                                                 
-                    var validSticker = document.getElementById('validStkr'+id_index).value;
-                    var validStikerType = document.getElementById('sticker_type').value;
-                    
-                    if (passNo != showPass)
-                    {
-                        this.submitModalShow = false;
-                        alert('Please Enter Valid Passport Number');
-                    }
-                    else if (visa_type == '')
-                    {
-                        this.submitModalShow = false;
-                        alert('Please Select Visa Type');
-                    }
-
-                    else if(contact_num.length != 10)
-                    {   
-                        alert('Please Enter Valid Contact Number');
+                    for(var k=0;k < this.addMoreButtonArr.length; k++){
+                        var id_index = k;
+                        var getPass = document.getElementById('passportNo'+id_index).value;
+                        var passNo = getPass.trim();
+                        passNo = passNo.toUpperCase();
+                        passNo = passNo.split(' ').join('');
+                        var getShowPass = document.getElementById('passport_show'+id_index).innerText;
+                        getShowPass = getShowPass.trim();
+                        var showPass = getShowPass.split(' ').join('');
+                        var gratisVal = $("input[name='gratis_status1']:checked").val();
+                        var webfile = document.getElementById('webfile'+id_index).value;
+                        var visa_type = document.getElementById('visa_type'+id_index).value;
+                        var contact_num = document.getElementById('contact'+id_index).value;
+                        var paytype = document.getElementById('paytype'+id_index).value;
+                        var old_pass = document.getElementById('old_pass'+id_index).value;
+                        var validStkr = document.getElementById('validStkr'+id_index).value;
+                        var validStkrF = Number(validStkr);
+                        var inputTSt = Number(this.stkr_str);
+                        var validStkr2 = document.getElementById('validStkr'+id_index).value;
+                        var validStkr2F = Number(validStkr2);
+                        var InputTE = Number(this.stkr_end);
+                                                                    
+                        var validSticker = document.getElementById('validStkr'+id_index).value;
+                        var validStikerType = document.getElementById('sticker_type').value;
                         
+                        if (webfile != ''){   
+
+                            if (passNo != showPass)
+                            {   
+                                this.not_all_data_valid = false;
+                                this.submitModalShow = false;
+                                alert('Please Enter Valid Passport Number');
+                            }
+                            else if (visa_type == '')
+                            {   
+                                this.not_all_data_valid = false;
+                                this.submitModalShow = false;
+                                alert('Please Select Visa Type');
+                            }
+
+                            else if(contact_num.length != 10)
+                            {   
+                                this.not_all_data_valid = false;
+                                this.submitModalShow = false;
+                                alert('Please Enter Valid Contact Number');
+                            }
+                            else if(paytype == '')
+                            {   
+                                this.not_all_data_valid = false;
+                                this.submitModalShow = false;
+                                alert('Please Select Payment Type');
+                            }
+                            else if(old_pass == '')
+                            {   
+                                this.not_all_data_valid = false;
+                                this.submitModalShow = false;
+                                alert('Please Enter Old Passport Qty');
+                            }
+                            else if(inputTSt >= validStkrF)
+                            {   
+                                this.not_all_data_valid = false;
+                                this.submitModalShow = false;
+                                alert('Please Input Valid Sticker Number');
+                            }
+                            else if(InputTE <= validStkr2F)
+                            {   
+                                this.not_all_data_valid = false;
+                                this.submitModalShow = false;
+                                alert('Please Input Valid Sticker Number');
+                            }
+                            else{
+                                this.is_all_data_valid = true;
+                            }
+
+                        }
+
                     }
-                    else if(paytype == '')
-                    {
-                        this.submitModalShow = false;
-                        alert('Please Select Payment Type');
-                    }
-                    else if(old_pass == '')
-                    {
-                        alert('Please Enter Old Passport Qty');
-                    }
-                    else if(inputTSt >= validStkrF)
-                    {
-                        alert('Please Input Valid Sticker Number');
-                    }
-                    else if(InputTE <= validStkr2F)
-                    {
-                        alert('Please Input Valid Sticker Number');
-                    }
-                    else{
-                        this.is_all_data_valid = true;
-                    }
+
+
                     if(this.is_all_data_valid){
-                        _this = this;
-                        axios.get('check_foreign_valid_sticker_axios',{params:{validSticker:validSticker,validStikerType:validStikerType}})
-                            .then(function(res){
-                                console.log(res.data.validStatus);
-                                if(res.data.validStatus == 'Yes'){
-                                    _this.submitModalShow = true;
-                                }
-                                else if(res.data.validStatus == 'No'){
-                                    alert('This sticker number already used');
-                                }
-                            })
-                            .catch(function(error){
-                                console.log(error);
-                            })
+                        if(this.not_all_data_valid){
+                            _this = this;
+                            axios.get('check_foreign_valid_sticker_axios',{params:{validSticker:validSticker,validStikerType:validStikerType}})
+                                .then(function(res){
+                                    console.log(res.data.validStatus);
+                                    if(res.data.validStatus == 'Yes'){
+                                        _this.submitModalShow = true;
+                                    }
+                                    else if(res.data.validStatus == 'No'){
+                                        alert('This sticker number already used');
+                                    }
+                                })
+                                .catch(function(error){
+                                    console.log(error);
+                                })
+                        }
                     }
 
                     validStkr = '';
@@ -1108,19 +1175,22 @@
 
                 },
                 addMoreButtonFunc:function(){
-                    this.addMoreBtn++
-                    this.addMoreButtonArr.push(this.addMoreBtn);
+                    
+                    this.addMoreButtonArr.push({});
+                },
+                removeMoreButtonFuncElemnt:function(index){
+                    this.addMoreButtonArr.splice(index,1);
                 },
                 clearButtonFunc:function(i){
                     var is_confirm = confirm('Are you sure! You want to clear?');
                     if(is_confirm == true){
-                        this.addMoreButtonArr = [];
-                        this.addMoreBtn = 1;
-                        this.addMoreButtonArr.push(this.addMoreBtn);
-                        console.log(i);
+                        // this.addMoreButtonArr = [];
+                        // this.addMoreBtn = 1;
+                        // this.addMoreButtonArr.push(this.addMoreBtn);
+                        // console.log(i);
+                        const itemIndex = this.addMoreButtonArr.indexOf(i)
+                        this.addMoreButtonArr.splice(itemIndex,1);
                     }
-                    // const itemIndex = this.addMoreButtonArr.indexOf(mainitem)
-                    // this.addMoreButtonArr.splice(this.i,1);
                 },
                 DataSubmitFunc: function () {
                     // this.submitModalShow = false;
@@ -1151,31 +1221,7 @@
 
                     var objectData = $('.input_values').serialize();
 
-                    axios.get('webfile-data-save-axios', {
-                        params: {
-                            cust_name: cust_name,
-                            webfile: webfile,
-                            passport: passport,
-                            user_id: user_id,
-                            counter_id: counter_id,
-                            curSvcFee: curSvcFee,
-                            selectedTokenDisplay: selectedTokenDisplay,
-                            validStkr: validStkr,
-                            proc_fee: proc_fee,
-                            Spfee: Spfee,
-                            visa_type: visa_type,
-                            contact: contact,
-                            sticker_type: sticker_type,
-                            txnNumber: txnNumber,
-                            remark: remark,
-                            center_name: center_name,
-                            ttdDelDate: ttdDelDate,
-                            corFee: corFee,
-                            old_pass: old_pass,
-                            corItem: corItem,
-                            paytype: paytype
-                        }
-                    }, this.webfilePreloader = true)
+                    axios.post('foreign-webfile-data-save-axios', objectData)
                         .then(function (res) {
                             _this.webfilePreloader = false;
                             _this.clearBtnFunc();
