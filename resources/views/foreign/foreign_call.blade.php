@@ -65,19 +65,21 @@
                             <div class="col-md-2">
                                 <div class="col-md-12">
                                     <div class="form-group">
-                                        <label for="service_type" style="font-weight:normal">Service Type</label>
-                                        <select @change="svcNameFunc($event)" name="service_type" id="service_type" class="form-control">
+                                        <label for="service_type" style="font-weight:normal" >Service Type</label>
+                                        <select @change="svcNameFunc($event)" name="service_type" id="service_type" class="form-control input_values">
                                             <option value=""></option>
                                             @foreach($counter_services as $service)
                                                 <option value="{{$service}}">{{$service}}</option>
                                             @endforeach
                                         </select>
                                     </div>
-                                    <input id="counter_id" type="hidden" value="{{$counter_no}}">
-                                    <input id="center_name" type="hidden" value="{{$center_name->center_name}}">
-                                    <input id="user_id" type="hidden" value="{{$user_id}}">
-                                    <input id="curSvcFee" type="hidden" value="{{$ivac_svc_fee->Svc_Fee}}">
-                                    <input id="floor_id" type="hidden" value="{{$floor_id}}">
+                                    <input name="counter_id" id="counter_id" type="hidden" value="{{$counter_no}}"  class="input_values">
+                                    <input name="center_name" id="center_name" type="hidden" value="{{$center_name->center_name}}"  class="input_values">
+                                    <input name="user_id" id="user_id" type="hidden" value="{{$user_id}}"  class="input_values">
+                                    <input name="curSvcFee" id="curSvcFee" type="hidden" value="{{$ivac_svc_fee->Svc_Fee}}"  class="input_values">
+                                    <input name="floor_id" id="floor_id" type="hidden" value="{{$floor_id}}" class="input_values">
+                                    <input name="selected_token" id="selected_token" type="hidden" :value="selectedTokenval" class="input_values">
+                                    <input name="selected_token_qty" id="selected_token_qty" type="hidden" :value="selectedTokenQty" class="input_values">
                                 </div>
                                 <div class="single-datadisplaybox-left">
                                     <div @click="regularAreaCLickFunc" class="single-datadisplaybox">
@@ -120,16 +122,16 @@
                                                                 <tr>
                                                                     <td>Sticker Type: </td>
                                                                     <td style="width:20px">
-                                                                        <select name="" id="sticker_type" class="" style="width:100px;height:26px" required>
+                                                                        <select name="sticker_type" id="sticker_type" class="input_values" style="width:100px;height:26px" required>
                                                                             <option value=""> </option>
                                                                             @foreach($stickers as $sticker)
                                                                                 <option value="{{$sticker->sticker}}">{{$sticker->sticker}}</option>
                                                                             @endforeach
                                                                         </select>
                                                                     </td>
-                                                                    <td><input v-model="stkr_str" id="sticker_no_from" type="number" style="width:65px" required autocomplete="off"> </td>
+                                                                    <td><input v-model="stkr_str" id="sticker_no_from" name="sticker_no_from" type="number" style="width:65px" class="input_values" required autocomplete="off"> </td>
                                                                     <td> To: </td>
-                                                                    <td><input v-model="stkr_end"  id="sticker_no_to" type="number"  style="width:65px" required autocomplete="off"> </td>
+                                                                    <td><input v-model="stkr_end"  id="sticker_no_to" name="sticker_no_to" type="number"  style="width:65px" class="input_values" required autocomplete="off"> </td>
                                                                     
                                                                 </tr>
                                                             </table>
@@ -185,12 +187,12 @@
                                                             <tr>
                                                                 <td>
                                                                     <div class="form-group">
-                                                                        <input class="form-control" 
+                                                                        <input class="form-control input_values" 
                                                                         value="Book no-<?php if (isset($book_no->book_no) && !empty($book_no->book_no)) {
                                                                                 echo $book_no->book_no;
                                                                             } ?>" name="book_no"
                                                                             placeholder="Book No" autocomplete="off" style="width:100px;height:30px" disabled>
-                                                                        <input type="hidden" class="form-control"
+                                                                        <input type="hidden" class="form-control input_values"
                                                                             value="<?php if (isset($book_no->book_no) && !empty($book_no->book_no)) {
                                                                                 echo $book_no->book_no;
                                                                             } ?>" name="book_no" id="book_no"
@@ -220,22 +222,21 @@
                                                                         <div class="col-md-1" style="padding-right: 0px;padding-left: 0px">
                                                                             <div class="checkbox">
                                                                                 <label>
-                                                                                    <input type="radio" name="gratis_status1" :id="'gratiseYes'+i" value="yes"
-                                                                                            required> Yes
+                                                                                    <input type="radio" :name='i+"gratis_status1[]"' :id="'gratiseYes'+i" class="input_values" value="yes" required> Yes
                                                                                 </label>
                                                                             </div>
                                                                         </div>
                                                                         <div class="col-md-1" style="padding-left: 0px;">
                                                                             <div class="checkbox">
                                                                                 <label>
-                                                                                    <input type="radio" name="gratis_status1" :id="'gratiseNo'+i" value="no"> No
+                                                                                    <input type="radio" :name='i+"gratis_status1[]"' :id="'gratiseNo'+i" class="input_values" value="no"> No
                                                                                 </label>
                                                                             </div>
                                                                         </div>
                                                                        
                                                                         <div class="col-md-2">
                                                                             <div class="form-group">
-                                                                                <input type="number" name="validStkr[]" :id="'validStkr'+i" :data-id="i" class="form-control" placeholder="Sticker Number" required   autocomplete="off">
+                                                                                <input type="number" name="validStkr[]" :id="'validStkr'+i" :data-id="i" class="form-control input_values" placeholder="Sticker Number" required   autocomplete="off">
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -244,13 +245,13 @@
                                                                             <div class="form-group">
                                                                                 {{-- <input class="form-control" id="web_file_no" name="web_file_no" placeholder="Web file number" autocomplete="off" required> --}}
                                                                             
-                                                                                <span>
+                                                                                <span :id="'webfile_p'+i">
                                                                                     <label for=""></label>
-                                                                                    <p v-if="passportSearch == false"><input @keyup.enter="webfileSubmit" name="webfile[]" :id="'webfile'+i" :data-id="i" class="form-control input_values" placeholder="Enter Webfile" required autocomplete="off"></p>
+                                                                                    <p ><input @keyup.enter="webfileSubmit" name="webfile[]" :id="'webfile'+i" :data-id="i" class="form-control input_values" placeholder="Enter Webfile" required autocomplete="off"></p>
                                                                                     {{-- <p v-show="passportSearch">Passport: <input  name="PassportNo2" id="PassportNo2" style="width:200px" required autocomplete="off" class="input_values"></p> --}}
                                                                                 </span>
-                                                                                <span >
-                                                                                    {{-- <p v-bind:style="{position:styleRelative,zIndex:styleIndex}" >Webfile: <input @keyup.enter="webfileSubmit2" v-model="webfile2Value" name="webfile2" id="webfileNo2" style="width:200px;background:#ffff87" class="input_values" required autocomplete="off"></p> --}}
+                                                                                <span :id="'webfile2_p'+i" style="display: none">
+                                                                                    <p><label :for="'webfileNo2'+i">Webfile</label><input @keyup.enter="webfileSubmit2"  name="webfile2" :id="'webfileNo2'+i" :data-id="i" style="background:#ffff87"  class="form-control input_values" required autocomplete="off"></p>
                                                                                 </span>
                                                                             </div>
                                                                         </div>
@@ -284,16 +285,23 @@
                                                                         </div>
                                                                         <div class="col-md-4">
                                                                             <div class="form-group">
-                                                                                <label for=""></label>
-                                                                                <input class="form-control input_values datepicker" value="<?php echo date('d-m-Y'); ?>" name="date_of_checking[]" :id="'check_date'+i" :data-id="i" placeholder="Date of Checking" required>
+                                                                                <label for=""><span :id="'tddDelDateId'+i"  style="height:10px;display: inline-block;"></span> </label>
+                                                                                <input name="tddDelDateValue[]" :id="'tddDelDateValue'+i" type="hidden" class="input_values">
+                                                                                {{-- @{{i}} --}}
+                                                                                <select class="form-control input_values visa_type_value" @change="visaTypeOnChange" name="visa_type[]" :id="'visa_type'+i" :data-id="i" required>
+                                                                                    <option value="">Visa Type</option>
+                                                                                    <?php foreach ($visa_type as $item) { ?>
+                                                                                    <option value="<?php  echo $item->visa_type; ?>"><?php  echo $item->visa_type; ?></option>
+                                                                                    <?php } ?>
+                                                                                </select>
                                                                             </div>
+
                                                                         </div>
                                         
                                                                     </div>
                                                                     <div class="row">
                                                                         <div class="col-md-4">
                                                                             <div class="form-group">
-                                                                                <label for=""></label>
                                                                                 <select class="form-control input_values" name="duration[]" :id="'duration'+i" :data-id="i" required>
                                                                                     <option value="">Select Duration</option>
                                                                                     <?php foreach ($duration as $item) { ?>
@@ -304,27 +312,17 @@
                                                                         </div>
                                                                         <div class="col-md-4">
                                                                             <div class="form-group">
-                                                                                <label for=""></label>
                                                                                 <select class="form-control input_values" name="entry_type[]" :id="'entry_type'+i" :data-id="i" required>
                                                                                     <option value="">Entry Type</option>
                                                                                     <?php foreach ($entry_type as $item) { ?>
                                                                                     <option value="<?php  echo $item->entry_type; ?>"><?php  echo $item->entry_type; ?></option>
                                                                                     <?php } ?>
-                                        
                                                                                 </select>
                                                                             </div>
                                                                         </div>
                                                                         <div class="col-md-4">
                                                                             <div class="form-group">
-                                                                                <label for=""><span :id="'tddDelDateId'+i"  style="height:10px;display: inline-block;"></span> </label>
-                                                                                {{-- <input id="tddDelDateInId'+i" type="hidden" > --}}
-                                                                                {{-- @{{i}} --}}
-                                                                                <select class="form-control input_values visa_type_value" @change="visaTypeOnChange" name="visa_type[]" :id="'visa_type'+i" :data-id="i" required>
-                                                                                    <option value="">Visa Type</option>
-                                                                                    <?php foreach ($visa_type as $item) { ?>
-                                                                                    <option value="<?php  echo $item->visa_type; ?>"><?php  echo $item->visa_type; ?></option>
-                                                                                    <?php } ?>
-                                                                                </select>
+                                                                                <input class="form-control input_values datepicker" value="<?php echo date('d-m-Y'); ?>" name="date_of_checking[]" :id="'check_date'+i" :data-id="i" placeholder="Date of Checking" required>
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -368,11 +366,8 @@
                                                                                 <div class="col-md-6">
                                                                                     <div class="form-group">
                                                                                         <input class="form-control input_values" name="total_fee_disable[]" :id="'total_fee_disable'+i" :data-id="i"  placeholder="Total Amount" disabled>
-                                                                                        <input type="hidden" class="form-control" id="total" name="total_amount" value="0">
-                                                                                        <input type="hidden" class="form-control" id="total1" name="" value="0">
-                                                                                        <input type="hidden" class="form-control" id="total2" name="" value="0">
-                                                                                        <input type="hidden" class="form-control" id="total3" name="" value="0">
-                                                                                        <input type="hidden" class="form-control" id="total4" name="" value="0">
+                                                                                        <input type="hidden" class="form-control input_values" id="total" name="total_amount[]" value="0">
+                                                                                       
                                                                                     </div>
                                                                                 </div>
                                                                                 
@@ -395,11 +390,13 @@
                                                                                 <div class="col-md-3">
                                                                                     <div class="form-group">
                                                                                         <label :for="'proc_fee'+i" :id="'proc_fee_res'+i"></label>
-                                                                                        <input :id="'proc_fee'+i" :data-id="i" name="proc_fee[]" class="form-control input_values" type="text" value="0.00"  autocomplete="off">
+                                                                                        <input type="hidden" :id="'proc_fee_res_value'+i" name="proc_fee[]" class="input_values">
+                                                                                        <input :id="'sp_fee'+i" :data-id="i" name="sp_fee[]" class="form-control input_values" type="text" value=""  autocomplete="off">
+                                                                                        
                                                                                     </div>
                                                                                 </div>
                                                                                 <div class="col-md-3">
-                                                                                    <div v-show="webfileData" class="reject_button-here">
+                                                                                    <div :id="'rejected_button_show'+i" class="reject_button-here" style="display:none">
                                                                                         <button @click="rejectBtnFunc" class="btn btn-danger" data-toggle="modal" data-target="#rejectModal"  style="margin-left:20px;">Reject</button>
                                                                                     </div>
                                                                                 </div>
@@ -433,8 +430,10 @@
                                                                                 </div>
 
                                                                                 <div class="col-md-12">
-                                                                                    <div v-show="webfileData" class="sslapi-res-area">
+                                                                                    <div  class="sslapi-res-area">
                                                                                         <h4 style="font-weight:bold" :id="'sslres_msg'+i" :data-id="i" /></h4>
+                                                                                        <input type="hidden" :id="'txn_number'+i" name="txn_number[]" class="input_values">
+                                                                                        <input type="hidden" :id="'txn_date'+i" name="txn_date[]" class="input_values">
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
@@ -444,7 +443,7 @@
                                                                                         <p><input @click="correctionShowFunc"  :id="'correction-box-show'+i" :data-id="i" type="checkbox" > <label  :for="'correction-box-show'+i" >CORRECTION</label></p>
                                                                                         <div :id="'correction-box'+i" class="correction-box" style="display: none;">
                                                                                             <p v-for="(correctionItem,i_in) in correctionList">
-                                                                                                <input class="input_values" name="correction_name[]" :id="'signle-cor-item'+i+i_in"  type="checkbox" :value="correctionItem.Correction"> 
+                                                                                                <input class="input_values" :name='i+"correction_name[]"' :id="'signle-cor-item'+i+i_in"  type="checkbox" :value="correctionItem.Correction"> 
                                                                                                 <label :for="'signle-cor-item'+i+i_in">@{{ correctionItem.Correction }}</label>
                                                                                             </p>
                                                                                         </div>
@@ -682,7 +681,7 @@
                     document.getElementById('visa_type'+id_index).value = '';
                     document.getElementById('name'+id_index).value = '';
                     document.getElementById('passportNo'+id_index).value = '';
-                    document.getElementById('proc_fee'+id_index).value = '';
+                    document.getElementById('proc_fee_res_value'+id_index).value = '';
                     // document.getElementById('Spfee').value = '';
                     // document.getElementById('visa_type').value = '';
                     document.getElementById('contact'+id_index).value = '';
@@ -694,7 +693,7 @@
                     var service_type = document.getElementById('service_type').value;
                     var gratiseYes = document.getElementById('gratiseYes'+id_index);
                     var gratiseNo = document.getElementById('gratiseNo'+id_index);
-                    var validStkr = document.getElementById('validStkr'+id_index);
+                    var validStkr = document.getElementById('validStkr'+id_index).value;
 
                     _this = this;
                     var sticker = document.getElementById('sticker_type').value;
@@ -752,6 +751,7 @@
                                             _this.webfileDataNull = false;
                                             _this.submitBtn = true;
                                             _this.cleanBtn = true;
+                                            $('#rejected_button_show'+id_index).show();
 
                                             document.getElementById('webfile'+id_index).value = res.data.webfileData.WebFile_no;
                                             // document.getElementById('web_file_no').value = res.data.webfileData.WebFile_no;
@@ -764,22 +764,25 @@
                                             var ssldata = res.data.sllData.split(',');
                                             document.getElementById('paytype'+id_index).innerHTML = res.data.paytype;
 
-                                            _this.txnNumber = ssldata[3];
-                                            _this.txnDate = ssldata[4];
+                                            document.getElementById('txn_number'+id_index).value  = ssldata[3];
+                                            document.getElementById('txn_date'+id_index).value = ssldata[4];
                                             if (ssldata[0] == 'Yes') {
                                                 if (ssldata[2] == '') {
                                                     document.getElementById('sslres_msg'+id_index).innerText = ssldata[3] + ' ' + ssldata[4];
                                                     document.getElementById('proc_fee_res'+id_index).innerText = ssldata[6];
+                                                    document.getElementById('proc_fee_res_value'+id_index).value = ssldata[6];
                                                 }
                                                 else if (!ssldata[1] == '0') {
                                                     document.getElementById('sslres_msg'+id_index).innerText = 'Already checked ' + ssldata[1] + ' on ' + ssldata[2] + ' amount ' + ssldata[6];
                                                     document.getElementById('proc_fee_res'+id_index).innerText = ssldata[6];
+                                                    document.getElementById('proc_fee_res_value'+id_index).value = ssldata[6];
                                                 }
 
                                             }
                                             else if (ssldata[0] == 'No') {
                                                 document.getElementById('sslres_msg'+id_index).innerText = 'No Payment Data Found';
                                                 document.getElementById('proc_fee_res'+id_index).innerText = '0.00';
+                                                document.getElementById('proc_fee_res_value'+id_index).value = '0.00';
                                             }
                                             else {
                                                 document.getElementById('sslres_msg'+id_index).innerText = 'SSL Server Not Found';
@@ -808,32 +811,46 @@
                             else {
 
                                 this.webfile2Value = '';
+                                $('#webfile_p'+id_index).hide();
+                                $('#webfile2_p'+id_index).show();
+                                $('#webfileNo2'+id_index).focus();
+                                document.getElementById('passportNo'+id_index).value = webfileDataIn;
+                                document.getElementById('webfileNo2'+id_index).value = '';
                                 this.passportSearch = true;
                                 this.styleIndex = '1';
-                                document.getElementById('PassportNo2').value = webfileDataIn;
+                                // document.getElementById('PassportNo2').value = webfileDataIn;
                                 this.cleanBtn = true;
                                 this.submitBtn = false;
                                 this.webfileDataNull = false;
-                                $('#webfileNo2').focus();
                             }
                         }
                     }
                 },
-                webfileSubmit2: function () {
+                webfileSubmit2: function(event) {
+                    var id_index = event.target.getAttribute('data-id');
+
                     this.storeResStatus = false,
-                        this.rejectResStatus = false,
-                        _this = this;
+                    this.rejectResStatus = false,
+                    _this = this;
                     this.correctionShow = false;
                     this.corItem = [];
                     this.corAllSelected = false;
 
+                    var service_type = document.getElementById('service_type').value;
+                    var gratiseYes = document.getElementById('gratiseYes'+id_index);
+                    var gratiseNo = document.getElementById('gratiseNo'+id_index);
+                    var validStkr = document.getElementById('validStkr'+id_index).value;
                     var sticker = document.getElementById('sticker_type').value;
-                    var sticker_no_from = document.getElementById('sticker_no_from').value;
-                    var sticker_no_to = document.getElementById('sticker_no_to').value;
+                    var book_rcvpt_no = document.getElementById('book_rcvpt_no').value;
                     var stkrNumST = Number(this.stkr_str);
                     var stkrNumEND = Number(this.stkr_end);
-
-                    if (sticker == '') {
+                    if (service_type == '') {
+                        alert('Please Select Service Type');
+                    }
+                    else if (this.selectedToken == false) {
+                        alert('Please Select Token');
+                    }
+                    else if (sticker == '') {
                         alert('Please Select Sticker Type')
                     }
                     else if (stkrNumST == '' || stkrNumEND == '') {
@@ -842,18 +859,27 @@
                     else if (stkrNumST >= stkrNumEND) {
                         alert('Please Input Valid Sticker Number');
                     }
+                    else if (book_rcvpt_no == '') {
+                        alert('Please Input Book Receipt No');
+                    }
+                    else if(gratiseYes.checked === false && gratiseNo.checked === false){
+                        alert('Please Select a GRATIS');
+                    }
+                    else if(validStkr == ''){
+                        alert('Please Enter Sticker Number');
+                    }
                     else {
-                        var webfileNo2 = document.getElementById('webfileNo2').value;
+                        var webfileNo2 = document.getElementById('webfileNo2'+id_index).value;
                         webfileNo2 = webfileNo2.split(' ').join('');
                         if (!webfileNo2 == '') {
                             var webfileNo2 = webfileNo2.toUpperCase();
                             var webfile2Check = webfileNo2.substring(0, 3);
-                            document.getElementById('webfileNo2').value = webfileNo2;
+                            document.getElementById('webfileNo2'+id_index).value = webfileNo2;
                             if (webfile2Check == 'BGD') {
                                 this.passportSearch = false;
                                 this.styleIndex = '-2';
                                 var user_id = document.getElementById('user_id').value;
-                                var checkByPass = document.getElementById('PassportNo2').value;
+                                var checkByPass = document.getElementById('passportNo'+id_index).value;
 
 
                                 axios.get('get_app_list_for_rcvd_by_webfile', {
@@ -874,44 +900,50 @@
                                             _this.webfileDataNull = false;
                                             _this.submitBtn = true;
                                             _this.cleanBtn = true;
+                                            document.getElementById('webfile'+id_index).value = webfileNo2;
+                                            document.getElementById('webfileNo2'+id_index).value = '';
+                                            $('#webfile_p'+id_index).show();
+                                            $('#webfile2_p'+id_index).hide();
+                                            $('#webfile'+id_index).focus();
+                                            $('#rejected_button_show'+id_index).show();
 
-                                            document.getElementById('webfile').value = res.data.webfileData.WebFile_no;
-                                            var PassportNo2 = document.getElementById('PassportNo2').value;
-                                            document.getElementById('passportNo').value = PassportNo2;
-                                            // console.log(PassportNo2);
-                                            // document.getElementById('name').value = res.data.webfileData.Applicant_name;
-                                            document.getElementById('passport_show').innerText = res.data.webfileData.Passport;
-                                            // document.getElementById('contact').value = res.data.webfileData.Contact;
-                                            // document.getElementById('paytype').value = res.data.webfileData.Applicant_name;
+                                            document.getElementById('webfile'+id_index).value = res.data.webfileData.WebFile_no;
+                                            // document.getElementById('web_file_no').value = res.data.webfileData.WebFile_no;
+                                            document.getElementById('name'+id_index).value = res.data.webfileData.Applicant_name;
+                                            document.getElementById('passport_show'+id_index).innerText = res.data.webfileData.Passport;
+                                            document.getElementById('contact'+id_index).value = res.data.webfileData.Contact;
+                                            document.getElementById('paytype'+id_index).value = res.data.paytype;
+
 
                                             var ssldata = res.data.sllData.split(',');
-                                            // document.getElementById('paytype').innerHTML = res.data.paytype;
-                                            _this.txnNumber = ssldata[3];
-                                            _this.txnDate = ssldata[4];
+                                            document.getElementById('paytype'+id_index).innerHTML = res.data.paytype;
 
-                                            console.log(ssldata[0]);
+                                            document.getElementById('txn_number'+id_index).value  = ssldata[3];
+                                            document.getElementById('txn_number'+id_index).value  = ssldata[3];
+                                            document.getElementById('txn_date'+id_index).value = ssldata[4];
                                             if (ssldata[0] == 'Yes') {
                                                 if (ssldata[2] == '') {
-                                                    _this.sslResMessage = ssldata[3] + ' ' + ssldata[4];
-                                                    document.getElementById('proc_fee').value = ssldata[6];
+                                                    document.getElementById('sslres_msg'+id_index).innerText = ssldata[3] + ' ' + ssldata[4];
+                                                    document.getElementById('proc_fee_res'+id_index).innerText = ssldata[6];
+                                                    document.getElementById('proc_fee_res_value'+id_index).value = ssldata[6];
                                                 }
                                                 else if (!ssldata[1] == '0') {
-                                                    _this.sslResMessage = 'Already checked ' + ssldata[1] + ' on ' + ssldata[2] + ' amount ' + ssldata[6];
-                                                    document.getElementById('proc_fee').value = ssldata[6];
+                                                    document.getElementById('sslres_msg'+id_index).innerText = 'Already checked ' + ssldata[1] + ' on ' + ssldata[2] + ' amount ' + ssldata[6];
+                                                    document.getElementById('proc_fee_res'+id_index).innerText = ssldata[6];
+                                                    document.getElementById('proc_fee_res_value'+id_index).value = ssldata[6];
                                                 }
 
                                             }
                                             else if (ssldata[0] == 'No') {
-                                                _this.sslResMessage = 'No Payment Data Found';
-                                                document.getElementById('proc_fee').value = '0.00';
+                                                document.getElementById('sslres_msg'+id_index).innerText = 'No Payment Data Found';
+                                                document.getElementById('proc_fee_res'+id_index).innerText = '0.00';
+                                                document.getElementById('proc_fee_res_value'+id_index).value = '0.00';
                                             }
                                             else {
-                                                _this.sslResMessage = 'SSL Server Not Found';
+                                                document.getElementById('sslres_msg'+id_index).innerText = 'SSL Server Not Found';
                                             }
 
                                             _this.specialCharBlock();
-
-
                                         }
                                         else {
                                             _this.webfileDataNull = true;
@@ -933,7 +965,12 @@
                                     })
                             }
                             else {
-                                alert('Please Provide Proper Webfile/Passport');
+                                document.getElementById('webfile'+id_index).value = '';
+                                $('#webfile_p'+id_index).hide();
+                                $('#webfile2_p'+id_index).show();
+                                $('#webfileNo2'+id_index).focus();
+                                alert('Please Provide Proper Webfile');
+
                             }
 
                         }
@@ -1026,6 +1063,7 @@
                     if (!visa_type == '') {
                         var tdd_date = document.getElementById('tdd_' + visa_type).value;
                         document.getElementById('tddDelDateId'+id_index).innerText = tdd_date;
+                        document.getElementById('tddDelDateValue'+id_index).value = tdd_date;
                         // this.ttdDelDate = tdd_date;
                         // console.log(tdd_date);
                         var visaTypeData = $('.visa_type_value').serialize();
@@ -1149,29 +1187,6 @@
                     validStkr2 = '';
                     this.is_all_data_valid = false;
 
-                                        // var curSvcFee = document.getElementById('curSvcFee'+id_index).value;
-                                        // var proc_fee = document.getElementById('proc_fee').value;
-                                        // var Spfee = document.getElementById('Spfee').value;
-                                        // curSvcFee = Number(curSvcFee);
-                                        // proc_fee = Number(proc_fee);
-                                        // Spfee = Number(Spfee);
-                                        // var old_svc = 0;
-                                        // old_svc = (proc_fee + Spfee);
-
-                                        // if(curSvcFee == old_svc)
-                                        // {
-
-
-
-
-
-                                        // }
-                                        // else
-                                        // {
-                                        //     this.submitModalShow = false;
-                                        //     alert('Payment Not Valid');
-                                        // }
-
 
                 },
                 addMoreButtonFunc:function(){
@@ -1193,8 +1208,8 @@
                     }
                 },
                 DataSubmitFunc: function () {
-                    // this.submitModalShow = false;
-                    // _this = this;
+                     this.submitModalShow = false;
+                    _this = this;
                     // var cust_name = document.getElementById('name').value;
                     // var webfile = document.getElementById('webfile').value;
                     // var passportNo = document.getElementById('passportNo').value;
@@ -1202,32 +1217,16 @@
                     // passport = passport.split(' ').join('');
                     // var user_id = document.getElementById('user_id').value;
                     // var counter_id = document.getElementById('counter_id').value;
-                    // var curSvcFee = document.getElementById('curSvcFee').value;
-                    // var selectedTokenDisplay = document.getElementById('selectedTokenDisplay').innerText;
-                    // var validStkr = document.getElementById('validStkr').value;
-                    // var proc_fee = document.getElementById('proc_fee').value;
-                    // var Spfee = document.getElementById('Spfee').value;
-                    // var visa_type = document.getElementById('visa_type').value;
-                    // var contact = document.getElementById('contact').value;
-                    // var sticker_type = document.getElementById('sticker_type').value;
-                    // var txnNumber = this.txnNumber;
-                    // var remark = this.txnDate + '-' + proc_fee+'|';
-                    // var center_name = document.getElementById('center_name').value;
-                    // var ttdDelDate = document.getElementById('ttdDelDate').value;
-                    // var corFee = document.getElementById('corFee').value;
-                    // var old_pass = document.getElementById('old_pass').value;
-                    // var paytype = document.getElementById('paytype').value;
-                    // var corItem = this.corItem;
 
                     var objectData = $('.input_values').serialize();
 
-                    axios.post('foreign-webfile-data-save-axios', objectData)
+                    axios.post('foreign-webfile-data-save-axios', objectData,)
                         .then(function (res) {
-                            _this.webfilePreloader = false;
-                            _this.clearBtnFunc();
-
-                            _this.cleanBtn = false;
-                            _this.storeResStatus = true;
+                            _this.addMoreButtonArr = [];
+                            // _this.addMoreBtn = 1;
+                            // _this.addMoreButtonArr.push(this.addMoreBtn);
+                            // _this.cleanBtn = false;
+                            // _this.storeResStatus = true;
                             _this.storeResMsg = res.data.status;
                             console.log(res);
                             var last_id = res.data.store_id;

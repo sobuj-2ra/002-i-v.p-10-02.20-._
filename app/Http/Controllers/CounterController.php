@@ -446,10 +446,6 @@ class CounterController extends Controller
 
     }
 
-    public function ForeignwebfileDataStore(Request $r){
-       return  $r->all();
-    }
-
 
 
     public function PassReceivePrint($id){
@@ -511,6 +507,7 @@ class CounterController extends Controller
 
 
     public function readAtCenterStoreData(Request $request){
+        
         $datas = $request->all();
         $user_id = Auth::user()->user_id;
         $curDate = Date('Y-m-d H:i:s');

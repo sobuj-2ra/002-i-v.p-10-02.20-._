@@ -495,6 +495,104 @@ class ForeignPassportController extends Controller
 
 
     }
+    public function ForeignwebfileDataStore(Request $r){
+        $datas = $r->all();
+        $curDT = Date('Y-m-d H:i:s');
+        $arrTemp = [];
+        $succArr = [];
+        $rejectArr = [];
+
+        foreach($r->webfile as $index=>$row)
+        {   
+            
+            if($datas['webfile'][$index] != '' && $datas['passportNo'][$index] != ''){
+                // if($index.gratis_status1 != ''){
+                //     if($index.gratis_status1  == 'yes'){
+                //         $gratis = 'yes';
+                //     }
+                //     else{
+                //         $gratis = 'no';
+                //     }
+                // }
+                if(isset($datas[$index.'correction_name'])){
+                    $corItem = $datas[$index.'correction_name'];
+                    $corItemF = implode(',',$corItem);
+                }
+                else{
+                    $corItemF = null;
+                }
+
+
+                $arrTemp[$index]['webfile'] = $datas['webfile'][$index];
+                $arrTemp[$index]['passportNo'] = $datas['passportNo'][$index];
+                $arrTemp[$index]['name'] = $datas['name'][$index];
+                $arrTemp[$index]['contact'] = $datas['contact'][$index];
+                $arrTemp[$index]['nationality'] = $datas['nationality'][$index];
+                $arrTemp[$index]['visa_type'] = $datas['visa_type'][$index];
+                $arrTemp[$index]['validStkr'] = $datas['validStkr'][$index];
+                $arrTemp[$index]['entry_type'] = $datas['entry_type'][$index];
+                $arrTemp[$index]['date_of_checking'] = $datas['date_of_checking'][$index];
+                $arrTemp[$index]['visa_fee'] = $datas['visa_fee'][$index];
+                $arrTemp[$index]['fax_trans_charge'] = $datas['fax_trans_charge'][$index];
+                $arrTemp[$index]['icwf'] = $datas['icwf'][$index];
+                $arrTemp[$index]['visa_app_charge'] = $datas['visa_app_charge'][$index];
+                $arrTemp[$index]['old_pass'] = $datas['old_pass'][$index];
+                $arrTemp[$index]['paytype'] = $datas['paytype'][$index];
+                $arrTemp[$index]['proc_fee'] = $datas['proc_fee'][$index];
+                $arrTemp[$index]['sp_fee'] = $datas['sp_fee'][$index];
+                $arrTemp[$index]['tddDelDateValue'] = $datas['tddDelDateValue'][$index];
+                $arrTemp[$index]['txn_number'] = $datas['txn_number'][$index];
+                $arrTemp[$index]['txn_date'] = $datas['txn_date'][$index];
+                $arrTemp[$index]['gratis'] = $datas[$index.'gratis_status1'][0];
+                $arrTemp[$index]['service_type'] = $datas['service_type'];
+                $arrTemp[$index]['sticker_type'] = $datas['sticker_type'];
+                $arrTemp[$index]['sticker_no_from'] = $datas['sticker_no_from'];
+                $arrTemp[$index]['sticker_no_to'] = $datas['sticker_no_to'];
+                $arrTemp[$index]['counter_id'] = $datas['counter_id'];
+                $arrTemp[$index]['center_name'] = $datas['center_name'];
+                $arrTemp[$index]['user_id'] = $datas['user_id'];
+                $arrTemp[$index]['curSvcFee'] = $datas['curSvcFee'];
+                $arrTemp[$index]['floor_id'] = $datas['floor_id'];
+                $arrTemp[$index]['selected_token'] = $datas['selected_token'];
+                $arrTemp[$index]['selected_token_qty'] = $datas['selected_token_qty'];
+                $arrTemp[$index]['book_no'] = $datas['book_no'];
+                $arrTemp[$index]['correction'] = $corItemF;
+            }
+        }
+
+        foreach($arrTemp as $item){
+            $remark = $item['txn_date'].'-'.$item['proc_fee'].'|';
+            $is_save = DB::select(
+                'CALL GetDATAIN(
+                    "'.$item['webfile'].'",
+                    "'.$item['name'].'",
+                    "'.$item['passportNo'].'",
+                    "'.$item['counter_id'].'",
+                    "'.$item['selected_token'].'",
+                    "'.$item['sticker_type'].'",
+                    "'.$item['validStkr'].'",
+                    "'.$item['paytype'].'",
+                    "'.$remark.'",
+                    "'.$item['txn_number'].'",
+                    "'.$item['user_id'].'",
+                    "'.$curDT.'",
+                    "'.$item['tddDelDateValue'].'",
+                    "'.$item['visa_type'].'",
+                    "'.$item['contact'].'",
+                    "'.$item['old_pass'].'",
+                    "'.'corFee'.'",
+                    "'.$item['correction'].'",
+                    "'.$item['center_name'].'",
+                    "'.$item['proc_fee'].'",
+                    "'.$item['sp_fee'].'"
+                    )'
+            );
+
+        }
+        Tbl_fp_served::where('')
+
+        // return $arrTemp;
+    }
 
     public function foreign_passport_slip_copy($strk = '', $from = '', $to = '', $c_row, $id)
     {

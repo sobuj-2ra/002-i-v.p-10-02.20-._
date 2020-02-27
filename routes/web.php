@@ -248,7 +248,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/appointment-import', 'AppointmentController@import');
     //foreign-passport-receive
     Route::get('/foreign-passport-receive', 'ForeignPassportController@index');
-    Route::post('store-foreign-passport', 'ForeignPassportController@store');
+    // Route::post('store-foreign-passport', 'ForeignPassportController@store');
+    Route::post('/foreign-webfile-data-save-axios', 'ForeignPassportController@ForeignwebfileDataStore');
     Route::get('/foreign-passport-receive/{a}/{b}/{c}/{d}', 'ForeignPassportController@after_submit');
     Route::get('/search-sticker-numbers', 'ForeignPassportController@search_sticker_number');
     Route::get('/money-receive-book', 'ForeignPassportController@money_receive_book');
@@ -427,7 +428,6 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/visatype-check-axios', 'CounterController@VisaCheckList');
     Route::post('/visatype-foreign-check-axios', 'CounterController@VisaForeignCheckList');
     Route::get('/webfile-data-save-axios', 'CounterController@webfileDataStore');
-    Route::post('/foreign-webfile-data-save-axios', 'CounterController@ForeignwebfileDataStore');
     Route::get('/send-token-to-waiting-axios', 'CounterController@TokenSentWaiting');
     Route::get('/send-token-to-recall-axios', 'CounterController@TokenSentRecall');
     Route::get('/pass-receive-print/{id}', 'CounterController@PassReceivePrint');
