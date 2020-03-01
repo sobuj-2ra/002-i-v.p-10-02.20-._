@@ -13,6 +13,7 @@ use App\Tbl_sticker;
 use App\Tbl_visa_type;
 use App\Tbl_center_info;
 use App\Tbl_ivac_service;
+use App\Tbl_fp_served;
 
 
 class ForeignPassportController extends Controller
@@ -501,6 +502,7 @@ class ForeignPassportController extends Controller
         $arrTemp = [];
         $succArr = [];
         $rejectArr = [];
+        $user_id = Auth::user()->user_id;
 
         foreach($r->webfile as $index=>$row)
         {   
@@ -536,6 +538,7 @@ class ForeignPassportController extends Controller
                 $arrTemp[$index]['fax_trans_charge'] = $datas['fax_trans_charge'][$index];
                 $arrTemp[$index]['icwf'] = $datas['icwf'][$index];
                 $arrTemp[$index]['visa_app_charge'] = $datas['visa_app_charge'][$index];
+                $arrTemp[$index]['total_amount'] = $datas['total_amount'][$index];
                 $arrTemp[$index]['old_pass'] = $datas['old_pass'][$index];
                 $arrTemp[$index]['paytype'] = $datas['paytype'][$index];
                 $arrTemp[$index]['proc_fee'] = $datas['proc_fee'][$index];
@@ -550,20 +553,22 @@ class ForeignPassportController extends Controller
                 $arrTemp[$index]['sticker_no_to'] = $datas['sticker_no_to'];
                 $arrTemp[$index]['counter_id'] = $datas['counter_id'];
                 $arrTemp[$index]['center_name'] = $datas['center_name'];
-                $arrTemp[$index]['user_id'] = $datas['user_id'];
+                $arrTemp[$index]['user_id'] = $user_id;
                 $arrTemp[$index]['curSvcFee'] = $datas['curSvcFee'];
                 $arrTemp[$index]['floor_id'] = $datas['floor_id'];
                 $arrTemp[$index]['selected_token'] = $datas['selected_token'];
                 $arrTemp[$index]['selected_token_qty'] = $datas['selected_token_qty'];
                 $arrTemp[$index]['book_no'] = $datas['book_no'];
+                $arrTemp[$index]['book_rcvpt_no'] = $datas['book_rcvpt_no'];
                 $arrTemp[$index]['correction'] = $corItemF;
             }
         }
 
         foreach($arrTemp as $item){
             $remark = $item['txn_date'].'-'.$item['proc_fee'].'|';
+            $stkr_no = $item['sticker_type'].'-'.$item['validStkr'];
             $is_save = DB::select(
-                'CALL GetDATAIN(
+                'CALL GetForeignDATAIN2(
                     "'.$item['webfile'].'",
                     "'.$item['name'].'",
                     "'.$item['passportNo'].'",
@@ -584,14 +589,45 @@ class ForeignPassportController extends Controller
                     "'.$item['correction'].'",
                     "'.$item['center_name'].'",
                     "'.$item['proc_fee'].'",
-                    "'.$item['sp_fee'].'"
+                    "'.$item['sp_fee'].'",
+                    "'.$item['gratis'].'",
+                    "'.$stkr_no.'",
+                    "'.$item['book_rcvpt_no'].'",
+                    "'.$item['book_no'].'",
+                    "'.$item['nationality'].'",
+                    "'.'remark'.'",
+                    "'.$item['visa_fee'].'",
+                    "'.$item['fax_trans_charge'].'",
+                    "'.$item['icwf'].'",
+                    "'.$item['visa_app_charge'].'",
+                    "'.$item['total_amount'].'",
+                    "'.'trupee'.'",
+                    "'.'rupeeRate'.'",
+                    "'.'region'.'"
                     )'
             );
 
-        }
-        Tbl_fp_served::where('')
+                $saveCount = $is_save[0]->COUNT;
+                $status = $is_save[0]->REPLY;
+                if($status == 'Data Saved Successfully'){
+                    array_push($succArr,$item['webfile']);
+                }
+                else{
+                    array_push($rejectArr,$item['webfile']);
+                }
 
-        // return $arrTemp;
+        }
+
+        if(count($rejectArr) < 1){
+            Session::push('tempArr', $arrTemp);
+            Session::push('successArr', $succArr);
+
+            return response()->json(['save'=>'yes','saveCount'=>$saveCount,'status'=>$status]);
+        }
+        else{
+            return response()->json(['save'=>'no','saveCount'=>$saveCount,'store_id'=>'','status'=>$status]);
+        }
+
     }
 
     public function foreign_passport_slip_copy($strk = '', $from = '', $to = '', $c_row, $id)

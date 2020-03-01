@@ -12,7 +12,6 @@
 
         <!-- <p class="date">@{{ date }}</p> -->
 
-
         </div>
         <script>
             var clock = new Vue({
@@ -201,7 +200,7 @@
                                                                 </td>
                                                                 <td>
                                                                     <div class="form-group">
-                                                                        <input class="form-control" name="book_rcvpt_no" id="book_rcvpt_no" placeholder="Receipt No" style="width:100px;height:30px" autocomplete="off" required>
+                                                                        <input class="form-control input_values" name="book_rcvpt_no" id="book_rcvpt_no" placeholder="Receipt No" style="width:100px;height:30px" autocomplete="off" required>
                                                                     </div>
                                                                 </td>
                                                             </tr>
@@ -366,7 +365,7 @@
                                                                                 <div class="col-md-6">
                                                                                     <div class="form-group">
                                                                                         <input class="form-control input_values" name="total_fee_disable[]" :id="'total_fee_disable'+i" :data-id="i"  placeholder="Total Amount" disabled>
-                                                                                        <input type="hidden" class="form-control input_values" id="total" name="total_amount[]" value="0">
+                                                                                        <input type="hidden" class="form-control input_values" id="'total_fee'+i" name="total_amount[]" value="0">
                                                                                        
                                                                                     </div>
                                                                                 </div>
@@ -724,6 +723,9 @@
                     else if(validStkr == ''){
                         alert('Please Enter Sticker Number');
                     }
+                    else if(validStkr < stkrNumST || validStkr > stkrNumEND){
+                        alert('Please Enter Valid Sticker No.');
+                    }
                     else {
                         var webfile = document.getElementById('webfile'+id_index).value;
                         var webfile = webfile.split(' ').join('');
@@ -868,6 +870,9 @@
                     else if(validStkr == ''){
                         alert('Please Enter Sticker Number');
                     }
+                    else if(validStkr < stkrNumST || validStkr > stkrNumEND){
+                        alert('Please Enter Valid Sticker No.');
+                    }
                     else {
                         var webfileNo2 = document.getElementById('webfileNo2'+id_index).value;
                         webfileNo2 = webfileNo2.split(' ').join('');
@@ -985,6 +990,7 @@
                     var appChange = document.getElementById('appCharge'+id_index).value;
                     var totalFeeSum = Number(visaFee)+Number(faxCharge)+Number(icwf)+Number(appChange);
                     document.getElementById('total_fee_disable'+id_index).value = totalFeeSum;
+                    document.getElementById('total_fee'+id_index).value = totalFeeSum;
                     // $('#total_fee_disable'+id_index).val() = totalFeeSum;
                     // this.totalFeeValue = Number(this.vasa_feeF)+Number(this.faxTnsChargeFee)+Number(this.icwfFee)+Number(this.visaAppChargeFee);
                 },
@@ -1084,7 +1090,7 @@
                 submitFunc: function (event) {
                     this.submitModalShow = false;
                     this.not_all_data_valid = true;
-
+                    var is_alert_already = true;
                     for(var k=0;k < this.addMoreButtonArr.length; k++){
                         var id_index = k;
                         var getPass = document.getElementById('passportNo'+id_index).value;
@@ -1095,70 +1101,173 @@
                         getShowPass = getShowPass.trim();
                         var showPass = getShowPass.split(' ').join('');
                         var gratisVal = $("input[name='gratis_status1']:checked").val();
-                        var webfile = document.getElementById('webfile'+id_index).value;
-                        var visa_type = document.getElementById('visa_type'+id_index).value;
-                        var contact_num = document.getElementById('contact'+id_index).value;
-                        var paytype = document.getElementById('paytype'+id_index).value;
-                        var old_pass = document.getElementById('old_pass'+id_index).value;
                         var validStkr = document.getElementById('validStkr'+id_index).value;
                         var validStkrF = Number(validStkr);
                         var inputTSt = Number(this.stkr_str);
                         var validStkr2 = document.getElementById('validStkr'+id_index).value;
                         var validStkr2F = Number(validStkr2);
                         var InputTE = Number(this.stkr_end);
-                                                                    
                         var validSticker = document.getElementById('validStkr'+id_index).value;
                         var validStikerType = document.getElementById('sticker_type').value;
-                        
-                        if (webfile != ''){   
-
-                            if (passNo != showPass)
+                        var gratiseYes = document.getElementById('gratiseYes'+id_index);
+                        var gratiseNo = document.getElementById('gratiseNo'+id_index);
+                        var webfile = document.getElementById('webfile'+id_index).value;
+                        var contact_num = document.getElementById('contact'+id_index).value;
+                        var name = document.getElementById('name'+id_index).value;
+                        var contact_num = document.getElementById('contact'+id_index).value;
+                        var visa_type = document.getElementById('visa_type'+id_index).value;
+                        var nationality = document.getElementById('nationality'+id_index).value;
+                        var duration = document.getElementById('duration'+id_index).value;
+                        var entry_type = document.getElementById('entry_type'+id_index).value;
+                        var visaFee = document.getElementById('visaFee'+id_index).value;
+                        var faxCharge = document.getElementById('faxCharge'+id_index).value;
+                        var icwf = document.getElementById('icwf'+id_index).value;
+                        var appCharge = document.getElementById('appCharge'+id_index).value;
+                        var paytype = document.getElementById('paytype'+id_index).value;
+                        var old_pass = document.getElementById('old_pass'+id_index).value;
+                        if(webfile != '' && showPass != ''){
+                            if(validStkrF < inputTSt || validStkr2F > InputTE)
                             {   
-                                this.not_all_data_valid = false;
-                                this.submitModalShow = false;
-                                alert('Please Enter Valid Passport Number');
+                                if(is_alert_already ==  true){
+                                    is_alert_already = false;
+                                    this.not_all_data_valid = false;
+                                    this.submitModalShow = false;
+                                    alert('Please Input Valid Sticker Number '+id_index);
+                                }
                             }
-                            else if (visa_type == '')
+                           
+                            else if(passNo != showPass)
                             {   
-                                this.not_all_data_valid = false;
-                                this.submitModalShow = false;
-                                alert('Please Select Visa Type');
+                                if(is_alert_already ==  true){
+                                    is_alert_already = false;
+                                    this.not_all_data_valid = false;
+                                    this.submitModalShow = false;
+                                    alert('Please Enter Valid Passport Number '+id_index);
+                                }
                             }
-
+                            else if (name == '')
+                            {   
+                                if(is_alert_already ==  true){
+                                    is_alert_already = false;
+                                    this.not_all_data_valid = false;
+                                    this.submitModalShow = false;
+                                    alert('Please Enter Valid Name '+id_index);
+                                }
+                            }
                             else if(contact_num.length != 10)
                             {   
-                                this.not_all_data_valid = false;
-                                this.submitModalShow = false;
-                                alert('Please Enter Valid Contact Number');
+                                if(is_alert_already ==  true){
+                                    is_alert_already = false;
+                                    this.not_all_data_valid = false;
+                                    this.submitModalShow = false;
+                                    alert('Please Enter Valid Contact Number '+id_index);
+                                }
                             }
-                            else if(paytype == '')
+                            else if (nationality == '')
                             {   
-                                this.not_all_data_valid = false;
-                                this.submitModalShow = false;
-                                alert('Please Select Payment Type');
+                                if(is_alert_already ==  true){
+                                    is_alert_already = false;
+                                    this.not_all_data_valid = false;
+                                    this.submitModalShow = false;
+                                    alert('Please Enter Valid Nationality '+id_index);
+                                }
                             }
-                            else if(old_pass == '')
+                            else if(visa_type == '')
                             {   
-                                this.not_all_data_valid = false;
-                                this.submitModalShow = false;
-                                alert('Please Enter Old Passport Qty');
+                                if(is_alert_already ==  true){
+                                    is_alert_already = false;
+                                    this.not_all_data_valid = false;
+                                    this.submitModalShow = false;
+                                    alert('Please Select Visa Type '+id_index);
+                                }
                             }
-                            else if(inputTSt >= validStkrF)
+                            else if(duration == '')
                             {   
-                                this.not_all_data_valid = false;
-                                this.submitModalShow = false;
-                                alert('Please Input Valid Sticker Number');
+                                if(is_alert_already ==  true){
+                                    is_alert_already = false;
+                                    this.not_all_data_valid = false;
+                                    this.submitModalShow = false;
+                                    alert('Please Enter Valid Duration '+id_index);
+                                }
                             }
-                            else if(InputTE <= validStkr2F)
+                            else if(entry_type == '')
                             {   
-                                this.not_all_data_valid = false;
-                                this.submitModalShow = false;
-                                alert('Please Input Valid Sticker Number');
-                            }
+                                if(is_alert_already ==  true){
+                                    is_alert_already = false;
+                                    this.not_all_data_valid = false;
+                                    this.submitModalShow = false;
+                                    alert('Please Enter Valid entry_type '+id_index);
+                                }
+                            }     
                             else{
-                                this.is_all_data_valid = true;
-                            }
 
+                                if(gratiseYes.checked == false && gratiseNo.checked == true)
+                                {   
+                                    if(visaFee ==  ''){
+                                        is_alert_already = false;
+                                        this.not_all_data_valid = false;
+                                        this.submitModalShow = false;
+                                        alert('Please Enter Visa Fee '+id_index);
+                                    }
+                                    else if(faxCharge == ''){
+                                        is_alert_already = false;
+                                        this.not_all_data_valid = false;
+                                        this.submitModalShow = false;
+                                        alert('Please Enter Fax Charge '+id_index);
+                                    }
+                                    else if(icwf == ''){
+                                        is_alert_already = false;
+                                        this.not_all_data_valid = false;
+                                        this.submitModalShow = false;
+                                        alert('Please Enter ICWF '+id_index);
+                                    }
+                                    else if(appCharge == ''){
+                                        is_alert_already = false;
+                                        this.not_all_data_valid = false;
+                                        this.submitModalShow = false;
+                                        alert('Please Enter App Charge '+id_index);
+                                    }
+                                    else if(paytype == ''){   
+                                        if(is_alert_already ==  true){
+                                            is_alert_already = false;
+                                            this.not_all_data_valid = false;
+                                            this.submitModalShow = false;
+                                            alert('Please Select Payment Type '+id_index);
+                                        }
+                                    }
+                                    else if(old_pass == ''){   
+                                        if(is_alert_already ==  true){
+                                            is_alert_already = false;
+                                            this.not_all_data_valid = false;
+                                            this.submitModalShow = false;
+                                            alert('Please Enter Old Passport Qty '+id_index);
+                                        }
+                                    }
+                                    else{
+                                        this.is_all_data_valid = true;
+                                    }
+                                }
+                                else if(paytype == ''){   
+                                    if(is_alert_already ==  true){
+                                        is_alert_already = false;
+                                        this.not_all_data_valid = false;
+                                        this.submitModalShow = false;
+                                        alert('Please Select Payment Type '+id_index);
+                                    }
+                                }
+                                else if(old_pass == ''){   
+                                    if(is_alert_already ==  true){
+                                        is_alert_already = false;
+                                        this.not_all_data_valid = false;
+                                        this.submitModalShow = false;
+                                        alert('Please Enter Old Passport Qty '+id_index);
+                                    }
+                                }
+                                else{
+                                    this.is_all_data_valid = true;
+                                }
+
+                            }  
                         }
 
                     }
@@ -1229,19 +1338,18 @@
                             // _this.storeResStatus = true;
                             _this.storeResMsg = res.data.status;
                             console.log(res);
-                            var last_id = res.data.store_id;
                             var saves = res.data.save;
                             if(saves == 'yes'){
                                 document.getElementById('total_save_count').innerText = res.data.saveCount;
                                 if(last_id == ''){
                                 }else{
-                                    window.open('pass-receive-print/'+last_id, '_blank');
+                                    window.open('pass-receive-print', '_blank');
                                 }
                             }
 
                         })
                         .catch(function (error) {
-
+                            console.log(error);
                         });
                 },
                 clearBtnFunc: function () {
