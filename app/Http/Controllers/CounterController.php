@@ -257,6 +257,41 @@ class CounterController extends Controller
         return response()->json(['status'=>'yes','rejectCount'=>$rejectCount,'statusMsg'=>$statusMsg]);
     }
 
+    public function foreignRejectSubmit(Request $request){
+        $rejectCause = implode(',',$request->rejectedCauses);
+        $curDT = Date('Y-m-d H:i:s');
+        $userId = Auth::user()->user_id;
+
+        $tbl_AppList = Tbl_appointmentlist::where('WebFile_no',$request->webfile)->update([
+            'Presence_Status'=>'REJECTED',
+            'RejectCause'=>$rejectCause,
+            'RejectBy'=>$userId,
+            'RejectTime'=>$curDT,
+        ]);
+        if($tbl_AppList){
+            $get_api = Tbl_setup::where('item_name', 'payment_api')->first();
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL,$get_api->item_value.'/?webfile='.$request->webfile.'&user='.$userId.'&save='.$request->save.'');
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+            $ssldata = curl_exec($ch);
+        }
+        if($tbl_AppList){
+            $statusMsg = 'Data Rejected';
+        }else{
+            $statusMsg = 'Couldn\'t Reject';
+        }
+        $curDate = Date('Y-m-d');
+        $rejectedData = Tbl_appointmentlist::where('Presence_Status','REJECTED')
+            ->whereDate('RejectTime', $curDate)
+            ->where('RejectBy', $userId)
+            ->get();
+
+        $rejectCount = count($rejectedData);
+        return response()->json(['status'=>'yes','rejectCount'=>$rejectCount,'statusMsg'=>$statusMsg]);
+    }
+
 
     public function VisaCheckList(Request $request){
         $visaType = $request->visa_type;
@@ -480,6 +515,28 @@ class CounterController extends Controller
 
 
         return view('counter.pass_receive_print',$datas);
+    }
+
+    public function ForeignPassReceivePrint(){
+        $tempArr = Session::get('tempArr');
+        $successArr = Session::get('successArr');
+        $valid_data = $successArr[0];
+        $dataArr = $tempArr[0];
+        if(isset($dataArr[0]['center_name'])){
+            $center_name = $dataArr[0]['center_name'];
+        }
+        $center_info = Tbl_center_info::where('center_name',$center_name)->first();
+        $del_time = $center_info->del_time;
+        $center_web = $center_info->center_web;
+        $barcodeType = Tbl_setup::where('item_name','Barcode')->first();
+        if($barcodeType->item_value == 'Passport'){
+            $BarcodePrint = 'passport';
+        }
+        else{
+            $BarcodePrint = 'webfile';
+        }
+        $slipCopy = Tbl_ivac_service::where('Service','Regular Passport')->first();
+        return view('foreign.foreign_pass_receive_print',compact('valid_data','dataArr','del_time','center_web','BarcodePrint','slipCopy'));
     }
 
 

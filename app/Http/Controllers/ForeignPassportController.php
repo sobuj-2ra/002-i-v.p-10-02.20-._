@@ -504,18 +504,16 @@ class ForeignPassportController extends Controller
         $rejectArr = [];
         $user_id = Auth::user()->user_id;
 
+        $rupee = DB::table('tbl_currency_rate')
+            ->where('currency_name', 'RUPEE')
+            ->orderBy('id', 'desc')
+            ->first();
+        $rupee_r = 1 / $rupee->currency_rate;
+
         foreach($r->webfile as $index=>$row)
         {   
             
             if($datas['webfile'][$index] != '' && $datas['passportNo'][$index] != ''){
-                // if($index.gratis_status1 != ''){
-                //     if($index.gratis_status1  == 'yes'){
-                //         $gratis = 'yes';
-                //     }
-                //     else{
-                //         $gratis = 'no';
-                //     }
-                // }
                 if(isset($datas[$index.'correction_name'])){
                     $corItem = $datas[$index.'correction_name'];
                     $corItemF = implode(',',$corItem);
@@ -533,12 +531,12 @@ class ForeignPassportController extends Controller
                 $arrTemp[$index]['visa_type'] = $datas['visa_type'][$index];
                 $arrTemp[$index]['validStkr'] = $datas['validStkr'][$index];
                 $arrTemp[$index]['entry_type'] = $datas['entry_type'][$index];
+                $arrTemp[$index]['duration'] = $datas['duration'][$index];
                 $arrTemp[$index]['date_of_checking'] = $datas['date_of_checking'][$index];
                 $arrTemp[$index]['visa_fee'] = $datas['visa_fee'][$index];
                 $arrTemp[$index]['fax_trans_charge'] = $datas['fax_trans_charge'][$index];
                 $arrTemp[$index]['icwf'] = $datas['icwf'][$index];
                 $arrTemp[$index]['visa_app_charge'] = $datas['visa_app_charge'][$index];
-                $arrTemp[$index]['total_amount'] = $datas['total_amount'][$index];
                 $arrTemp[$index]['old_pass'] = $datas['old_pass'][$index];
                 $arrTemp[$index]['paytype'] = $datas['paytype'][$index];
                 $arrTemp[$index]['proc_fee'] = $datas['proc_fee'][$index];
@@ -561,14 +559,35 @@ class ForeignPassportController extends Controller
                 $arrTemp[$index]['book_no'] = $datas['book_no'];
                 $arrTemp[$index]['book_rcvpt_no'] = $datas['book_rcvpt_no'];
                 $arrTemp[$index]['correction'] = $corItemF;
+                $arrTemp[$index]['rupee_rate'] = $rupee_r;
+                $arrTemp[$index]['receive_date'] = $curDT;
+
+                $arrTemp[$index]['remark'] = $datas['txn_date'][$index].'-'.$datas['proc_fee'][$index].'|' ;
+                $arrTemp[$index]['remark2'] = $datas['duration'][$index] . '/' . $datas['entry_type'][$index] . '/' . $datas['visa_type'][$index];
+
+                if(isset($datas['sticker_type'][$index]) && !empty($datas['sticker_type'][$index])) {
+                    $arrTemp[$index]['stkr_with_no'] = $datas['sticker_type'][$index] . '-' . $datas['validStkr'][$index];
+                } 
+                else{
+                    $arrTemp[$index]['stkr_with_no'] = $datas['validStkr'][$index];
+                }
+
+                if($datas['total_amount'][$index] != 0) {
+                    $arrTemp[$index]['total_amount'] = $datas['total_amount'][$index];
+                    $arrTemp[$index]['total_rupee'] = $rupee_r * $datas['total_amount'][$index];
+                }else if ($datas['total_amount'][$index] == 0 || $datas['total_amount'][$index] == '0') {
+                    $arrTemp[$index]['total_amount'] = " ";
+                    $arrTemp[$index]['total_rupee'] = " ";
+                }
+
+
             }
         }
 
         foreach($arrTemp as $item){
-            $remark = $item['txn_date'].'-'.$item['proc_fee'].'|';
-            $stkr_no = $item['sticker_type'].'-'.$item['validStkr'];
+            
             $is_save = DB::select(
-                'CALL GetForeignDATAIN2(
+                'CALL GetForeignDATAIN(
                     "'.$item['webfile'].'",
                     "'.$item['name'].'",
                     "'.$item['passportNo'].'",
@@ -577,10 +596,10 @@ class ForeignPassportController extends Controller
                     "'.$item['sticker_type'].'",
                     "'.$item['validStkr'].'",
                     "'.$item['paytype'].'",
-                    "'.$remark.'",
+                    "'.$item['remark'].'",
                     "'.$item['txn_number'].'",
                     "'.$item['user_id'].'",
-                    "'.$curDT.'",
+                    "'.$item['receive_date'].'",
                     "'.$item['tddDelDateValue'].'",
                     "'.$item['visa_type'].'",
                     "'.$item['contact'].'",
@@ -591,18 +610,18 @@ class ForeignPassportController extends Controller
                     "'.$item['proc_fee'].'",
                     "'.$item['sp_fee'].'",
                     "'.$item['gratis'].'",
-                    "'.$stkr_no.'",
+                    "'.$item['stkr_with_no'].'",
                     "'.$item['book_rcvpt_no'].'",
                     "'.$item['book_no'].'",
                     "'.$item['nationality'].'",
-                    "'.'remark'.'",
+                    "'.$item['remark2'].'",
                     "'.$item['visa_fee'].'",
                     "'.$item['fax_trans_charge'].'",
                     "'.$item['icwf'].'",
                     "'.$item['visa_app_charge'].'",
                     "'.$item['total_amount'].'",
-                    "'.'trupee'.'",
-                    "'.'rupeeRate'.'",
+                    "'.$item['total_rupee'].'",
+                    "'.$item['rupee_rate'].'",
                     "'.'region'.'"
                     )'
             );
@@ -619,13 +638,22 @@ class ForeignPassportController extends Controller
         }
 
         if(count($rejectArr) < 1){
+            Session::forget('tempArr');
+            Session::forget('successArr');
             Session::push('tempArr', $arrTemp);
             Session::push('successArr', $succArr);
+            return response()->json(['save'=>'yes','saveCount'=>$saveCount,'status'=>'Data Saved Successfully']);
+        }
+        else if(count($succArr) < 1){
 
-            return response()->json(['save'=>'yes','saveCount'=>$saveCount,'status'=>$status]);
+            return response()->json(['save'=>'no','saveCount'=>$saveCount,'store_id'=>'','status'=>$status,'rejectArr'=>$rejectArr]);
         }
         else{
-            return response()->json(['save'=>'no','saveCount'=>$saveCount,'store_id'=>'','status'=>$status]);
+            Session::forget('tempArr');
+            Session::forget('successArr');
+            Session::push('tempArr', $arrTemp);
+            Session::push('successArr', $succArr);
+            return response()->json(['save'=>'notall','saveCount'=>$saveCount,'status'=>'Some Data Couldn\'t Saved','rejectArr'=>$rejectArr]);
         }
 
     }

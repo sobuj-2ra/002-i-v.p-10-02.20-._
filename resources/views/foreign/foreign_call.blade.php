@@ -364,8 +364,8 @@
                                                                                 </div>
                                                                                 <div class="col-md-6">
                                                                                     <div class="form-group">
-                                                                                        <input class="form-control input_values" name="total_fee_disable[]" :id="'total_fee_disable'+i" :data-id="i"  placeholder="Total Amount" disabled>
-                                                                                        <input type="hidden" class="form-control input_values" id="'total_fee'+i" name="total_amount[]" value="0">
+                                                                                        <input class="form-control"  :id="'total_fee_disable'+i" :data-id="i"  placeholder="Total Amount" disabled>
+                                                                                        <input type="hidden" class="form-control input_values" :id="'total_fee'+i" name="total_amount[]" >
                                                                                        
                                                                                     </div>
                                                                                 </div>
@@ -382,7 +382,7 @@
                                                                                     <div class="form-group">
                                                                                         <label :for="'paytype'+i"></label>
                                                                                         <select name="paytype[]" :id="'paytype'+i" :data-id="i" class="form-control input_values" placeholder="Pay Type">
-                                                                                            <option value="">Pay Type</option>
+                                                                                            <option value="3">Pay Type</option>
                                                                                         </select>
                                                                                     </div>
                                                                                 </div>
@@ -420,7 +420,7 @@
         
                                                                                                 </div>
                                                                                                 <div class="custom-modal-footer">
-                                                                                                    <button @click="rejectSubmitFunc" class="btn btn-danger float-left">Reject</button>
+                                                                                                    <button @click="rejectSubmitFunc" :id="'rejectsubmit'+i" :data-id="i" class="btn btn-danger float-left">Reject</button>
                                                                                                     <button @click="rejectModalShow = !rejectModalShow" class="btn btn-warning float-right">Cancel</button>
                                                                                                 </div>
                                                                                             </div>
@@ -456,18 +456,21 @@
                                                             </div>
                                                             <div class="webfile-not-found">
                                                                 <h3 v-if="webfileDataNull" class="text-center">Opps! No Data Found</h3>
+                                                                <h3 v-if="webfileDataNull" class="text-center"></h3>
                                                             </div>
                                                             <div class="webfile-not-found">
                                                                 <h3 v-if="storeResStatus" class="text-center">@{{ storeResMsg }}</h3>
-                                                                <h3 v-if="rejectResStatus" class="text-center">@{{ rejectResMsg }}</h3>
+                                                                <h3 :id="'rejected_res_msg'+i" :data-id="i" style="color:red;text-align:center"></h3>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
+                                               
                                                 <div class="col-md-12">
                                                     <button @click="addMoreButtonFunc" class="btn btn-info btn-sm"><i class="fa fa-plus"></i></button>
                                                     <button @click="clearButtonFunc" class="btn btn-default btn-sm">Remove</button>
                                                 </div>
+                                                
                                                 <div class="col-md-12">
                                                     <div  class="webfile-submit-area">
                                                         <button  @click="submitFunc" type="button" class="btn btn-primary" data-toggle="modal" data-target="#submitModal">Submit</button> 
@@ -493,7 +496,11 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                            </div>
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <h2 v-if="storeResStatusf" id="data_store_msg" style="text-align:center">@{{storeResMsg}}</h2> 
+                                                <p class="text-center" v-for="failsd in failToSaveArr" style="font-weight:bold;color:red;">@{{failsd}}</p>   
+                                                </div>
                                         </div>
                                     </div>
                                 </div>
@@ -550,6 +557,7 @@
                 txnDate:'',
                 storeResMsg:'',
                 storeResStatus:false,
+                storeResStatusf:false,
                 rejectResMsg:'',
                 rejectResStatus:false,
                 selectedTokenval:'',
@@ -565,6 +573,7 @@
                 addMoreBtn:-1,
                 is_all_data_valid:false,
                 not_all_data_valid:true,
+                failToSaveArr:[],
 
             },
             methods: {
@@ -672,6 +681,7 @@
                     this.cleanBtn = false;
                     this.passportSearch = false;
                     this.storeResStatus = false;
+                    this.storeResStatusf = false;
                     this.rejectResStatus = false;
                     this.styleIndex = '-2';
                     this.correctionShow = false;
@@ -832,6 +842,7 @@
                     var id_index = event.target.getAttribute('data-id');
 
                     this.storeResStatus = false,
+                    this.storeResStatusf = false,
                     this.rejectResStatus = false,
                     _this = this;
                     this.correctionShow = false;
@@ -1335,16 +1346,23 @@
                             // _this.addMoreBtn = 1;
                             // _this.addMoreButtonArr.push(this.addMoreBtn);
                             // _this.cleanBtn = false;
-                            // _this.storeResStatus = true;
+                            _this.storeResStatusf = true;
                             _this.storeResMsg = res.data.status;
                             console.log(res);
                             var saves = res.data.save;
                             if(saves == 'yes'){
                                 document.getElementById('total_save_count').innerText = res.data.saveCount;
-                                if(last_id == ''){
-                                }else{
-                                    window.open('pass-receive-print', '_blank');
-                                }
+                                window.open('foreign-pass-receive-print', '_blank');
+                                
+                            }
+                            else if(saves == 'notall'){
+                                document.getElementById('total_save_count').innerText = res.data.saveCount;
+                                _this.failToSaveArr = res.data.rejectArr;
+                                window.open('foreign-pass-receive-print', '_blank');
+                                
+                            }
+                            else if(saves == 'no'){
+                                _this.failToSaveArr = res.data.rejectArr;
                             }
 
                         })
@@ -1381,12 +1399,15 @@
                     this.sslResMessage = '';
                     document.getElementById('webfile').value = '';
                 },
-                rejectSubmitFunc: function () {
+                rejectSubmitFunc: function(event) {
                     this.rejectModalShow = false;
+                    var id_name = event.target.getAttribute('id');
+                    var id_index = event.target.getAttribute('data-id');
+                    var webfile = document.getElementById('webfile'+id_index).value;
                     _this = this;
-                    axios.get('reject-submit-axios', {
+                    axios.get('foreign-reject-submit-axios', {
                         params: {
-                            webfile: this.webfileUC,
+                            webfile: webfile,
                             rejectedCauses: this.rejectItem,
                             save: 'Y'
                         }
@@ -1399,7 +1420,7 @@
                                 document.getElementById('total_reject_count').innerText = res.data.rejectCount;
                                 //console.log('d')
                                 _this.rejectResStatus = true;
-                                _this.rejectResMsg = res.data.statusMsg;
+                                document.getElementById('rejected_res_msg'+id_index).innerText = res.data.statusMsg;
                                 _this.selectedTokenval = '';
                                 _this.selectedTokenQty = '';
                                 _this.clearBtnFunc();

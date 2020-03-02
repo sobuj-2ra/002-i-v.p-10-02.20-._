@@ -425,12 +425,14 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/get_data_onload_axios', 'CounterController@getDataOnload');
     Route::get('/get_data_onload_editpass_axios', 'CounterController@getDataOnloadEditPass');
     Route::get('/reject-submit-axios', 'CounterController@rejectSubmit');
+    Route::get('/foreign-reject-submit-axios', 'CounterController@foreignRejectSubmit');
     Route::get('/visatype-check-axios', 'CounterController@VisaCheckList');
     Route::post('/visatype-foreign-check-axios', 'CounterController@VisaForeignCheckList');
     Route::get('/webfile-data-save-axios', 'CounterController@webfileDataStore');
     Route::get('/send-token-to-waiting-axios', 'CounterController@TokenSentWaiting');
     Route::get('/send-token-to-recall-axios', 'CounterController@TokenSentRecall');
     Route::get('/pass-receive-print/{id}', 'CounterController@PassReceivePrint');
+    Route::get('/foreign-pass-receive-print', 'CounterController@ForeignPassReceivePrint');
     Route::get('/readyat-center', 'CounterController@readAtCenter');
     Route::get('/onload-readyat-center-datas', 'CounterController@OnloadReadyatCenterData');
     Route::post('/ready-center-passport-datas', 'CounterController@readAtCenterStoreData');
