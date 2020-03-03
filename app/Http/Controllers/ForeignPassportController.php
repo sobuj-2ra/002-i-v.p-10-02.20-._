@@ -62,7 +62,8 @@ class ForeignPassportController extends Controller
         $datas['ivac_svc_fee'] = Tbl_ivac_service::where('Service', 'Regular Passport')->first();
 
         $datas['tdd_list'] = Tbl_visa_type::all();
-
+        $corFee = Tbl_ivac_service::select('corrFee','Service')->where('Service','Foreign Passport')->first();
+        $datas['getCorFee'] = $corFee->corrFee;
 //        return redirect('readyat-center');
         return view('foreign.foreign_call',$datas);
     }
@@ -517,9 +518,11 @@ class ForeignPassportController extends Controller
                 if(isset($datas[$index.'correction_name'])){
                     $corItem = $datas[$index.'correction_name'];
                     $corItemF = implode(',',$corItem);
+                    $corrFee = $datas['corr_fee'][$index];
                 }
                 else{
                     $corItemF = null;
+                    $corrFee = 0;
                 }
 
 
@@ -559,6 +562,7 @@ class ForeignPassportController extends Controller
                 $arrTemp[$index]['book_no'] = $datas['book_no'];
                 $arrTemp[$index]['book_rcvpt_no'] = $datas['book_rcvpt_no'];
                 $arrTemp[$index]['correction'] = $corItemF;
+                $arrTemp[$index]['corr_fee'] = $corrFee;
                 $arrTemp[$index]['rupee_rate'] = $rupee_r;
                 $arrTemp[$index]['receive_date'] = $curDT;
 
@@ -604,7 +608,7 @@ class ForeignPassportController extends Controller
                     "'.$item['visa_type'].'",
                     "'.$item['contact'].'",
                     "'.$item['old_pass'].'",
-                    "'.'corFee'.'",
+                    "'.$item['corr_fee'].'",
                     "'.$item['correction'].'",
                     "'.$item['center_name'].'",
                     "'.$item['proc_fee'].'",

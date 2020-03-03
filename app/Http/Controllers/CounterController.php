@@ -535,7 +535,7 @@ class CounterController extends Controller
         else{
             $BarcodePrint = 'webfile';
         }
-        $slipCopy = Tbl_ivac_service::where('Service','Regular Passport')->first();
+        $slipCopy = Tbl_ivac_service::where('Service','Foreign Passport')->first();
         return view('foreign.foreign_pass_receive_print',compact('valid_data','dataArr','del_time','center_web','BarcodePrint','slipCopy'));
     }
 

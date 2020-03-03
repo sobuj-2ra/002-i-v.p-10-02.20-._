@@ -6,6 +6,16 @@
 
 <!--Page Header-->
 @section('page-header')
+    <style type="text/css">
+        .passport-label{
+            -webkit-user-select:none;
+            -moz-user-select:none;
+            user-select:none;
+        }
+        .alert-item:focus{
+            border:1px solid red;
+        }
+    </style>
     @if(isset($counter_no) && $counter_no > 0)
         <div id="page-header">
             Counter: <span class="bold_text">{{$counter_no}}</span> &nbsp;&nbsp;&nbsp; Floor No: <span class="bold_text">{{$floor_id}}</span> &nbsp;&nbsp;&nbsp; User ID: <span class="bold_text" >{{$user_id}}</span> &nbsp;&nbsp;&nbsp; Center: <span class="bold_text" >{{@$center_name->center_name}}</span> &nbsp;&nbsp;&nbsp; Service Fee: <span class="bold_text" >{{$ivac_svc_fee->Svc_Fee}}Tk</span> <span class="time float-right ">Time: <span class="bold_text">@{{ time }}</span></span></p>
@@ -235,7 +245,7 @@
                                                                        
                                                                         <div class="col-md-2">
                                                                             <div class="form-group">
-                                                                                <input type="number" name="validStkr[]" :id="'validStkr'+i" :data-id="i" class="form-control input_values" placeholder="Sticker Number" required   autocomplete="off">
+                                                                                <input @keypress="checkvalidStickerNoFunc" type="number" name="validStkr[]" :id="'validStkr'+i" :data-id="i" class="form-control input_values doubleStkr" placeholder="Sticker No." required   autocomplete="off">
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -249,8 +259,8 @@
                                                                                     <p ><input @keyup.enter="webfileSubmit" name="webfile[]" :id="'webfile'+i" :data-id="i" class="form-control input_values" placeholder="Enter Webfile" required autocomplete="off"></p>
                                                                                     {{-- <p v-show="passportSearch">Passport: <input  name="PassportNo2" id="PassportNo2" style="width:200px" required autocomplete="off" class="input_values"></p> --}}
                                                                                 </span>
-                                                                                <span :id="'webfile2_p'+i" style="display: none">
-                                                                                    <p><label :for="'webfileNo2'+i">Webfile</label><input @keyup.enter="webfileSubmit2"  name="webfile2" :id="'webfileNo2'+i" :data-id="i" style="background:#ffff87"  class="form-control input_values" required autocomplete="off"></p>
+                                                                                <span :id="'webfile2_p'+i" style="display: none" >
+                                                                                    <p><label :for="'webfileNo2'+i">Webfile</label><input @keyup.enter="webfileSubmit2"  name="webfile2" :id="'webfileNo2'+i" :data-id="i" style="background:#ffff87"  class="form-control input_values " required autocomplete="off"></p>
                                                                                 </span>
                                                                             </div>
                                                                         </div>
@@ -271,7 +281,7 @@
                                                                     <div class="row">
                                                                         <div class="col-md-4">
                                                                             <div class="form-group">
-                                                                                <label :id="'passport_show'+i"></label>
+                                                                                <label :id="'passport_show'+i" class="passport-label"></label>
                                                                                 <input class="form-control passport input_values" name="passportNo[]" placeholder="Passport" :id="'passportNo'+i" :data-id="i" autocomplete="off" required>
                                                                             </div>
 
@@ -350,6 +360,7 @@
                                                                                     <span class="input-group-addon">Taka</span>
                                                                                 </div>
                                                                             </div>
+
                                                                         </div>
                                                                         <br>
                                                                         
@@ -362,27 +373,26 @@
                                                                                         <span class="input-group-addon">Taka</span>
                                                                                     </div>
                                                                                 </div>
-                                                                                <div class="col-md-6">
+                                                                                <div class="col-md-3">
                                                                                     <div class="form-group">
                                                                                         <input class="form-control"  :id="'total_fee_disable'+i" :data-id="i"  placeholder="Total Amount" disabled>
                                                                                         <input type="hidden" class="form-control input_values" :id="'total_fee'+i" name="total_amount[]" >
-                                                                                       
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-md-3">
+                                                                                    <div class="form-group">
+                                                                                        <input @keyup="oldPassQtyFunc" required class="form-control input_values" name="old_pass[]" :id="'old_pass'+i" :data-id="i" placeholder="Old Passport Qty">
                                                                                     </div>
                                                                                 </div>
                                                                                 
                                                                             </div>
                                                                             <div class="row">
-                                                                                <div class="col-md-3">
-                                                                                    <div class="form-group">
-                                                                                        <label :for="'old_pass'+i"></label>
-                                                                                        <input required class="form-control input_values" name="old_pass[]" :id="'old_pass'+i" :data-id="i" placeholder="Old Passport Quantity">
-                                                                                    </div>
-                                                                                </div>
+                                                                                
                                                                                 <div class="col-md-3">
                                                                                     <div class="form-group">
                                                                                         <label :for="'paytype'+i"></label>
-                                                                                        <select name="paytype[]" :id="'paytype'+i" :data-id="i" class="form-control input_values" placeholder="Pay Type">
-                                                                                            <option value="3">Pay Type</option>
+                                                                                        <select name="paytype[]" :id="'paytype'+i" :data-id="i" class="form-control input_values" >
+                                                                                            <option>Pay Type</option>
                                                                                         </select>
                                                                                     </div>
                                                                                 </div>
@@ -395,10 +405,21 @@
                                                                                     </div>
                                                                                 </div>
                                                                                 <div class="col-md-3">
-                                                                                    <div :id="'rejected_button_show'+i" class="reject_button-here" style="display:none">
-                                                                                        <button @click="rejectBtnFunc" class="btn btn-danger" data-toggle="modal" data-target="#rejectModal"  style="margin-left:20px;">Reject</button>
+                                                                                    <div  class="form-group" >
+                                                                                        <label for="">Corr Fee</label>
+                                                                                        <input class="form-control" :id="'cor_item_fee_value'+i" style="display: none;" type="button" value="{{$getCorFee}}">
+                                                                                        <input class="form-control" :id="'cor_item_fee_value2'+i"  type="button" value="0" disabled>
+                                                                                        <input class="form-control input_values" name="corr_fee[]"  type="hidden" value="{{$getCorFee}}">
                                                                                     </div>
                                                                                 </div>
+                                                                                <div class="col-md-3">
+                                                                                    <div class="input-group">
+                                                                                        <div :id="'rejected_button_show'+i" class="reject_button-here" style="display:none">
+                                                                                            <button @click="rejectBtnFunc" class="btn btn-danger" data-toggle="modal" data-target="#rejectModal"  style="margin-left:20px;">Reject</button>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                
                                                                                 <br>
                                                                                 <br>
                                                                                 
@@ -442,8 +463,8 @@
                                                                                         <p><input @click="correctionShowFunc"  :id="'correction-box-show'+i" :data-id="i" type="checkbox" > <label  :for="'correction-box-show'+i" >CORRECTION</label></p>
                                                                                         <div :id="'correction-box'+i" class="correction-box" style="display: none;">
                                                                                             <p v-for="(correctionItem,i_in) in correctionList">
-                                                                                                <input class="input_values" :name='i+"correction_name[]"' :id="'signle-cor-item'+i+i_in"  type="checkbox" :value="correctionItem.Correction"> 
-                                                                                                <label :for="'signle-cor-item'+i+i_in">@{{ correctionItem.Correction }}</label>
+                                                                                                <input class="input_values" :name='i+"correction_name[]"' :id="'signle-cor-item'+i+i_in"  type="checkbox" :value="correctionItem.Correction" @click="correctionFeeFunc" :data-id="i"> 
+                                                                                                <label :for="'signle-cor-item'+i+i_in" @click="correctionFeeFunc" :data-id="i">@{{ correctionItem.Correction }}</label>
                                                                                             </p>
                                                                                         </div>
                                                                                         <p :id="'correction-box-select-all'+i" style="display: none;" ><input :id="'correction-all-select'+i" :data-id="i" @click="corrSelectAllFunc"  type="checkbox"> <label :for="'correction-all-select'+i">SELECT ALL</label></p>
@@ -490,7 +511,7 @@
                                                                 </div>
                                                                 <div class="custom-modal-footer">
                                                                     <button @click="DataSubmitFunc" class="btn btn-info float-left">YES</button>
-                                                                    <button @click="submitModalShow = !submitModalShow" class="btn btn-warning float-right">Cance</button>
+                                                                    <button @click="submitModalShow = !submitModalShow" class="btn btn-warning float-right">Cancel</button>
                                                                     
                                                                 </div>
                                                             </div>
@@ -672,6 +693,20 @@
                             console.log(error);
                         })
                 },
+                checkvalidStickerNoFunc:function(event){
+                    var id_name = event.target.getAttribute('id');
+                    $("#"+id_name).on("keypress keyup blur", function (event) {
+                        $(this).val($(this).val().replace(/[^0-9\.]/g, ''));
+                        if ((event.which != 46 || $(this).val().indexOf('.') != -1) && (event.which < 48 || event.which > 57)) {
+                            event.preventDefault();
+                        }
+                    });
+                    $("#"+id_name).on("input", function() {
+                        if (/^0/.test(this.value)) {
+                            this.value = this.value.replace(/^0/, "")
+                        }
+                    });
+                },
                 webfileSubmit:function(event) {
                     var id_index = event.target.getAttribute('data-id');
                     this.webfileDataNull = false;
@@ -723,9 +758,6 @@
                     }
                     else if (stkrNumST >= stkrNumEND) {
                         alert('Please Input Valid Sticker Number');
-                    }
-                    else if (book_rcvpt_no == '') {
-                        alert('Please Input Book Receipt No');
                     }
                     else if(gratiseYes.checked === false && gratiseNo.checked === false){
                         alert('Please Select a GRATIS');
@@ -872,9 +904,6 @@
                     else if (stkrNumST >= stkrNumEND) {
                         alert('Please Input Valid Sticker Number');
                     }
-                    else if (book_rcvpt_no == '') {
-                        alert('Please Input Book Receipt No');
-                    }
                     else if(gratiseYes.checked === false && gratiseNo.checked === false){
                         alert('Please Select a GRATIS');
                     }
@@ -985,16 +1014,34 @@
                                 $('#webfile_p'+id_index).hide();
                                 $('#webfile2_p'+id_index).show();
                                 $('#webfileNo2'+id_index).focus();
-                                alert('Please Provide Proper Webfile');
+                                alert('Please Input Valid Webfile No');
 
                             }
 
                         }
                     }
                 },
+                oldPassQtyFunc:function(event){
+                    var id_name = event.target.getAttribute('id');
+                    $("#"+id_name).on("keypress keyup blur", function (event) {
+                        $(this).val($(this).val().replace(/[^0-9\.]/g, ''));
+                        if ((event.which != 46 || $(this).val().indexOf('.') != -1) && (event.which < 48 || event.which > 57)) {
+                            event.preventDefault();
+                        }
+                    });
+                },
                 TotalFeeFunc:function(event){
                     var id = event.target.getAttribute('id');
                     var id_index = event.target.getAttribute('data-id');
+                    var id_name = event.target.getAttribute('id');
+                    $("#"+id_name).on("keypress keyup blur", function (event) {
+                        $(this).val($(this).val().replace(/[^0-9\.]/g, ''));
+                        if ((event.which != 46 || $(this).val().indexOf('.') != -1) && (event.which < 48 || event.which > 57)) {
+                            event.preventDefault();
+                        }
+                    });
+
+
                     var visaFee = document.getElementById('visaFee'+id_index).value;
                     var faxCharge = document.getElementById('faxCharge'+id_index).value;
                     var icwf = document.getElementById('icwf'+id_index).value;
@@ -1009,6 +1056,22 @@
                     var id_name = event.target.getAttribute('id');
                     var id_index = event.target.getAttribute('data-id');
                     var corSelectAll = document.getElementById(id_name);
+                    var is_cor_fee = false;
+                    for(var k = 0; k < this.correctionList.length; k++){
+                        var cor_item = document.getElementById(id_name);
+                        if(cor_item.checked === true){
+                            is_cor_fee = true;
+                        }
+                    }
+
+                    if(is_cor_fee == true){
+                        $('#cor_item_fee_value2'+id_index).hide();
+                        $('#cor_item_fee_value'+id_index).show();
+                    }
+                    else{
+                        $('#cor_item_fee_value'+id_index).hide();
+                        $('#cor_item_fee_value2'+id_index).show();
+                    }
 
                     if(corSelectAll.checked === true){
                         for(var j=0; j < this.correctionList.length; j++){
@@ -1026,6 +1089,28 @@
                             }
                         }
                     }
+
+                },
+                correctionFeeFunc: function(event){
+                    var id_name = event.target.getAttribute('id');
+                    var id_index = event.target.getAttribute('data-id');
+                    var is_cor_fee = false;
+                    for(var j = 0; j < this.correctionList.length; j++){
+                        var cor_item = document.getElementById('signle-cor-item'+id_index+j);
+                        if(cor_item.checked === true){
+                            is_cor_fee = true;
+                        }
+                    }
+
+                    if(is_cor_fee == true){
+                        $('#cor_item_fee_value2'+id_index).hide();
+                        $('#cor_item_fee_value'+id_index).show();
+                    }
+                    else{
+                        $('#cor_item_fee_value'+id_index).hide();
+                        $('#cor_item_fee_value2'+id_index).show();
+                    }
+
 
                 },
                 correctionShowFunc: function (event) {
@@ -1047,6 +1132,8 @@
                             var single_select_all = document.getElementById("signle-cor-item"+id_index+j);
                             if(single_select_all.checked === true){
                                 single_select_all.checked = false;
+                                $('#cor_item_fee_value'+id_index).hide();
+                                $('#cor_item_fee_value2'+id_index).show();
                             }
                         }
                         document.getElementById("correction-all-select"+id_index).checked = false;
@@ -1102,6 +1189,7 @@
                     this.submitModalShow = false;
                     this.not_all_data_valid = true;
                     var is_alert_already = true;
+                    var DoubleValidStkrArr = [];
                     for(var k=0;k < this.addMoreButtonArr.length; k++){
                         var id_index = k;
                         var getPass = document.getElementById('passportNo'+id_index).value;
@@ -1114,6 +1202,7 @@
                         var gratisVal = $("input[name='gratis_status1']:checked").val();
                         var validStkr = document.getElementById('validStkr'+id_index).value;
                         var validStkrF = Number(validStkr);
+                        DoubleValidStkrArr.push(validStkrF);
                         var inputTSt = Number(this.stkr_str);
                         var validStkr2 = document.getElementById('validStkr'+id_index).value;
                         var validStkr2F = Number(validStkr2);
@@ -1136,8 +1225,26 @@
                         var appCharge = document.getElementById('appCharge'+id_index).value;
                         var paytype = document.getElementById('paytype'+id_index).value;
                         var old_pass = document.getElementById('old_pass'+id_index).value;
+                        
                         if(webfile != '' && showPass != ''){
-                            if(validStkrF < inputTSt || validStkr2F > InputTE)
+
+                            if(DoubleValidStkrArr.length > 1){
+                                var obj = {};
+                                $(".doubleStkr").each(function(){
+                                    if(obj.hasOwnProperty(this.value)) {
+                                        if(is_alert_already ==  true){
+                                            is_alert_already = false;
+                                            this.not_all_data_valid = false;
+                                            this.submitModalShow = false;
+                                            alert("there is a duplicate value " + this.value);
+                                        }
+                                    } 
+                                    else {
+                                        obj[this.value] = this.value;
+                                    }
+                                });
+                            }
+                            else if(validStkrF < inputTSt || validStkr2F > InputTE)
                             {   
                                 if(is_alert_already ==  true){
                                     is_alert_already = false;
@@ -1153,6 +1260,7 @@
                                     is_alert_already = false;
                                     this.not_all_data_valid = false;
                                     this.submitModalShow = false;
+                                    $('#passportNo'+id_index).focus();
                                     alert('Please Enter Valid Passport Number '+id_index);
                                 }
                             }
@@ -1232,11 +1340,14 @@
                                         this.submitModalShow = false;
                                         alert('Please Enter ICWF '+id_index);
                                     }
-                                    else if(appCharge == ''){
-                                        is_alert_already = false;
-                                        this.not_all_data_valid = false;
-                                        this.submitModalShow = false;
-                                        alert('Please Enter App Charge '+id_index);
+                                    
+                                    else if(old_pass == ''){   
+                                        if(is_alert_already ==  true){
+                                            is_alert_already = false;
+                                            this.not_all_data_valid = false;
+                                            this.submitModalShow = false;
+                                            alert('Please Enter Old Passport Qty '+id_index);
+                                        }
                                     }
                                     else if(paytype == ''){   
                                         if(is_alert_already ==  true){
@@ -1246,24 +1357,9 @@
                                             alert('Please Select Payment Type '+id_index);
                                         }
                                     }
-                                    else if(old_pass == ''){   
-                                        if(is_alert_already ==  true){
-                                            is_alert_already = false;
-                                            this.not_all_data_valid = false;
-                                            this.submitModalShow = false;
-                                            alert('Please Enter Old Passport Qty '+id_index);
-                                        }
-                                    }
+                                    
                                     else{
                                         this.is_all_data_valid = true;
-                                    }
-                                }
-                                else if(paytype == ''){   
-                                    if(is_alert_already ==  true){
-                                        is_alert_already = false;
-                                        this.not_all_data_valid = false;
-                                        this.submitModalShow = false;
-                                        alert('Please Select Payment Type '+id_index);
                                     }
                                 }
                                 else if(old_pass == ''){   
@@ -1274,6 +1370,15 @@
                                         alert('Please Enter Old Passport Qty '+id_index);
                                     }
                                 }
+                                else if(paytype == ''){   
+                                    if(is_alert_already ==  true){
+                                        is_alert_already = false;
+                                        this.not_all_data_valid = false;
+                                        this.submitModalShow = false;
+                                        alert('Please Select Payment Type '+id_index);
+                                    }
+                                }
+                                
                                 else{
                                     this.is_all_data_valid = true;
                                 }
@@ -1312,6 +1417,9 @@
                 addMoreButtonFunc:function(){
                     
                     this.addMoreButtonArr.push({});
+                    this.storeResStatusf = false;
+                    this.storeResMsg = '';
+                    this.failToSaveArr = [];
                 },
                 removeMoreButtonFuncElemnt:function(index){
                     this.addMoreButtonArr.splice(index,1);
@@ -1416,13 +1524,17 @@
                             _this.webfilePreloader = false;
                             console.log(res);
                             if (res.data.status = 'yes') {
+                                if(_this.addMoreButtonArr.length <= 1){
+                                    _this.addMoreButtonArr = [];
+                                    _this.storeResStatusf = true;
+                                    _this.storeResMsg = res.data.statusMsg;
+                                }
+
                                 _this.rejectModalShow = false;
                                 document.getElementById('total_reject_count').innerText = res.data.rejectCount;
                                 //console.log('d')
                                 _this.rejectResStatus = true;
                                 document.getElementById('rejected_res_msg'+id_index).innerText = res.data.statusMsg;
-                                _this.selectedTokenval = '';
-                                _this.selectedTokenQty = '';
                                 _this.clearBtnFunc();
                                 _this.cleanBtn = false;
 
@@ -1596,6 +1708,18 @@
             }
         });
 
+        $("#book_rcvpt_no").on("keypress keyup blur", function (event) {
+            $(this).val($(this).val().replace(/[^0-9\.]/g, ''));
+            if ((event.which != 46 || $(this).val().indexOf('.') != -1) && (event.which < 48 || event.which > 57)) {
+                event.preventDefault();
+            }
+        });
+        $("#book_rcvpt_no").on("input", function() {
+            if (/^0/.test(this.value)) {
+                this.value = this.value.replace(/^0/, "")
+            }
+        });
+
 
         $("#sticker_no_to").on("keypress keyup blur", function (event) {
             $(this).val($(this).val().replace(/[^0-9\.]/g, ''));
@@ -1610,17 +1734,7 @@
         });
 
 
-        $("#validStkr").on("keypress keyup blur", function (event) {
-            $(this).val($(this).val().replace(/[^0-9\.]/g, ''));
-            if ((event.which != 46 || $(this).val().indexOf('.') != -1) && (event.which < 48 || event.which > 57)) {
-                event.preventDefault();
-            }
-        });
-        $("#validStkr").on("input", function() {
-            if (/^0/.test(this.value)) {
-                this.value = this.value.replace(/^0/, "")
-            }
-        });
+
 
 
         $("#Spfee").on("keypress keyup blur", function (event) {
