@@ -388,31 +388,33 @@ class ManageSettingController extends Controller
 
   public function changeStatusEdit(Request $r){
     $webfileData = Tbl_appointmentlist::where('WebFile_no',$r->webfile)->first();
-    $status = $webfileData->Presence_Status;
-    if($status){
-      $statusArr = ['ACCEPTED','PENDING','REJECTED','RETURN','BACK REJECTED','EXPIRED'];
-      if($status == 'ACCEPTED'){
-        $resArr = ['PENDING','REJECTED','RETURN','BACK REJECTED','EXPIRED'];
-      }
-      else if($status == 'PENDING'){
-        $resArr = ['REJECTED'];
-      }
-      else if($status == 'BACK REJECTED'){
-        $resArr = ['PENDING','RETURN'];
-      }
-      else if($status == 'REJECTED'){
-        $resArr = ['PENDING','RETURN'];
-      }
-      else if($status == 'RETURN'){
-        $resArr = ['REJECTED','PENDING'];
-      }
-      else if($status == 'EXPIRED'){
-        $resArr =  ['PENDING','REJECTED','RETURN','BACK REJECTED'];
-      }
-      return view('admin_operation.change_status_edit',compact('statusArr','webfileData','resArr'));
+    if($webfileData){
+        $status = $webfileData->Presence_Status;
+        if($status){
+          $statusArr = ['ACCEPTED','PENDING','REJECTED','RETURN','BACK REJECTED','EXPIRED'];
+          if($status == 'ACCEPTED'){
+            $resArr = ['PENDING','REJECTED','RETURN','BACK REJECTED','EXPIRED'];
+          }
+          else if($status == 'PENDING'){
+            $resArr = ['REJECTED'];
+          }
+          else if($status == 'BACK REJECTED'){
+            $resArr = ['PENDING','RETURN'];
+          }
+          else if($status == 'REJECTED'){
+            $resArr = ['PENDING','RETURN'];
+          }
+          else if($status == 'RETURN'){
+            $resArr = ['REJECTED','PENDING'];
+          }
+          else if($status == 'EXPIRED'){
+            $resArr =  ['PENDING','REJECTED','RETURN','BACK REJECTED'];
+          }
+          return view('admin_operation.change_status_edit',compact('statusArr','webfileData','resArr'));
+        }
     }
     else{
-      return redirect('operation/change-status');
+      return redirect('operation/change-status')->with(['msg'=>'Webfile Not Found','status'=>'warning']);
     }
   }
 

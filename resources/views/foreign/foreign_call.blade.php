@@ -15,6 +15,9 @@
         .alert-item:focus{
             border:1px solid red;
         }
+        .reject_button-here {
+            margin-top: 5px;
+        }
     </style>
     @if(isset($counter_no) && $counter_no > 0)
         <div id="page-header">
@@ -89,6 +92,8 @@
                                     <input name="floor_id" id="floor_id" type="hidden" value="{{$floor_id}}" class="input_values">
                                     <input name="selected_token" id="selected_token" type="hidden" :value="selectedTokenval" class="input_values">
                                     <input name="selected_token_qty" id="selected_token_qty" type="hidden" :value="selectedTokenQty" class="input_values">
+                                    <input id="book_start_no" type="hidden" value="{{$book_no->start_no}}" >
+                                    <input id="book_end_no" type="hidden" value="{{$book_no->end_no}}" >
                                 </div>
                                 <div class="single-datadisplaybox-left">
                                     <div @click="regularAreaCLickFunc" class="single-datadisplaybox">
@@ -200,7 +205,7 @@
                                                                         value="Book no-<?php if (isset($book_no->book_no) && !empty($book_no->book_no)) {
                                                                                 echo $book_no->book_no;
                                                                             } ?>" name="book_no"
-                                                                            placeholder="Book No" autocomplete="off" style="width:100px;height:30px" disabled>
+                                                                            placeholder="Book No" autocomplete="off" style="width:110px;height:30px" disabled>
                                                                         <input type="hidden" class="form-control input_values"
                                                                             value="<?php if (isset($book_no->book_no) && !empty($book_no->book_no)) {
                                                                                 echo $book_no->book_no;
@@ -210,16 +215,14 @@
                                                                 </td>
                                                                 <td>
                                                                     <div class="form-group">
-                                                                        <input class="form-control input_values" name="book_rcvpt_no" id="book_rcvpt_no" placeholder="Receipt No" style="width:100px;height:30px" autocomplete="off" required>
+                                                                        <input @blur="receiptNoFunc" class="form-control input_values" name="book_rcvpt_no" id="book_rcvpt_no" placeholder="Receipt No" style="width:100px;height:30px" autocomplete="off" required>
                                                                     </div>
                                                                 </td>
                                                             </tr>
                                                         </table>
                                                     </div>
                                                     <div  v-for="(mainitem, i) in addMoreButtonArr" class="col-md-12">
-                                                        <br>
                                                         
-                                                        <br>
                                                         <div  class="webfile-bottom-area">
                                                             <div class="webfile-success-area">
                                                                 
@@ -231,21 +234,26 @@
                                                                         <div class="col-md-1" style="padding-right: 0px;padding-left: 0px">
                                                                             <div class="checkbox">
                                                                                 <label>
-                                                                                    <input type="radio" :name='i+"gratis_status1[]"' :id="'gratiseYes'+i" class="input_values" value="yes" required> Yes
+                                                                                    <input @click="gratisClickFunc" type="radio" :name='i+"gratis_status1[]"' :id="'gratiseYes'+i" :data-id="i" class="input_values" value="yes" required> Yes
                                                                                 </label>
                                                                             </div>
                                                                         </div>
                                                                         <div class="col-md-1" style="padding-left: 0px;">
                                                                             <div class="checkbox">
                                                                                 <label>
-                                                                                    <input type="radio" :name='i+"gratis_status1[]"' :id="'gratiseNo'+i" class="input_values" value="no"> No
+                                                                                    <input @click="gratisClickFunc"  type="radio" :name='i+"gratis_status1[]"' :id="'gratiseNo'+i" :data-id="i" class="input_values" value="no"> No
                                                                                 </label>
                                                                             </div>
                                                                         </div>
                                                                        
                                                                         <div class="col-md-2">
                                                                             <div class="form-group">
-                                                                                <input @keypress="checkvalidStickerNoFunc" type="number" name="validStkr[]" :id="'validStkr'+i" :data-id="i" class="form-control input_values doubleStkr" placeholder="Sticker No." required   autocomplete="off">
+                                                                                <input @keyup="SpecialCharValidationFunc" @blur="checkValidStkrFunc" type="number" name="validStkr[]" :id="'validStkr'+i" :data-id="i" class="form-control input_values doubleStkr" placeholder="Sticker No." required  autocomplete="off">
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-2">
+                                                                            <div class="form-group">
+                                                                                <input @keyup="SpecialCharValidationFunc" @blur="checkGratisStkrFunc" type="number" name="gratisStrkNum[]" :id="'gratisStrkNum'+i" :data-id="i" class="form-control input_values" placeholder="Gratis Sticker" style="display: none"    autocomplete="off">
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -254,9 +262,14 @@
                                                                             <div class="form-group">
                                                                                 {{-- <input class="form-control" id="web_file_no" name="web_file_no" placeholder="Web file number" autocomplete="off" required> --}}
                                                                             
-                                                                                <span :id="'webfile_p'+i">
+                                                                                <span :id="'webfile_disable'+i"  style="display: none">
                                                                                     <label for=""></label>
-                                                                                    <p ><input @keyup.enter="webfileSubmit" name="webfile[]" :id="'webfile'+i" :data-id="i" class="form-control input_values" placeholder="Enter Webfile" required autocomplete="off"></p>
+                                                                                    <p><input   :id="'webfile_disable_value'+i" :data-id="i" class="form-control " placeholder="Enter Webfile" required autocomplete="off" disabled></p>
+                                                                                    {{-- <p v-show="passportSearch">Passport: <input  name="PassportNo2" id="PassportNo2" style="width:200px" required autocomplete="off" class="input_values"></p> --}}
+                                                                                </span>
+                                                                                <span :id="'webfile_p'+i" >
+                                                                                    <label for=""></label>
+                                                                                    <p><input @keyup.enter="webfileSubmit" name="webfile[]" :id="'webfile'+i" :data-id="i" class="form-control input_values" placeholder="Enter Webfile" required autocomplete="off" ></p>
                                                                                     {{-- <p v-show="passportSearch">Passport: <input  name="PassportNo2" id="PassportNo2" style="width:200px" required autocomplete="off" class="input_values"></p> --}}
                                                                                 </span>
                                                                                 <span :id="'webfile2_p'+i" style="display: none" >
@@ -390,7 +403,7 @@
                                                                                 
                                                                                 <div class="col-md-3">
                                                                                     <div class="form-group">
-                                                                                        <label :for="'paytype'+i"></label>
+                                                                                        <label :for="'paytype'+i">Pay Method</label>
                                                                                         <select name="paytype[]" :id="'paytype'+i" :data-id="i" class="form-control input_values" >
                                                                                             <option>Pay Type</option>
                                                                                         </select>
@@ -398,13 +411,13 @@
                                                                                 </div>
                                                                                 <div class="col-md-3">
                                                                                     <div class="form-group">
-                                                                                        <label :for="'proc_fee'+i" :id="'proc_fee_res'+i"></label>
+                                                                                        <label :for="'proc_fee'+i" :id="'proc_fee_res'+i">Proc Fee</label>
                                                                                         <input type="hidden" :id="'proc_fee_res_value'+i" name="proc_fee[]" class="input_values">
                                                                                         <input :id="'sp_fee'+i" :data-id="i" name="sp_fee[]" class="form-control input_values" type="text" value=""  autocomplete="off">
                                                                                         
                                                                                     </div>
                                                                                 </div>
-                                                                                <div class="col-md-3">
+                                                                                <div class="col-md-2">
                                                                                     <div  class="form-group" >
                                                                                         <label for="">Corr Fee</label>
                                                                                         <input class="form-control" :id="'cor_item_fee_value'+i" style="display: none;" type="button" value="{{$getCorFee}}">
@@ -412,10 +425,19 @@
                                                                                         <input class="form-control input_values" name="corr_fee[]"  type="hidden" value="{{$getCorFee}}">
                                                                                     </div>
                                                                                 </div>
-                                                                                <div class="col-md-3">
-                                                                                    <div class="input-group">
+                                                                                <div class="col-md-2">
+                                                                                    <div  class="form-group" >
+                                                                                        <label for=""></label>
                                                                                         <div :id="'rejected_button_show'+i" class="reject_button-here" style="display:none">
                                                                                             <button @click="rejectBtnFunc" class="btn btn-danger" data-toggle="modal" data-target="#rejectModal"  style="margin-left:20px;">Reject</button>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-md-2">
+                                                                                    <div  class="form-group" >
+                                                                                        <label for=""></label>
+                                                                                        <div :id="'clear_button_item'+i" style="display:none">
+                                                                                            <button @click="clearAddMoreItemFunc" class="btn btn-warning"  :id="'clearAddMoreItem'+i" :data-id="i" style="margin-left:20px;">Clear</button>
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
@@ -494,7 +516,7 @@
                                                 
                                                 <div class="col-md-12">
                                                     <div  class="webfile-submit-area">
-                                                        <button  @click="submitFunc" type="button" class="btn btn-primary" data-toggle="modal" data-target="#submitModal">Submit</button> 
+                                                        <button  @click="submitFunc" type="button" class="btn btn-success" data-toggle="modal" data-target="#submitModal">Submit</button> 
                                                         <!-- Modal -->
                                                         <div v-show="submitModalShow" class="custom-modal-area">
                                                             <div class="custom-modal">
@@ -507,12 +529,10 @@
                                                                             <td><span>@{{ vcItem }}</span></td>
                                                                         </tr>
                                                                     </table>
-
                                                                 </div>
                                                                 <div class="custom-modal-footer">
                                                                     <button @click="DataSubmitFunc" class="btn btn-info float-left">YES</button>
                                                                     <button @click="submitModalShow = !submitModalShow" class="btn btn-warning float-right">Cancel</button>
-                                                                    
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -532,10 +552,11 @@
                 </div>
             </div>
         </section>
+        <input type="hidden" id="start_no"  value="{{@$book_no->start_no}}">
+        <input type="hidden" id="end_no"  value="{{@$book_no->end_no}}">
     </div>
 
     <script>
-        
         var app = new Vue({
             el:'#app1',
             data:{
@@ -693,7 +714,7 @@
                             console.log(error);
                         })
                 },
-                checkvalidStickerNoFunc:function(event){
+                SpecialCharValidationFunc:function(event){
                     var id_name = event.target.getAttribute('id');
                     $("#"+id_name).on("keypress keyup blur", function (event) {
                         $(this).val($(this).val().replace(/[^0-9\.]/g, ''));
@@ -706,6 +727,112 @@
                             this.value = this.value.replace(/^0/, "")
                         }
                     });
+                },
+                checkGratisStkrFunc:function(event){
+                    var id_name = event.target.getAttribute('id');
+                    var id_index = event.target.getAttribute('data-id');
+                    var validStkr = document.getElementById(id_name).value;
+                    validStkr = Number(validStkr);
+                    var is_alert_run = true;
+                   
+                    axios.get('check_gratis_sticker_axios',{params:{'validStkr':validStkr}})
+                    .then(function(res){
+                        if(res.data.validStatus == 'No'){
+                            document.getElementById(id_name).value = '';
+                            alert("This Gratis Stiker number already exists !");
+                        };
+                    })
+                    .catch(function(error){
+                        console.log('error');
+                    });
+
+                },
+                checkValidStkrFunc:function(event){
+                    var id_name = event.target.getAttribute('id');
+                    var id_index = event.target.getAttribute('data-id');
+                    var validStkr = document.getElementById(id_name).value;
+                    validStkr = Number(validStkr);
+                    var validStikerType = document.getElementById('sticker_type').value;
+                    var is_alert_run = true;
+                    if(validStikerType == ''){
+                        $('#sticker_type').focus();
+                        document.getElementById(id_name).value = '';
+                        alert('Please Select Sticker Type');
+                    }
+                    else if(this.stkr_str == '' || this.stkr_end == ''){
+                        document.getElementById(id_name).value = '';
+                        if(this.stkr_str == ''){
+                            $('#sticker_no_from').focus();
+                        }
+                        else{
+                            $('#sticker_no_to').focus();
+                        }
+                        alert('Please Input Sticker Number Start/End');
+                    }
+                    else if(validStkr == ''){
+                        
+                    }
+                    else if(this.stkr_str > validStkr || this.stkr_end < validStkr){
+                        document.getElementById(id_name).value = '';
+                        alert("Stiker No must be between " + this.stkr_str + " and " + this.stkr_end + "");
+                    }
+                    else{
+                        axios.get('check_valid_sticker_axios',{params:{'validSticker':validStkr,'validStikerType':validStikerType}})
+                        .then(function(res){
+                            if(res.data.validStatus == 'No'){
+                                document.getElementById(id_name).value = '';
+                                alert("This Stiker number already exists !");
+                            };
+                        })
+                        .catch(function(error){
+                            console.log('error');
+                        });
+                    }
+
+                },
+                gratisClickFunc:function(event){
+                    var id_name = event.target.getAttribute('id');
+                    var id_index = event.target.getAttribute('data-id');
+                    var gratisYes = document.getElementById('gratiseYes'+id_index);
+                    if(gratisYes.checked === true){
+                        document.getElementById('gratisStrkNum'+id_index).value = '';
+                        $('#gratisStrkNum'+id_index).show();
+                    }
+                    else{
+                        document.getElementById('gratisStrkNum'+id_index).value = '';
+                        $('#gratisStrkNum'+id_index).hide();
+                    } 
+
+                },
+                receiptNoFunc:function(event){
+                    var id_name = event.target.getAttribute('id');
+                    var center_name = document.getElementById('center_name').value;
+                    var receiptNo = document.getElementById(id_name).value;
+                        receiptNo = Number(receiptNo);
+                    var book_name =  document.getElementById('book_no').value;
+                    var book_start =  document.getElementById('book_start_no').value;
+                        book_start = Number(book_start);
+                    var book_end =  document.getElementById('book_end_no').value;
+                        book_end = Number(book_end);
+                    var is_alert_run = true;
+                    console.log(book_start+ ' '+book_end+' '+receiptNo);
+                    if(receiptNo < book_start || receiptNo > book_end){
+                        is_alert_run = false;
+                        document.getElementById(id_name).value = '';
+                        alert("Receipt No must be between " + book_start + " and " + book_end + "");
+                    }
+                    else{
+                        axios.get('axios_check_foreign_pass_rcpt_valid',{params:{'receiptNo':receiptNo,'book_name':book_name,'center_name':center_name}})
+                        .then(function(res){
+                            if(res.data.status == 'invalid'){
+                                document.getElementById(id_name).value = '';
+                                alert("This Receipt number already exists !");
+                            };
+                        })
+                        .catch(function(error){
+                            console.log('error');
+                        });
+                    }
                 },
                 webfileSubmit:function(event) {
                     var id_index = event.target.getAttribute('data-id');
@@ -726,6 +853,21 @@
                     document.getElementById('name'+id_index).value = '';
                     document.getElementById('passportNo'+id_index).value = '';
                     document.getElementById('proc_fee_res_value'+id_index).value = '';
+                    document.getElementById('passport_show'+id_index).innerText = '';
+                    document.getElementById('nationality'+id_index).innerText = '';
+                    document.getElementById('duration'+id_index).value = '';
+                    document.getElementById('entry_type'+id_index).value = '';
+                    document.getElementById('visaFee'+id_index).innerText = '';
+                    document.getElementById('faxCharge'+id_index).innerText = '';
+                    document.getElementById('icwf'+id_index).innerText = '';
+                    document.getElementById('appCharge'+id_index).innerText = '';
+                    document.getElementById('total_fee'+id_index).innerText = '';
+                    document.getElementById('total_fee_disable'+id_index).innerText = '';
+                    document.getElementById('old_pass'+id_index).innerText = '';
+                    document.getElementById('tddDelDateId'+id_index).innerText = '';
+                    document.getElementById('tddDelDateValue'+id_index).value = '';
+                    document.getElementById('sp_fee'+id_index).value = '';
+
                     // document.getElementById('Spfee').value = '';
                     // document.getElementById('visa_type').value = '';
                     document.getElementById('contact'+id_index).value = '';
@@ -738,6 +880,8 @@
                     var gratiseYes = document.getElementById('gratiseYes'+id_index);
                     var gratiseNo = document.getElementById('gratiseNo'+id_index);
                     var validStkr = document.getElementById('validStkr'+id_index).value;
+                    var gratisStrkNum = document.getElementById('gratisStrkNum'+id_index).value;
+                    var selectedToken = document.getElementById('selectedTokenDisplay').innerText;
 
                     _this = this;
                     var sticker = document.getElementById('sticker_type').value;
@@ -745,27 +889,38 @@
                     var stkrNumST = Number(this.stkr_str);
                     var stkrNumEND = Number(this.stkr_end);
                     if (service_type == '') {
+                        $('#service_type').focus();
                         alert('Please Select Service Type');
                     }
-                    else if (this.selectedToken == false) {
+                    else if (selectedToken == '') {
                         alert('Please Select Token');
                     }
                     else if (sticker == '') {
+                        $('#sticker_type').focus();
                         alert('Please Select Sticker Type')
                     }
                     else if (stkrNumST == '' || stkrNumEND == '') {
+                        $('#sticker_no_from').focus();
                         alert('Please Input Sticker Starting and Ending Number');
                     }
                     else if (stkrNumST >= stkrNumEND) {
+                        $('#sticker_no_from').focus();
                         alert('Please Input Valid Sticker Number');
                     }
                     else if(gratiseYes.checked === false && gratiseNo.checked === false){
-                        alert('Please Select a GRATIS');
+                        $('#gratiseYes'+id_index).focus();
+                        alert('Please Select GRATIS status');
                     }
                     else if(validStkr == ''){
+                        // $('#validStkr'+id_index).focus();
                         alert('Please Enter Sticker Number');
                     }
+                    else if(gratiseYes.checked === true && gratiseNo.checked === false && gratisStrkNum == ''){
+                        $('#gratisStrkNum'+id_index).focus();
+                        alert('Please Input GRATIS No.');
+                    }
                     else if(validStkr < stkrNumST || validStkr > stkrNumEND){
+                        $('#sticker_no_from'+id_index).focus();
                         alert('Please Enter Valid Sticker No.');
                     }
                     else {
@@ -796,40 +951,46 @@
                                             _this.submitBtn = true;
                                             _this.cleanBtn = true;
                                             $('#rejected_button_show'+id_index).show();
+                                            $('#clear_button_item'+id_index).show();
 
                                             document.getElementById('webfile'+id_index).value = res.data.webfileData.WebFile_no;
+                                            $('#webfile_p'+id_index).hide();
+                                            $('#webfile_disable'+id_index).show();
+                                            document.getElementById('webfile_disable_value'+id_index).value = res.data.webfileData.WebFile_no;
                                             // document.getElementById('web_file_no').value = res.data.webfileData.WebFile_no;
                                             document.getElementById('name'+id_index).value = res.data.webfileData.Applicant_name;
                                             document.getElementById('passport_show'+id_index).innerText = res.data.webfileData.Passport;
                                             document.getElementById('contact'+id_index).value = res.data.webfileData.Contact;
-                                            document.getElementById('paytype'+id_index).value = res.data.paytype;
-
-
-                                            var ssldata = res.data.sllData.split(',');
                                             document.getElementById('paytype'+id_index).innerHTML = res.data.paytype;
+                                            // document.getElementById('paytype'+id_index).value = res.data.paytype;
 
-                                            document.getElementById('txn_number'+id_index).value  = ssldata[3];
-                                            document.getElementById('txn_date'+id_index).value = ssldata[4];
-                                            if (ssldata[0] == 'Yes') {
-                                                if (ssldata[2] == '') {
-                                                    document.getElementById('sslres_msg'+id_index).innerText = ssldata[3] + ' ' + ssldata[4];
-                                                    document.getElementById('proc_fee_res'+id_index).innerText = ssldata[6];
-                                                    document.getElementById('proc_fee_res_value'+id_index).value = ssldata[6];
-                                                }
-                                                else if (!ssldata[1] == '0') {
-                                                    document.getElementById('sslres_msg'+id_index).innerText = 'Already checked ' + ssldata[1] + ' on ' + ssldata[2] + ' amount ' + ssldata[6];
-                                                    document.getElementById('proc_fee_res'+id_index).innerText = ssldata[6];
-                                                    document.getElementById('proc_fee_res_value'+id_index).value = ssldata[6];
-                                                }
 
-                                            }
-                                            else if (ssldata[0] == 'No') {
-                                                document.getElementById('sslres_msg'+id_index).innerText = 'No Payment Data Found';
-                                                document.getElementById('proc_fee_res'+id_index).innerText = '0.00';
-                                                document.getElementById('proc_fee_res_value'+id_index).value = '0.00';
+                                            if(res.data.sslnotrun == 'Yes'){
+                                                document.getElementById('sslres_msg'+id_index).innerText = 'SSL Server Not Found';
+                                                
                                             }
                                             else {
-                                                document.getElementById('sslres_msg'+id_index).innerText = 'SSL Server Not Found';
+                                                var ssldata = res.data.sllData.split(',');
+                                                document.getElementById('txn_number'+id_index).value  = ssldata[3];
+                                                document.getElementById('txn_date'+id_index).value = ssldata[4];
+                                                if (ssldata[0] == 'Yes') {
+                                                    if (ssldata[2] == '') {
+                                                        document.getElementById('sslres_msg'+id_index).innerText = ssldata[3] + ' ' + ssldata[4];
+                                                        document.getElementById('proc_fee_res'+id_index).innerText = ssldata[6];
+                                                        document.getElementById('proc_fee_res_value'+id_index).value = ssldata[6];
+                                                    }
+                                                    else if (!ssldata[1] == '0') {
+                                                        document.getElementById('sslres_msg'+id_index).innerText = 'Already checked ' + ssldata[1] + ' on ' + ssldata[2] + ' amount ' + ssldata[6];
+                                                        document.getElementById('proc_fee_res'+id_index).innerText = ssldata[6];
+                                                        document.getElementById('proc_fee_res_value'+id_index).value = ssldata[6];
+                                                    }
+
+                                                }
+                                                else if (ssldata[0] == 'No') {
+                                                    document.getElementById('sslres_msg'+id_index).innerText = 'No Payment Data Found';
+                                                    document.getElementById('proc_fee_res'+id_index).innerText = '0.00';
+                                                    document.getElementById('proc_fee_res_value'+id_index).value = '0.00';
+                                                }
                                             }
 
                                             _this.specialCharBlock();
@@ -880,6 +1041,21 @@
                     this.correctionShow = false;
                     this.corItem = [];
                     this.corAllSelected = false;
+                    document.getElementById('passport_show'+id_index).innerText = '';
+                    document.getElementById('nationality'+id_index).innerText = '';
+                    document.getElementById('duration'+id_index).value = '';
+                    document.getElementById('entry_type'+id_index).value = '';
+                    document.getElementById('visaFee'+id_index).innerText = '';
+                    document.getElementById('faxCharge'+id_index).innerText = '';
+                    document.getElementById('icwf'+id_index).innerText = '';
+                    document.getElementById('appCharge'+id_index).innerText = '';
+                    document.getElementById('total_fee'+id_index).innerText = '';
+                    document.getElementById('total_fee_disable'+id_index).innerText = '';
+                    document.getElementById('old_pass'+id_index).innerText = '';
+                    document.getElementById('tddDelDateId'+id_index).innerText = '';
+                    document.getElementById('tddDelDateValue'+id_index).value = '';
+                    document.getElementById('sp_fee'+id_index).value = '';
+
 
                     var service_type = document.getElementById('service_type').value;
                     var gratiseYes = document.getElementById('gratiseYes'+id_index);
@@ -887,18 +1063,25 @@
                     var validStkr = document.getElementById('validStkr'+id_index).value;
                     var sticker = document.getElementById('sticker_type').value;
                     var book_rcvpt_no = document.getElementById('book_rcvpt_no').value;
+                    var gratisStrkNum = document.getElementById('gratisStrkNum'+id_index).value;
+                    var selectedToken = document.getElementById('selectedTokenDisplay').innerText;
+
+
                     var stkrNumST = Number(this.stkr_str);
                     var stkrNumEND = Number(this.stkr_end);
                     if (service_type == '') {
+                        $('#service_type').focus();
                         alert('Please Select Service Type');
                     }
-                    else if (this.selectedToken == false) {
+                    else if (selectedToken == '') {
                         alert('Please Select Token');
                     }
                     else if (sticker == '') {
+                        $('#sticker_type').focus();
                         alert('Please Select Sticker Type')
                     }
                     else if (stkrNumST == '' || stkrNumEND == '') {
+                        $('#sticker_no_from').focus();
                         alert('Please Input Sticker Starting and Ending Number');
                     }
                     else if (stkrNumST >= stkrNumEND) {
@@ -909,6 +1092,10 @@
                     }
                     else if(validStkr == ''){
                         alert('Please Enter Sticker Number');
+                    }
+                    else if(gratiseYes.checked === true && gratiseNo.checked === false && gratisStrkNum == ''){
+                        $('#gratisStrkNum'+id_index).focus();
+                        alert('Please Input GRATIS No.');
                     }
                     else if(validStkr < stkrNumST || validStkr > stkrNumEND){
                         alert('Please Enter Valid Sticker No.');
@@ -951,8 +1138,12 @@
                                             $('#webfile2_p'+id_index).hide();
                                             $('#webfile'+id_index).focus();
                                             $('#rejected_button_show'+id_index).show();
+                                            $('#clear_button_item'+id_index).show();
 
                                             document.getElementById('webfile'+id_index).value = res.data.webfileData.WebFile_no;
+                                            $('#webfile_p'+id_index).hide();
+                                            $('#webfile_disable'+id_index).show();
+                                            document.getElementById('webfile_disable_value'+id_index).value = res.data.webfileData.WebFile_no;
                                             // document.getElementById('web_file_no').value = res.data.webfileData.WebFile_no;
                                             document.getElementById('name'+id_index).value = res.data.webfileData.Applicant_name;
                                             document.getElementById('passport_show'+id_index).innerText = res.data.webfileData.Passport;
@@ -1151,11 +1342,50 @@
                         }
                     }
                 },
+
                 rejectBtnFunc: function () {
+                    var id_name = event.target.getAttribute('id');
+                    var id_index = event.target.getAttribute('data-id');
+                    
                     this.rejectModalShow = true;
                     this.rejectItem = [];
                     if (this.rejectItem == '') {
                         this.selectRejectAll = false;
+                    }
+                },
+
+                clearAddMoreItemFunc: function (event) {
+                    var id_name = event.target.getAttribute('id');
+                    var id_index = event.target.getAttribute('data-id');
+                    $('#webfile_p'+id_index).show();
+                    $('#webfile_disable'+id_index).hide();
+                    document.getElementById('webfile'+id_index).value = '';
+                    document.getElementById('webfile_disable_value'+id_index).value = '';
+                    document.getElementById('name'+id_index).value = '';
+                    document.getElementById('passport_show'+id_index).innerText = '';
+                    document.getElementById('contact'+id_index).value = '';
+                    document.getElementById('passportNo'+id_index).value = '';
+                    document.getElementById('paytype'+id_index).value = '';
+                    document.getElementById('visa_type'+id_index).value = '';
+                    document.getElementById('nationality'+id_index).value = '';
+                    document.getElementById('duration'+id_index).value = '';
+                    document.getElementById('entry_type'+id_index).value = '';
+                    document.getElementById('visaFee'+id_index).value = '';
+                    document.getElementById('faxCharge'+id_index).value = '';
+                    document.getElementById('icwf'+id_index).value = '';
+                    document.getElementById('appCharge'+id_index).value = '';
+                    document.getElementById('total_fee'+id_index).value = '';
+                    document.getElementById('total_fee_disable'+id_index).value = '';
+                    document.getElementById('old_pass'+id_index).value = '';
+                    document.getElementById('tddDelDateId'+id_index).innerText = '';
+                    document.getElementById('tddDelDateValue'+id_index).value = '';
+                    document.getElementById('cor_item_fee_value'+id_index).value = '';
+                    document.getElementById('sp_fee'+id_index).value = '';
+                    for(var j=0; j < this.correctionList.length; j++){
+                        var single_select_all = document.getElementById("signle-cor-item"+id_index+j);
+                        if(single_select_all.checked === true){
+                            single_select_all.checked = false;
+                        }
                     }
                 },
 
@@ -1196,6 +1426,7 @@
                         var passNo = getPass.trim();
                         passNo = passNo.toUpperCase();
                         passNo = passNo.split(' ').join('');
+                        document.getElementById('passportNo'+id_index).value = passNo;
                         var getShowPass = document.getElementById('passport_show'+id_index).innerText;
                         getShowPass = getShowPass.trim();
                         var showPass = getShowPass.split(' ').join('');
@@ -1228,28 +1459,30 @@
                         
                         if(webfile != '' && showPass != ''){
 
-                            if(DoubleValidStkrArr.length > 1){
-                                var obj = {};
-                                $(".doubleStkr").each(function(){
-                                    if(obj.hasOwnProperty(this.value)) {
-                                        if(is_alert_already ==  true){
-                                            is_alert_already = false;
-                                            this.not_all_data_valid = false;
-                                            this.submitModalShow = false;
-                                            alert("there is a duplicate value " + this.value);
-                                        }
-                                    } 
-                                    else {
-                                        obj[this.value] = this.value;
-                                    }
-                                });
-                            }
-                            else if(validStkrF < inputTSt || validStkr2F > InputTE)
+                            // if(DoubleValidStkrArr.length > 1){
+                            //     var obj = {};
+                            //     $(".doubleStkr").each(function(){
+                            //         if(obj.hasOwnProperty(this.value)) {
+                            //             if(is_alert_already ==  true){
+                            //                 is_alert_already = false;
+                            //                 this.not_all_data_valid = false;
+                            //                 this.submitModalShow = false;
+                            //                 $('#validStkr'+id_index).focus();
+                            //                 alert("there is a duplicate value " + this.value);
+                            //             }
+                            //         } 
+                            //         else {
+                            //             obj[this.value] = this.value;
+                            //         }
+                            //     });
+                            // }
+                            if(validStkrF < inputTSt || validStkr2F > InputTE)
                             {   
                                 if(is_alert_already ==  true){
                                     is_alert_already = false;
                                     this.not_all_data_valid = false;
                                     this.submitModalShow = false;
+                                    $('#validStkr'+id_index).focus();
                                     alert('Please Input Valid Sticker Number '+id_index);
                                 }
                             }
@@ -1270,6 +1503,7 @@
                                     is_alert_already = false;
                                     this.not_all_data_valid = false;
                                     this.submitModalShow = false;
+                                    $('#name'+id_index).focus();
                                     alert('Please Enter Valid Name '+id_index);
                                 }
                             }
@@ -1279,6 +1513,7 @@
                                     is_alert_already = false;
                                     this.not_all_data_valid = false;
                                     this.submitModalShow = false;
+                                    $('#contact'+id_index).focus();
                                     alert('Please Enter Valid Contact Number '+id_index);
                                 }
                             }
@@ -1288,6 +1523,7 @@
                                     is_alert_already = false;
                                     this.not_all_data_valid = false;
                                     this.submitModalShow = false;
+                                    $('#nationality'+id_index).focus();
                                     alert('Please Enter Valid Nationality '+id_index);
                                 }
                             }
@@ -1297,6 +1533,7 @@
                                     is_alert_already = false;
                                     this.not_all_data_valid = false;
                                     this.submitModalShow = false;
+                                    $('#visa_type'+id_index).focus();
                                     alert('Please Select Visa Type '+id_index);
                                 }
                             }
@@ -1306,6 +1543,7 @@
                                     is_alert_already = false;
                                     this.not_all_data_valid = false;
                                     this.submitModalShow = false;
+                                    $('#duration'+id_index).focus();
                                     alert('Please Enter Valid Duration '+id_index);
                                 }
                             }
@@ -1315,6 +1553,7 @@
                                     is_alert_already = false;
                                     this.not_all_data_valid = false;
                                     this.submitModalShow = false;
+                                    $('#entry_type'+id_index).focus();
                                     alert('Please Enter Valid entry_type '+id_index);
                                 }
                             }     
@@ -1326,18 +1565,21 @@
                                         is_alert_already = false;
                                         this.not_all_data_valid = false;
                                         this.submitModalShow = false;
+                                        $('#visaFee'+id_index).focus();
                                         alert('Please Enter Visa Fee '+id_index);
                                     }
                                     else if(faxCharge == ''){
                                         is_alert_already = false;
                                         this.not_all_data_valid = false;
                                         this.submitModalShow = false;
+                                        $('#faxCharge'+id_index).focus();
                                         alert('Please Enter Fax Charge '+id_index);
                                     }
                                     else if(icwf == ''){
                                         is_alert_already = false;
                                         this.not_all_data_valid = false;
                                         this.submitModalShow = false;
+                                        $('#icwf'+id_index).focus();
                                         alert('Please Enter ICWF '+id_index);
                                     }
                                     
@@ -1346,6 +1588,7 @@
                                             is_alert_already = false;
                                             this.not_all_data_valid = false;
                                             this.submitModalShow = false;
+                                            $('#old_pass'+id_index).focus();
                                             alert('Please Enter Old Passport Qty '+id_index);
                                         }
                                     }
@@ -1354,6 +1597,7 @@
                                             is_alert_already = false;
                                             this.not_all_data_valid = false;
                                             this.submitModalShow = false;
+                                            $('#paytype'+id_index).focus();
                                             alert('Please Select Payment Type '+id_index);
                                         }
                                     }
@@ -1367,6 +1611,7 @@
                                         is_alert_already = false;
                                         this.not_all_data_valid = false;
                                         this.submitModalShow = false;
+                                        $('#old_pass'+id_index).focus();
                                         alert('Please Enter Old Passport Qty '+id_index);
                                     }
                                 }
@@ -1375,6 +1620,7 @@
                                         is_alert_already = false;
                                         this.not_all_data_valid = false;
                                         this.submitModalShow = false;
+                                        $('#paytype'+id_index).focus();
                                         alert('Please Select Payment Type '+id_index);
                                     }
                                 }
@@ -1391,20 +1637,7 @@
 
                     if(this.is_all_data_valid){
                         if(this.not_all_data_valid){
-                            _this = this;
-                            axios.get('check_foreign_valid_sticker_axios',{params:{validSticker:validSticker,validStikerType:validStikerType}})
-                                .then(function(res){
-                                    console.log(res.data.validStatus);
-                                    if(res.data.validStatus == 'Yes'){
-                                        _this.submitModalShow = true;
-                                    }
-                                    else if(res.data.validStatus == 'No'){
-                                        alert('This sticker number already used');
-                                    }
-                                })
-                                .catch(function(error){
-                                    console.log(error);
-                                })
+                            _this.submitModalShow = true;
                         }
                     }
 
@@ -1425,7 +1658,7 @@
                     this.addMoreButtonArr.splice(index,1);
                 },
                 clearButtonFunc:function(i){
-                    var is_confirm = confirm('Are you sure! You want to clear?');
+                    var is_confirm = confirm('Are you sure! You want to delete/remove?');
                     if(is_confirm == true){
                         // this.addMoreButtonArr = [];
                         // this.addMoreBtn = 1;
@@ -1448,12 +1681,14 @@
 
                     var objectData = $('.input_values').serialize();
 
-                    axios.post('foreign-webfile-data-save-axios', objectData,)
+                    axios.post('foreign-webfile-data-save-axios', objectData,this.webfilePreloader = true)
                         .then(function (res) {
+                            _this.webfilePreloader = false;
                             _this.addMoreButtonArr = [];
                             // _this.addMoreBtn = 1;
                             // _this.addMoreButtonArr.push(this.addMoreBtn);
                             // _this.cleanBtn = false;
+                            document.getElementById('book_rcvpt_no').value = '';
                             _this.storeResStatusf = true;
                             _this.storeResMsg = res.data.status;
                             console.log(res);

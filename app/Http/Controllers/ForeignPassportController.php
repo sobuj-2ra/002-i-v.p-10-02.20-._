@@ -14,6 +14,8 @@ use App\Tbl_visa_type;
 use App\Tbl_center_info;
 use App\Tbl_ivac_service;
 use App\Tbl_fp_served;
+use App\Tbl_appointmentserved;
+use App\Tbl_setup;
 
 
 class ForeignPassportController extends Controller
@@ -64,6 +66,10 @@ class ForeignPassportController extends Controller
         $datas['tdd_list'] = Tbl_visa_type::all();
         $corFee = Tbl_ivac_service::select('corrFee','Service')->where('Service','Foreign Passport')->first();
         $datas['getCorFee'] = $corFee->corrFee;
+        $datas['book_no'] = DB::table('tbl_money_receive')
+        ->where('center_name', Auth::user()->center_name)
+        ->orderBy('id', 'desc')
+        ->first();
 //        return redirect('readyat-center');
         return view('foreign.foreign_call',$datas);
     }
@@ -568,12 +574,16 @@ class ForeignPassportController extends Controller
 
                 $arrTemp[$index]['remark'] = $datas['txn_date'][$index].'-'.$datas['proc_fee'][$index].'|' ;
                 $arrTemp[$index]['remark2'] = $datas['duration'][$index] . '/' . $datas['entry_type'][$index] . '/' . $datas['visa_type'][$index];
-
-                if(isset($datas['sticker_type'][$index]) && !empty($datas['sticker_type'][$index])) {
-                    $arrTemp[$index]['stkr_with_no'] = $datas['sticker_type'][$index] . '-' . $datas['validStkr'][$index];
-                } 
-                else{
-                    $arrTemp[$index]['stkr_with_no'] = $datas['validStkr'][$index];
+                if($datas[$index.'gratis_status1'][0] == 'no'){
+                    if(isset($datas['sticker_type'][$index]) && !empty($datas['sticker_type'][$index])) {
+                        $arrTemp[$index]['stkr_with_no'] = $datas['sticker_type'][$index] . '-' . $datas['validStkr'][$index];
+                    } 
+                    else{
+                        $arrTemp[$index]['stkr_with_no'] = $datas['validStkr'][$index];
+                    }
+                }
+                else if($datas[$index.'gratis_status1'][0] == 'yes'){
+                    $arrTemp[$index]['stkr_with_no'] =  $datas['gratisStrkNum'][$index];
                 }
 
                 if($datas['total_amount'][$index] != 0) {
@@ -629,7 +639,6 @@ class ForeignPassportController extends Controller
                     "'.'region'.'"
                     )'
             );
-
                 $saveCount = $is_save[0]->COUNT;
                 $status = $is_save[0]->REPLY;
                 if($status == 'Data Saved Successfully'){
@@ -638,6 +647,7 @@ class ForeignPassportController extends Controller
                 else{
                     array_push($rejectArr,$item['webfile']);
                 }
+
 
         }
 
@@ -658,6 +668,24 @@ class ForeignPassportController extends Controller
             Session::push('tempArr', $arrTemp);
             Session::push('successArr', $succArr);
             return response()->json(['save'=>'notall','saveCount'=>$saveCount,'status'=>'Some Data Couldn\'t Saved','rejectArr'=>$rejectArr]);
+        }
+
+    }
+    public function checkForeignBookReceiptNum(Request $r){
+        // return $r->all();
+        $receiptNo = $r->receiptNo;
+        $book_no = $r->book_name;
+        $center_name = $r->center_name;
+
+        $is_found = Tbl_fp_served::where('book_no',$book_no)
+            ->where('receive_no',$receiptNo)
+            ->where('center',$center_name)
+            ->get();
+        if(count($is_found) > 0){
+            return response()->json(['status'=>'invalid']);
+        }
+        else{
+            return response()->json(['status'=>'valid']);
         }
 
     }
@@ -953,17 +981,30 @@ class ForeignPassportController extends Controller
     {
         $data = array();
         if (isset($_POST['submit'])) {
-            $passport = strtoupper(str_replace(' ', '', $_POST['passport']));
-            $data['deleteData'] = $s_data = DB::table('tbl_fp_served')
-                ->where('passport', $passport)
-                ->orderBy('id', 'DESC')
-                ->first();
-            $data['service'] = DB::table('tbl_ivac_services')
-                ->where('Service', 'Foreign Passport')
-                ->first();
-            $data['center'] = DB::table('tbl_center_info')
-                ->where('center_name', $s_data->center)
-                ->first();
+            $webfile = strtoupper(str_replace(' ', '', $_POST['webfile']));
+            $data['appServed']= $appServed = Tbl_appointmentserved::where('WebFile_no',$webfile)->first();
+            $data['fpServed']= $fpServed = Tbl_fp_served::where('web_file_no',$webfile)->first();
+            if($appServed == true && $fpServed == true){
+                $data['service'] = DB::table('tbl_ivac_services')
+                    ->where('Service', 'Foreign Passport')
+                    ->first();
+                $data['center'] = DB::table('tbl_center_info')
+                    ->where('center_name', $appServed['center'])
+                    ->first();
+                $barcodeType = Tbl_setup::where('item_name','Barcode')->first();
+                if($barcodeType->item_value == 'Passport'){
+                    $data['BarcodePrint'] = 'passport';
+                }
+                else{
+                    $data['BarcodePrint'] = 'webfile';
+                }
+                $data['id'] = '1';
+                // return $data;
+                return view('foreign.reprint_print', $data);
+            }
+            else{
+                return redirect('reprint-foreign-passport')->with(['msg'=>'No Data Found','status'=>'warning']);
+            }
         }
         return view('foreign.reprint', $data);
     }

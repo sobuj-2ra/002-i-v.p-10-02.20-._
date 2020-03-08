@@ -494,7 +494,7 @@
                     var stkrNumST = Number(this.stkr_str);
                     var stkrNumEND = Number(this.stkr_end);
                     if (sticker == '') {
-                        alert('Please Select Sticker Type')
+                        alert('Please Select Sticker Type');
                     }
                     else if (stkrNumST == '' || stkrNumEND == '') {
                         alert('Please Input Sticker Starting and Ending Number');

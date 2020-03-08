@@ -267,6 +267,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/delete-foreign/{a}', 'ForeignPassportController@destroy');
     Route::get('/reprint-foreign-passport', 'ForeignPassportController@reprint');
     Route::post('/foreign/reprint-search', 'ForeignPassportController@reprint');
+    Route::get('/axios_check_foreign_pass_rcpt_valid', 'ForeignPassportController@checkForeignBookReceiptNum');
 
 //    foreign passport report
 
@@ -440,7 +441,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/onload-delivery-center-datas', 'CounterController@OnloadDeliveryCenter');
     Route::post('/delivery-center-passport-datas', 'CounterController@deliveryCenterStoreData');
     Route::get('/check_valid_sticker_axios', 'CounterController@ValidStickerCheck');
-    Route::get('/check_foreign_valid_sticker_axios', 'CounterController@ValidForeignStickerCheck');
+    Route::get('/check_gratis_sticker_axios', 'CounterController@GratisStickerCheck');
 
     /// edit passport recive center //
     Route::get('/edit-receive-passport', 'CounterController@EditViewPassportReceive');

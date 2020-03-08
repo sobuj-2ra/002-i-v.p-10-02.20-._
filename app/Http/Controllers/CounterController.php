@@ -139,23 +139,30 @@ class CounterController extends Controller
                 curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
                 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
                 $ssldata = curl_exec($ch);
-
                 $sslArr = explode(',',$ssldata);
                 $onlinePay = $sslArr[0];
-                if($onlinePay == 'Yes'){
-                    $paytype = ['<option value=""></option>\',<option value="Cash/Manual">Cash/Manual</option>','<option value="ONLINE" selected>ONLINE</option>','<option value="WAIVE">WAIVE</option>'];
+                if($ssldata != ''){
+                    if($onlinePay == 'Yes'){
+                        $sslnotrun = '';
+                        $paytype = ['<option value=""></option>\',<option value="Cash/Manual">Cash/Manual</option>','<option value="ONLINE" selected>ONLINE</option>','<option value="WAIVE">WAIVE</option>'];
+                    }
+                    else{
+                        $sslnotrun = '';
+                        $paytype = ['<option value=""></option>\',<option value="Cash/Manual">Cash/Manual</option>','<option value="WAIVE">WAIVE</option>'];
+                    }
                 }
                 else{
+                    $sslnotrun = 'Yes';
                     $paytype = ['<option value=""></option>\',<option value="Cash/Manual">Cash/Manual</option>','<option value="ONLINE">ONLINE</option>','<option value="WAIVE">WAIVE</option>'];
                 }
-
             }
             else{
+                $sslnotrun = '';
                 $ssldata = ['','','','','',''];
-                $paytype = [];
+                $paytype = ['<option value=""></option>\',<option value="Cash/Manual">Cash/Manual</option>','<option value="ONLINE">ONLINE</option>','<option value="WAIVE">WAIVE</option>'];
             }
 
-        return response()->json(['webfileData'=>$webfileData,'sllData'=>$ssldata,'paytype'=>$paytype]);
+        return response()->json(['webfileData'=>$webfileData,'sllData'=>$ssldata,'paytype'=>$paytype,'sslnotrun'=>$sslnotrun]);
     }
 
     public function ValidStickerCheck(Request $request){
@@ -174,28 +181,23 @@ class CounterController extends Controller
             return response()->json(['validStatus'=>'Yes']);
         }
     }
-
-    public function ValidForeignStickerCheck(Request $request){
-        $request->validStkr;
+    public function GratisStickerCheck(Request $request){
+        // $request->validStkr;
         $curDate = Date('Y-m-d');
-        $tempArr = [];
-        $StkData = Tbl_fp_served::whereDate('rec_cen_time',$curDate)->get();
-        foreach($StkData as $item){
-            $exData = explode('-',$item->strk_no);
-            if($exData[0] == $request->validStikerType && $exData[1] == $request->validSticker){
-                array_push($tempArr,'a');
-            }
-        }
-        if(count($tempArr) > 0)
-        {   
-           
+        $StkCheck = Tbl_fp_served::whereDate('rec_cen_time',$curDate)
+                            ->where('gratis_status','yes')
+                            ->where('strk_no',$request->validStkr)
+                            ->get();
+        if(count($StkCheck) > 0)
+        {
             return response()->json(['validStatus'=>'No','stikerNum'=>$request->validSticker]);
         }
         else
         {
-            return response()->json(['validStatus'=>'Yes','data'=>$StkData]);
+            return response()->json(['validStatus'=>'Yes']);
         }
     }
+
 
     public function getDataOnload(Request $request){
         $rejectCause = Tbl_rejectcause::all();
