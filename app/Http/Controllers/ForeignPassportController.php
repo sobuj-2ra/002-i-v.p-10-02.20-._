@@ -912,6 +912,15 @@ class ForeignPassportController extends Controller
                 )'
         );
         if($is_save[0]->REPLY == 'yes'){
+            $oldData = $r->webfile.';'.$r->name.';'.$r->sticker_type.';'.$r->validStkr.';'.$r->remark.';'.$r->tddDelDateValue.';'.$r->visa_type.';'.$r->old_pass;
+            
+            DB::table('tbl_delete_log')->insert(
+                ['delete_id' => $r->webfile,
+                    'type' => 4,
+                    'delete_data' => $oldData,
+                    'delete_by' => Auth::user()->user_id,
+                    'delete_date' => date('Y-m-d H:i:s'),
+                ]);
             return redirect('edit-receive-foreign-passport')->with(['message'=>'Data Updated Successfully','status'=>'alert-success']);
         }
         else{

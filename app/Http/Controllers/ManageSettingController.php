@@ -395,7 +395,7 @@ class ManageSettingController extends Controller
         if($status){
           $statusArr = ['ACCEPTED','PENDING','REJECTED','RETURN','BACK REJECTED','EXPIRED'];
           if($status == 'ACCEPTED'){
-            $resArr = ['PENDING','REJECTED','RETURN','BACK REJECTED','EXPIRED'];
+            $resArr = ['PENDING','REJECTED','RETURN','BACK REJECTED'];
           }
           else if($status == 'PENDING'){
             $resArr = ['REJECTED'];
@@ -498,7 +498,7 @@ class ManageSettingController extends Controller
           return $this->hit_changeStatusFunc_AppServeDel($webfile,$status,$p_status,$del=1);
           
         }
-        else if($p_status == 'EXPIRED'){
+        else if($p_status == 'REJECTED'){
           return $this->hit_changeStatusFunc_AppServeDel($webfile,$status,$p_status,$del=1);
         }
       }
