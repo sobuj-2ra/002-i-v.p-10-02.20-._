@@ -407,6 +407,7 @@
                     var counter_id = document.getElementById('counter_id').value;
                     var user_id = document.getElementById('user_id').value;
                     var floor_id = document.getElementById('floor_id').value;
+                    floor_id = Number(floor_id);
                     axios.get('call_token_data_axios', {
                         params: {
                             svc_name: service_type,
@@ -437,6 +438,7 @@
                     var counter_id = document.getElementById('counter_id').value;
                     var user_id = document.getElementById('user_id').value;
                     var floor_id = document.getElementById('floor_id').value;
+                    floor_id = Number(floor_id);
                     axios.get('call_token_data_axios', {
                         params: {
                             svc_name: service_type,

@@ -89,10 +89,10 @@ class CounterController extends Controller
         $svc_no = $svc_nos[0]->svc_number;
 
         if($request->token_type == 1){
-            $token_res = DB::select('CALL CallTokenF("'.$user_id.'","'.$request->counter_id.'","'.$svc_no.'","'.$request->floor_no.'","'.$request->token_type.'"," ")');
+            $token_res = DB::select('CALL CallTokenF("'.$user_id.'","'.$request->counter_id.'","'.$svc_no.'","'.$request->floor_id.'","'.$request->token_type.'"," ")');
         }
         else{
-            $token_res = DB::select('CALL CallTokenF("'.$user_id.'","'.$request->counter_id.'","'.$svc_no.'","'.$request->floor_no.'","'.$request->token_type.'","'.$request->tkn_no.'")');
+            $token_res = DB::select('CALL CallTokenF("'.$user_id.'","'.$request->counter_id.'","'.$svc_no.'","'.$request->floor_id.'","'.$request->token_type.'","'.$request->tkn_no.'")');
         }
 
         return response()->json(['token_res'=>$token_res]);
@@ -532,13 +532,39 @@ class CounterController extends Controller
         $center_web = $center_info->center_web;
         $barcodeType = Tbl_setup::where('item_name','Barcode')->first();
         if($barcodeType->item_value == 'Passport'){
-            $BarcodePrint = 'passport';
+            $BarcodePrint = 'Passport';
         }
         else{
-            $BarcodePrint = 'webfile';
+            $BarcodePrint = 'Webfile';
         }
         $slipCopy = Tbl_ivac_service::where('Service','Foreign Passport')->first();
         return view('foreign.foreign_pass_receive_print',compact('valid_data','dataArr','del_time','center_web','BarcodePrint','slipCopy'));
+    }
+
+    public function regularPassReprint(){
+        return view('counter.reprint');
+    }
+
+    public function regularPassReprintSlip(Request $r){
+        $data['appServed'] = $appServed = Tbl_appointmentserved::where('WebFile_no',$r->webfile)->first();
+        if($appServed){
+            $data['slip'] = $slip = Tbl_ivac_service::where('Service','Regular Passport')->first();
+            $data['barcodeType'] = $barcodeType = Tbl_setup::where('item_name','Barcode')->first();
+            if($barcodeType->item_value == 'Passport'){
+                $data['BarcodeData'] = $BarcodeData = $appServed->Passport;
+            }
+            elseif($barcodeType->item_value == 'Webfile'){
+                $data['BarcodeData'] =  $BarcodeData = $appServed->WebFile_no;
+            }
+            $data['id'] = 1;
+            $data['center'] = $center_info = Tbl_center_info::where('center_name',$appServed->center)->first();
+            return view('counter.reprint_slip',$data);
+        }
+        else{
+            return redirect('/regular-passport-reprint')->with(['message'=>'No Data Found','status'=>'alert-warning']);
+        }
+
+
     }
 
 
@@ -761,9 +787,12 @@ class CounterController extends Controller
         $datas['allUsers'] = User::all();
         $datas['allSticker'] = Tbl_sticker::all();
         $datas['allCenter'] = CenterInfo::all();
-
-
-        return view('counter.edit_pass_receive_center', $datas);
+        if($getData_App){
+            return view('counter.edit_pass_receive_center', $datas);
+        }
+        else{
+            return redirect('edit-receive-passport')->with(['message'=>'No Data Found','msgType'=>'alert-warning']);
+        }   
     }
     public function getTddEditPassRec(Request $request){
         $visaType = Tbl_visa_type::select('tdd')->where('visa_type',$request->visa_type)->first();
@@ -833,6 +862,27 @@ class CounterController extends Controller
             return redirect('/edit-receive-passport')->with(['message'=>'Data Could not Update','msgType'=>'alert-warning']);
         }
     }
+
+    public function EditViewPassportDelete(){
+
+        return view('counter.delete_pass_receive_center');
+    }
+
+    public function EditViewPassportDeleteView(Request $r){
+        $wenfile_no = $r->webfile_no;
+        $datas['readyEditData'] = $getData_App = Tbl_appointmentserved::where('WebFile_no',$wenfile_no)->first();
+        $datas['visaTypeData'] = Tbl_visa_type::all();
+        $datas['allUsers'] = User::all();
+        $datas['allSticker'] = Tbl_sticker::all();
+        $datas['allCenter'] = CenterInfo::all();
+        if($getData_App){
+            return view('counter.delete_pass_receive_center', $datas);
+        }
+        else{
+            return redirect('edit-receive-passport')->with(['message'=>'No Data Found','msgType'=>'alert-warning']);
+        }
+    }
+
 
     public function EditPassportReceiveDestroy($webNo){
         $userId = Auth::user()->user_id;

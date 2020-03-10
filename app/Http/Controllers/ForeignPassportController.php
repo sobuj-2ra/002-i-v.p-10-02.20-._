@@ -636,6 +636,7 @@ class ForeignPassportController extends Controller
                     "'.$item['total_amount'].'",
                     "'.$item['total_rupee'].'",
                     "'.$item['rupee_rate'].'",
+                    "'.$item['date_of_checking'].'",
                     "'.'region'.'"
                     )'
             );
@@ -788,120 +789,217 @@ class ForeignPassportController extends Controller
      */
     public function edit_receive_foreign_passport()
     {
-        $data = array();
-        if (isset($_POST['submit'])) {
-            $passport = strtoupper(str_replace(' ', '', $_POST['passport']));
-            $data['editData'] = DB::table('tbl_fp_served')
-                ->where('passport', $passport)
-                ->orderBy('id', 'DESC')
-                ->First();
-            if (isset($data['editData']) && !empty($data['editData'])) {
-                $data['sticker'] = DB::table('tbl_sticker_mapping')
+        // $data = array();
+        // if (isset($_POST['submit'])) {
+        //     $webfile = strtoupper(str_replace(' ', '', $_POST['webfile']));
+        //     $data['editData'] = DB::table('tbl_fp_served')
+        //         ->where('web_file_no', $webfile)
+        //         ->orderBy('id', 'DESC')
+        //         ->First();
+        //     if (isset($data['editData']) && !empty($data['editData'])) {
+        //         $data['sticker'] = DB::table('tbl_sticker_mapping')
+        //             ->get();
+        //         $data['book_no'] = DB::table('tbl_money_receive')
+        //             ->where('center_name', Auth::user()->center_name)
+        //             ->orderBy('id', 'desc')
+        //             ->first();
+
+        //         $data['duration'] = DB::table('tbl_duration')
+        //             ->get();
+        //         $data['entry_type'] = DB::table('tbl_entry_type')
+        //             ->get();
+        //         $data['visa_type'] = DB::table('tbl_visa_type')
+        //             ->get();
+        //         $data['remarks'] = explode("/", $data['editData']->remarks);
+        //     } else {
+        //         $data['messages'] = '<h4 align="center">No Passport Match</h4>';
+        //     }
+
+
+
+        //     return view('foreign.edit_receive_foreign_passport_view', $data);
+
+        // }
+
+        return view('foreign.edit_receive_foreign_passport');
+    }
+    public function edit_receive_foreign_passport_View(Request $r){
+        
+
+        $appServed = Tbl_appointmentserved::where('WebFile_no',$r->webfile)->orderBy('app_sl','DESC')->first();
+        if($appServed){
+            $fpServed = Tbl_fp_served::where('web_file_no',$r->webfile)->orderBy('id','DESC')->first();
+            if($fpServed){
+                $datas['appServed'] = $appServed;
+                $datas['fpServed'] = $fpServed;
+                $datas['stickers'] = DB::table('tbl_sticker_mapping')
                     ->get();
-                $data['book_no'] = DB::table('tbl_money_receive')
+                $datas['visa_type'] = DB::table('tbl_visa_type')
+                    ->get();
+                $datas['duration'] = DB::table('tbl_duration')
+                    ->get();
+                $datas['entry_type'] = DB::table('tbl_entry_type')
+                    ->get();
+                $datas['book_no'] = DB::table('tbl_money_receive')
                     ->where('center_name', Auth::user()->center_name)
                     ->orderBy('id', 'desc')
                     ->first();
+                // return view('foreign.countercall', $data);
+                $hostname = gethostbyaddr($_SERVER['REMOTE_ADDR']);
 
-                $data['duration'] = DB::table('tbl_duration')
-                    ->get();
-                $data['entry_type'] = DB::table('tbl_entry_type')
-                    ->get();
-                $data['visa_type'] = DB::table('tbl_visa_type')
-                    ->get();
-                $data['remarks'] = explode("/", $data['editData']->remarks);
-            } else {
-                $data['messages'] = '<h4 align="center">No Passport Match</h4>';
+                // $hostname = gethostname();
+                $ip = getHostByName(getHostName());
+
+
+                $counter = Tbl_counter::where('hostname',$hostname)->first();
+
+
+                if($counter){
+                    $datas['counter_no'] = $counter->counter_no;
+                    $datas['floor_id'] = $counter->floor_id;
+                    $datas['counter_services'] = explode(',',$counter->svc_name);
+                }
+
+
+                $datas['user_id'] = Auth::user()->user_id;
+                // $datas['stickers'] = Tbl_sticker::all();
+                $datas['visa_types'] = Tbl_visa_type::all();
+                $datas['center_name'] = Tbl_center_info::where('active',1)->first();
+                $datas['ivac_svc_fee'] = Tbl_ivac_service::where('Service', 'Regular Passport')->first();
+
+                $datas['tdd_list'] = Tbl_visa_type::all();
+                $corFee = Tbl_ivac_service::select('corrFee','Service')->where('Service','Foreign Passport')->first();
+                $datas['getCorFee'] = $corFee->corrFee;
+                $datas['book_no'] = DB::table('tbl_money_receive')
+                ->where('center_name', Auth::user()->center_name)
+                ->orderBy('id', 'desc')
+                ->first();
+
+                return view('foreign.edit_receive_foreign_passport_view',$datas);
+
             }
-
-
+            else{
+                return redirect('edit-receive-foreign-passport')->with(['message'=>'No Data Found','status'=>'alert-warning']);
+            }
         }
+        else{
+            return redirect('edit-receive-foreign-passport')->with(['message'=>'No Data Found','status'=>'alert-warning']);
+        }
+        
 
-        return view('foreign.edit_receive_foreign_passport', $data);
+
     }
 
-    public function update_foreign_passport(Request $request)
+    public function update_foreign_passport(Request $r)
     {
-        $gratis_status = $request->gratis_status;
-        $remarks = $request->duration . '/' . $request->entry_type . '/' . $request->visa_type;
-        $strk = $request->strk_number;
-        $rupee = $request->rupee;
-        $total_rupee = $rupee * $request->total_amount;
-        $book_no = $request->book_no;
+        // return $r->all();
+        $user_id = Auth::user()->user_id;
+        $webfile = str_replace(' ', '', $r->webfile);
 
-        if ($gratis_status == 'yes') {
-            $arrData = array(
-                'passport' => strtoupper(str_replace(' ', '', $request->passport)),
-                'gratis_status' => $request->gratis_status,
-                'strk_no' => $strk,
-                'app_name' => $request->app_name,
-                'contact' => (int)$request->contact,
-                'web_file_no' => strtoupper(str_replace(' ', '', $request->web_file_no)),
-                'nationality' => strtoupper($request->nationality),
-                'date_of_checking' => date('Y-m-d', strtotime($request->date_of_checking)),
-                'remarks' => $remarks,
-                'updated_date' => date('Y-m-d H:i:s'),
-                'updated_by' => Auth::user()->user_id,
-                'old_passport_qty' => $request->old_passport_qty,
-                'visa_fee' => $request->visa_fee,
-                'fax_trans_charge' => $request->fax_trans_charge,
-                'icwf' => $request->icwf,
-                'visa_app_charge' => $request->visa_app_charge,
-                'total_amount' => $request->total_amount,
-                'total_rupee' => $total_rupee,
-                'receive_no' => $request->receive_no,
-                'book_no' => $book_no,
-            );
-            $updated = DB::table('tbl_FP_served')
-                ->where('id', $request->id)
-                ->update($arrData);
-            if ($updated) {
-                Session::flash('message', 'Successfully Updated Data !');
-                Session::flash('alert-class', 'btn-info');
-            } else {
-                Session::flash('message', 'Fail to Updated Data !');
-                Session::flash('alert-class', 'btn-danger');
-            }
-            return redirect("edit-foreign-passport-slip-copy-gratise/$request->id");
-        } else {
-
-
-
-            $arrData = array(
-                'passport' => strtoupper(str_replace(' ', '', $request->passport)),
-                'gratis_status' => $request->gratis_status,
-                'receive_no' => $request->receive_no,
-                'book_no' => $book_no,
-                'app_name' => $request->app_name,
-                'contact' => (int)$request->contact,
-                'web_file_no' => strtoupper(str_replace(' ', '', $request->web_file_no)),
-                'nationality' => strtoupper($request->nationality),
-                'date_of_checking' => date('Y-m-d', strtotime($request->date_of_checking)),
-                'remarks' => $remarks,
-                'updated_date' => date('Y-m-d H:i:s'),
-                'updated_by' => Auth::user()->user_id,
-                'strk_no' => $strk,
-                'visa_fee' => $request->visa_fee,
-                'fax_trans_charge' => $request->fax_trans_charge,
-                'icwf' => $request->icwf,
-                'visa_app_charge' => $request->visa_app_charge,
-                'total_amount' => $request->total_amount,
-                'total_rupee' => $total_rupee,
-                'old_passport_qty' => $request->old_passport_qty
-            );
-            $up = DB::table('tbl_FP_served')
-                ->where('id', $request->id)
-                ->update($arrData);
-            if ($up) {
-                Session::flash('message', 'Successfully Updated Data !');
-                Session::flash('alert-class', 'btn-info');
-            } else {
-                Session::flash('message', 'Fail to Updated Data !');
-                Session::flash('alert-class', 'btn-danger');
-            }
-            return redirect("edit-foreign-passport-slip-copy-gratise/$request->id");
-
+        $remark = $r->duration.'/'.$r->entry_type.'/'.$r->visa_type;
+        $is_save = DB::select(
+            'CALL GetForeignDataUpdate(
+                "'.$r->webfile.'",
+                "'.$r->name.'",
+                "'.$r->sticker_type.'",
+                "'.$r->validStkr.'",
+                "'.$remark.'",
+                "'.$user_id.'",
+                "'.$r->tddDelDateValue.'",
+                "'.$r->visa_type.'",
+                "'.$r->old_pass.'",
+                "'.$r->nationality.'"
+                )'
+        );
+        if($is_save[0]->REPLY == 'yes'){
+            return redirect('edit-receive-foreign-passport')->with(['message'=>'Data Updated Successfully','status'=>'alert-success']);
         }
+        else{
+            return redirect('edit-receive-foreign-passport')->with(['message'=>'Data Couldn\'t Update','status'=>'alert-success']);
+        }
+
+        return $app_update;
+
+        // $gratis_status = $request->gratis_status;
+        // $remarks = $request->duration . '/' . $request->entry_type . '/' . $request->visa_type;
+        // $strk = $request->strk_number;
+        // $rupee = $request->rupee;
+        // $total_rupee = $rupee * $request->total_amount;
+        // $book_no = $request->book_no;
+
+        // if ($gratis_status == 'yes') {
+        //     $arrData = array(
+        //         'passport' => strtoupper(str_replace(' ', '', $request->passport)),
+        //         'gratis_status' => $request->gratis_status,
+        //         'strk_no' => $strk,
+        //         'app_name' => $request->app_name,
+        //         'contact' => (int)$request->contact,
+        //         'web_file_no' => strtoupper(str_replace(' ', '', $request->web_file_no)),
+        //         'nationality' => strtoupper($request->nationality),
+        //         'date_of_checking' => date('Y-m-d', strtotime($request->date_of_checking)),
+        //         'remarks' => $remarks,
+        //         'updated_date' => date('Y-m-d H:i:s'),
+        //         'updated_by' => Auth::user()->user_id,
+        //         'old_passport_qty' => $request->old_passport_qty,
+        //         'visa_fee' => $request->visa_fee,
+        //         'fax_trans_charge' => $request->fax_trans_charge,
+        //         'icwf' => $request->icwf,
+        //         'visa_app_charge' => $request->visa_app_charge,
+        //         'total_amount' => $request->total_amount,
+        //         'total_rupee' => $total_rupee,
+        //         'receive_no' => $request->receive_no,
+        //         'book_no' => $book_no,
+        //     );
+        //     $updated = DB::table('tbl_FP_served')
+        //         ->where('id', $request->id)
+        //         ->update($arrData);
+        //     if ($updated) {
+        //         Session::flash('message', 'Successfully Updated Data !');
+        //         Session::flash('alert-class', 'btn-info');
+        //     } else {
+        //         Session::flash('message', 'Fail to Updated Data !');
+        //         Session::flash('alert-class', 'btn-danger');
+        //     }
+        //     return redirect("edit-foreign-passport-slip-copy-gratise/$request->id");
+        // } else {
+
+
+
+        //     $arrData = array(
+        //         'passport' => strtoupper(str_replace(' ', '', $request->passport)),
+        //         'gratis_status' => $request->gratis_status,
+        //         'receive_no' => $request->receive_no,
+        //         'book_no' => $book_no,
+        //         'app_name' => $request->app_name,
+        //         'contact' => (int)$request->contact,
+        //         'web_file_no' => strtoupper(str_replace(' ', '', $request->web_file_no)),
+        //         'nationality' => strtoupper($request->nationality),
+        //         'date_of_checking' => date('Y-m-d', strtotime($request->date_of_checking)),
+        //         'remarks' => $remarks,
+        //         'updated_date' => date('Y-m-d H:i:s'),
+        //         'updated_by' => Auth::user()->user_id,
+        //         'strk_no' => $strk,
+        //         'visa_fee' => $request->visa_fee,
+        //         'fax_trans_charge' => $request->fax_trans_charge,
+        //         'icwf' => $request->icwf,
+        //         'visa_app_charge' => $request->visa_app_charge,
+        //         'total_amount' => $request->total_amount,
+        //         'total_rupee' => $total_rupee,
+        //         'old_passport_qty' => $request->old_passport_qty
+        //     );
+        //     $up = DB::table('tbl_FP_served')
+        //         ->where('id', $request->id)
+        //         ->update($arrData);
+        //     if ($up) {
+        //         Session::flash('message', 'Successfully Updated Data !');
+        //         Session::flash('alert-class', 'btn-info');
+        //     } else {
+        //         Session::flash('message', 'Fail to Updated Data !');
+        //         Session::flash('alert-class', 'btn-danger');
+        //     }
+        //     return redirect("edit-foreign-passport-slip-copy-gratise/$request->id");
+
+        // }
     }
 
     public function edit_foreign_passport_slip_copy_gratise($id)
@@ -942,23 +1040,79 @@ class ForeignPassportController extends Controller
 
     public function delete_page()
     {
-        $data = array();
-        if (isset($_POST['submit'])) {
-            $passport = strtoupper(str_replace(' ', '', $_POST['passport']));
-            $data['deleteDatas'] = DB::table('tbl_fp_served')
-                ->where('passport', $passport)
-                ->orderBy('id', 'DESC')
-                ->get();
+        return view('foreign.delete');
+    }
+    public function delete_page_view(Request $r)
+    {
+        $appServed = Tbl_appointmentserved::where('WebFile_no',$r->webfile)->orderBy('app_sl','DESC')->first();
+        if($appServed){
+            $fpServed = Tbl_fp_served::where('web_file_no',$r->webfile)->orderBy('id','DESC')->first();
+            if($fpServed){
+                $datas['appServed'] = $appServed;
+                $datas['fpServed'] = $fpServed;
+                $datas['stickers'] = DB::table('tbl_sticker_mapping')
+                    ->get();
+                $datas['visa_type'] = DB::table('tbl_visa_type')
+                    ->get();
+                $datas['duration'] = DB::table('tbl_duration')
+                    ->get();
+                $datas['entry_type'] = DB::table('tbl_entry_type')
+                    ->get();
+                $datas['book_no'] = DB::table('tbl_money_receive')
+                    ->where('center_name', Auth::user()->center_name)
+                    ->orderBy('id', 'desc')
+                    ->first();
+                // return view('foreign.countercall', $data);
+                $hostname = gethostbyaddr($_SERVER['REMOTE_ADDR']);
+
+                // $hostname = gethostname();
+                $ip = getHostByName(getHostName());
+
+
+                $counter = Tbl_counter::where('hostname',$hostname)->first();
+
+
+                if($counter){
+                    $datas['counter_no'] = $counter->counter_no;
+                    $datas['floor_id'] = $counter->floor_id;
+                    $datas['counter_services'] = explode(',',$counter->svc_name);
+                }
+
+
+                $datas['user_id'] = Auth::user()->user_id;
+                // $datas['stickers'] = Tbl_sticker::all();
+                $datas['visa_types'] = Tbl_visa_type::all();
+                $datas['center_name'] = Tbl_center_info::where('active',1)->first();
+                $datas['ivac_svc_fee'] = Tbl_ivac_service::where('Service', 'Regular Passport')->first();
+
+                $datas['tdd_list'] = Tbl_visa_type::all();
+                $corFee = Tbl_ivac_service::select('corrFee','Service')->where('Service','Foreign Passport')->first();
+                $datas['getCorFee'] = $corFee->corrFee;
+                $datas['book_no'] = DB::table('tbl_money_receive')
+                ->where('center_name', Auth::user()->center_name)
+                ->orderBy('id', 'desc')
+                ->first();
+
+                return view('foreign.delete_receive_foreign_passport_view',$datas);
+
+            }
+            else{
+                return redirect('/delete-foreign-passport')->with(['message'=>'No Data Found','status'=>'alert-warning']);
+            }
         }
-        return view('foreign.delete', $data);
+        else{
+            return redirect('/delete-foreign-passport')->with(['message'=>'No Data Found','status'=>'alert-warning']);
+        }
     }
 
-    public function destroy($id)
+    public function destroy($webfile)
     {
-        $get_data = DB::table('tbl_fp_served')->where('id', $id)->first();
+        $get_data = DB::table('tbl_fp_served')->where('web_file_no', $webfile)->first();
+        $id = $get_data->id;
         $data = $get_data->passport.';'.$get_data->gratis_status.';'.$get_data->strk_no.';'.$get_data->receive_no.';'.$get_data->app_name.';'.$get_data->contact.';'.$get_data->web_file_no.';'.$get_data->center.';'.$get_data->remarks;
-        $delete = DB::table('tbl_fp_served')->where('id', $id)->delete();
-        if ($delete) {
+        $delete = DB::table('tbl_fp_served')->where('web_file_no', $webfile)->delete();
+        $is_delete = DB::table('tbl_appointmentserved')->where('WebFile_no', $webfile)->delete();
+        if ($is_delete) {
             DB::table('tbl_delete_log')->insert(
                 ['delete_id' => $id,
                     'type' => 4,

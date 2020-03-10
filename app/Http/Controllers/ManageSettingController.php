@@ -273,7 +273,7 @@ class ManageSettingController extends Controller
       }
 
 
-      return response()->json(['msg'=>'Token Create Successfully','status'=>'yes']);
+      return response()->json(['msg'=>'Token Created Successfully','status'=>'yes']);
 
   }
 
@@ -288,6 +288,7 @@ class ManageSettingController extends Controller
   public function counterSetupStore(Request $r)
   {
       $user_id = Auth::user()->user_id;
+      $curDate = Date('Y-m-d H:i:s');
       $service_name = implode($r->service_name,',');
 
      $if_exist = Tbl_counter::where('counter_no',$r->counter_no)->where('floor_id',$r->floor_no)->count();
@@ -298,6 +299,7 @@ class ManageSettingController extends Controller
             'counter_no'=>$r->counter_no,
             'ip'=>$r->counter_ip,
             'floor_id'=>$r->floor_no,
+            'entrydate'=>$curDate,
             'entryby'=>$user_id,
             'permission'=>$user_id,
             'svc_name'=>$service_name,
@@ -806,7 +808,7 @@ class ManageSettingController extends Controller
 
   public function portNameStore(Request $r)
   {
-      $name = $r->fee;
+      $name = $r->port_name;
       $fee = $r->fee;
       $s_type = $r->service_type;
 

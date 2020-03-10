@@ -1,12 +1,12 @@
 @extends('admin.master')
 <!--Page Title-->
 @section('page-title')
-   Edit Passport Receive Center
+Delete Passport Receive Center
 @endsection
 
 <!--Page Header-->
 @section('page-header')
-Edit Regular Passport
+Delete Regular Passport
 
 @endsection
 
@@ -43,7 +43,7 @@ Edit Regular Passport
                                             </div>
                                             <div class="form-group">
                                                 <label for="visatypeId">Visa Type:</label>
-                                                <select @change="visaTypeFunc"  name="Visa_type" id="visatypeId" class="form-control">
+                                                <select @change="visaTypeFunc"  name="Visa_type" id="visatypeId" class="form-control" disabled>
                                                     @foreach($visaTypeData as $visaItem)
                                                         <option value="{{$visaItem->visa_type}}" <?php if($readyEditData->Visa_type == $visaItem->visa_type){ echo 'selected'; }?>  >{{$visaItem->visa_type}}</option>
                                                     @endforeach
@@ -56,11 +56,11 @@ Edit Regular Passport
                                              
                                             <div class="form-group">
                                                 <label for="nameId">Name: </label>
-                                                <input type="text" name="Applicant_name" value="{{@$readyEditData->Applicant_name}}" id="nameId" class="form-control">
+                                                <input type="text" name="Applicant_name" value="{{@$readyEditData->Applicant_name}}" id="nameId" class="form-control" disabled>
                                             </div>
                                             <div class="form-group">
                                                 <label for="contactNoId">Contact No.</label>
-                                                <input type="text" name="Contact" value="{{@$readyEditData->Contact}}" id="contactNoId" class="form-control">
+                                                <input type="text" name="Contact" value="{{@$readyEditData->Contact}}" id="contactNoId" class="form-control" disabled>
                                             </div>
                                             
                                         </div>
@@ -68,7 +68,7 @@ Edit Regular Passport
                                             <hr>
                                             <div class="form-group">
                                                 <label for="stikerTypeId">Stiker Type: </label>
-                                                <select  @change="stickerCheckFunc" name="Sticker_type" id="stikerTypeId" class="form-control">
+                                                <select  @change="stickerCheckFunc" name="Sticker_type" id="stikerTypeId" class="form-control" disabled>
                                                     @if($readyEditData->Sticker_type == '')
                                                         <option value=""></option>
                                                     @endif
@@ -83,7 +83,7 @@ Edit Regular Passport
                                             </div>
                                             <div class="form-group">
                                                 <label for="RoundStickerId">Sticker No. </label>
-                                                <input @change="stickerCheckFunc" type="number" name="RoundSticker" id="RoundSticker"  value="{{@$readyEditData->RoundSticker}}" id="RoundStickerId" class="form-control">
+                                                <input @change="stickerCheckFunc" type="number" name="RoundSticker" id="RoundSticker"  value="{{@$readyEditData->RoundSticker}}" id="RoundStickerId" class="form-control" disabled>
                                             </div>
                                             <div class="form-group">
                                                 <label for="tddDateId">TDD:</label>
@@ -91,11 +91,11 @@ Edit Regular Passport
                                             </div>
                                             <div class="form-group">
                                                 <label for="oldPassportId">Old Passport:</label>
-                                                <input type="text" name="OldPassQty" value="{{@$readyEditData->OldPassQty}}" id="oldPassportId" class="form-control">
+                                                <input type="text" name="OldPassQty" value="{{@$readyEditData->OldPassQty}}" id="oldPassportId" class="form-control" disabled>
                                             </div>
                                         </div>
                                         <div class="col-md-12">
-                                            <input v-if="submitPermit" type="submit" name="submit" value="Update" class="btn btn-primary" id="UpdateBtn" style="padding:6px 30px;"><input onclick="alert('This sticker number already used')" v-else="submitPermit" type="button" value="Update" class="btn btn-primary" style="padding:6px 30px;"> 
+                                            <input onclick="alert('This sticker number already used')" v-else="submitPermit" type="button" value="Update" class="btn btn-primary" style="padding:6px 30px;"> <a  onclick="return confirm('Are you sure! Do you want to Delete?')" href="{{URL::to('passport/receive/edit-destroy').'/'.$readyEditData->WebFile_no}}" name="delete" value="Delete" class="btn btn-danger">Delete</a>
                                             <p></p>
                                         </div>
                                     </div>
@@ -119,7 +119,7 @@ Edit Regular Passport
                                     <div class="row">
                                         <div class="col-lg-12">
 
-                                            {!! Form::open(['url' => '/edit-receive-passport','id' => 'applicant_edit_form']) !!}
+                                            {!! Form::open(['url' => '/delete-receive-passport','id' => 'applicant_edit_form']) !!}
                                             <div class="form-group">
                                                 <input class="form-control" name="webfile_no" placeholder="Enter Webfile No"
                                                        required="required">

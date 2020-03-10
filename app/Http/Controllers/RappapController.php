@@ -473,7 +473,7 @@ class RappapController extends Controller
     Edit Rap/Pap
      ***********************/
     public function edit($request,$flg){
-
+        // return $request;
         $routes      = DB::table('tbl_route')->select('route_id', 'route_name')->get(); //Entry Port / Exit Port
         $port        = DB::table('tbl_port_names')->select('port_id', 'port_name')->where('service_type', 'R.A.P./P.A.P.')->get(); // Area
         $mode        = DB::table('tbl_transport_mode')->select('serial_no', 'mode')->get(); // Mode query

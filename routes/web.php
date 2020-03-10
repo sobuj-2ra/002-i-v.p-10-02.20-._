@@ -259,10 +259,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('delete_money_receive/{a}', 'ForeignPassportController@delete_money_receive');
     Route::get('/search-receive-number', 'ForeignPassportController@search_receive_number');
     Route::get('/edit-receive-foreign-passport', 'ForeignPassportController@edit_receive_foreign_passport');
-    Route::post('/edit-receive-foreign-passport/search', 'ForeignPassportController@edit_receive_foreign_passport');
+    Route::post('/edit-receive-foreign-passport', 'ForeignPassportController@edit_receive_foreign_passport_View');
     Route::post('update-foreign-passport', 'ForeignPassportController@update_foreign_passport');
     Route::get('edit-foreign-passport-slip-copy-gratise/{a}', 'ForeignPassportController@edit_foreign_passport_slip_copy_gratise');
     Route::get('/delete-foreign-passport', 'ForeignPassportController@delete_page');
+    Route::post('/delete-foreign-passport', 'ForeignPassportController@delete_page_view');
     Route::post('foreign/delete-search', 'ForeignPassportController@delete_page');
     Route::get('/delete-foreign/{a}', 'ForeignPassportController@destroy');
     Route::get('/reprint-foreign-passport', 'ForeignPassportController@reprint');
@@ -442,12 +443,16 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/delivery-center-passport-datas', 'CounterController@deliveryCenterStoreData');
     Route::get('/check_valid_sticker_axios', 'CounterController@ValidStickerCheck');
     Route::get('/check_gratis_sticker_axios', 'CounterController@GratisStickerCheck');
+    Route::get('/regular-passport-reprint', 'CounterController@regularPassReprint');
+    Route::post('/regular-passport-reprint', 'CounterController@regularPassReprintSlip');
 
     /// edit passport recive center //
     Route::get('/edit-receive-passport', 'CounterController@EditViewPassportReceive');
     Route::post('/edit-receive-passport', 'CounterController@EditPassportReceive');
     Route::get('/get_ttd_pass_edit_axios', 'CounterController@getTddEditPassRec');
     Route::post('/passport/receive/edit-store', 'CounterController@EditPassportReceiveUpdate');
+    Route::get('/delete-receive-passport', 'CounterController@EditViewPassportDelete');
+    Route::post('/delete-receive-passport', 'CounterController@EditViewPassportDeleteView');
     Route::get('/passport/receive/edit-destroy/{webNo}', 'CounterController@EditPassportReceiveDestroy');
 
     /// edit ready at center //
@@ -515,7 +520,7 @@ Route::group(['middleware' => ['auth']], function () {
 Route::get('counter-receive/details/report','CounterController@CounterReceiveDetailsReport');
 Route::post('counter-receive/details/report','CounterController@CounterReceiveDetailsReportView');
 
-Route::get('counter-receive/summary/report','CounterController@CounterReceiveSummaryReport');
+Route::get('counter-receive/summary/report','CounterController@delete-receive-passport');
 Route::post('counter-receive/summary/report','CounterController@CounterReceiveSumaryReportView');
 
 Route::get('counter-receive/user-wise/summary/report','CounterController@CounterUserWiseSummaryReport');
