@@ -1033,6 +1033,103 @@ class ManageSettingController extends Controller
   }
 
 
+  //// Holiday  Start/////
+
+  public function holidayView(){
+
+    $data['allHoliday'] = DB::table('tbl_holiday')->orderBy('hday_id','DESC')->get();
+    return view('master_setting.holiday.holiday_view',$data);
+  }
+
+  public function holidayStore(Request $r){
+    $allDay = $r->day;
+    $curDateTime = Date('Y-m-d H:i:s');
+    $from_date = Date('Y-m-d',strtotime($r->from_date));
+    $to_date = Date('Y-m-d',strtotime($r->to_date));
+
+
+    //$date_from = "2020-02-01";
+    $date_from = strtotime($from_date);
+
+    //$date_to="2020-12-30";
+    $date_to = strtotime($to_date);
+    foreach($allDay as $s_day){
+        for ($i=$date_from; $i<=$date_to; $i+=86400) {
+            $day = date("Y-m-d", $i);
+            $unixTimestamp = strtotime($day);
+      
+            $dayOfWeek = date("l", $unixTimestamp);
+      
+            if ($dayOfWeek == $s_day){
+                // echo $day ."is a". $dayOfWeek."<br>";
+                $dbl_check = DB::table('tbl_holiday')->whereDate('date',$day)->get();
+                if(count($dbl_check) < 1){
+                  DB::table('tbl_holiday')->insert([
+                      'date'=>$day,
+                      'description'=>'Weekly Holiday',
+                      'entry_date'=>$curDateTime
+                  ]);
+                }
+            }
+        }
+    }
+
+    return redirect('/setting/holiday')->with(['message'=>'Data Inserted Successfully','status'=>'alert-success']);
+  }
+
+  public function holidayDateStore(Request $r){
+    //return $r->all();
+    $curDateTime = Date('Y-m-d H:i:s');
+    $description = $r->description;
+    if($r->from_date != $r->to_date){
+      $from_date = Date('Y-m-d',strtotime($r->from_date));
+      $to_date = Date('Y-m-d',strtotime($r->to_date));
+      $date_from = strtotime($from_date);
+      $date_to = strtotime($to_date);
+      for ($i=$date_from; $i<=$date_to; $i+=86400) {
+        $day = date("Y-m-d", $i);
+        $dbl_check = DB::table('tbl_holiday')->whereDate('date',$day)->get();
+        if(count($dbl_check) < 1){
+          DB::table('tbl_holiday')->insert([
+                'date'=>$day,
+                'description'=>$description,
+                'entry_date'=>$curDateTime
+            ]);
+        }
+      }
+      $msg = true;
+    }
+    else{
+      $to_date = Date('Y-m-d',strtotime($r->from_date));
+      $dbl_check = DB::table('tbl_holiday')->whereDate('date',$to_date)->get();
+      if(count($dbl_check) < 1){
+
+        DB::table('tbl_holiday')->insert([
+              'date'=>$to_date,
+              'description'=>$description,
+              'entry_date'=>$curDateTime
+          ]);
+      }
+      else{
+        return redirect('/setting/holiday')->with(['message'=>'Data Already Exist','status'=>'alert-warning']);
+      }
+    }
+
+
+    return redirect('/setting/holiday')->with(['message'=>'Data Inserted Successfully','status'=>'alert-success']);
+  }
+
+  public function holidayDateDestroy($id){
+    $is_delete = DB::table('tbl_holiday')->where('hday_id',$id)->delete();
+    if($is_delete){
+      return redirect('/setting/holiday')->with(['message'=>'Data Deleted Successfully','status'=>'alert-success']);
+    }
+    else{
+      return redirect('/setting/holiday')->with(['message'=>'Data Couldn\'t Delete','status'=>'alert-danger']);
+    }
+  }
+
+
 
 
 }

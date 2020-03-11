@@ -515,6 +515,10 @@ Route::group(['middleware' => ['auth']], function () {
   Route::get('/setting/counter-setup/edit/{id}', 'ManageSettingController@counterSetupEdit');
   Route::post('/setting/counter-setup/update', 'ManageSettingController@counterSetupUpdate');
   Route::get('/setting/counter-setup/destroy/{id}', 'ManageSettingController@counterSetupDestroy');
+  Route::get('/setting/holiday', 'ManageSettingController@holidayView');
+  Route::post('/setting/holiday/store', 'ManageSettingController@holidayStore');
+  Route::post('/setting/holiday/date/store', 'ManageSettingController@holidayDateStore');
+  Route::get('/setting/holiday/delete/{id}', 'ManageSettingController@holidayDateDestroy');
 
   ///// report -----//////
 Route::get('counter-receive/details/report','CounterController@CounterReceiveDetailsReport');

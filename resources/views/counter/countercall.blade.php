@@ -137,7 +137,7 @@
                                                     <div class="col-md-12">
                                                         <br>
                                                         <span v-show="selectedToken">
-                                                            <p v-if="passportSearch == false">WebFile: <input @keyup.enter="webfileSubmit" name="webfile" id="webfile" style="width:200px;" required autocomplete="off"></p>
+                                                            <p v-if="passportSearch == false">WebFile: <input @keyup.enter="webfileSubmit" id="webfile" style="width:200px;" required autocomplete="off"><input type="hidden" name="webfile" id="webfile_hidden"></p>
                                                             <p v-show="passportSearch">Passport: <input  name="PassportNo2" id="PassportNo2" style="width:200px" required autocomplete="off"></p>
                                                         </span>
                                                         <br>
