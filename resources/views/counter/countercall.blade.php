@@ -540,6 +540,8 @@
                                             document.getElementById('contact').value = res.data.webfileData.Contact;
                                             document.getElementById('paytype').value = res.data.paytype;
 
+                                            var webDesa = document.getElementById('webfile');
+                                            webDesa.disabled = true;
 
                                             var ssldata = res.data.sllData.split(',');
                                             document.getElementById('paytype').innerHTML = res.data.paytype;
@@ -672,7 +674,8 @@
                                             document.getElementById('passport_show').innerText = res.data.webfileData.Passport;
                                             document.getElementById('contact').value = res.data.webfileData.Contact;
                                             document.getElementById('paytype').value = res.data.webfileData.Applicant_name;
-
+                                            var webDesa = document.getElementById('webfile');
+                                            webDesa.disabled = true;
                                             var ssldata = res.data.sllData.split(',');
                                             document.getElementById('paytype').innerHTML = res.data.paytype;
                                             _this.txnNumber = ssldata[3];
@@ -992,6 +995,7 @@
 //                        document.getElementById('name').value = '';
 
                     }
+
                     document.getElementById('name').value = '';
                     document.getElementById('passportNo').value = '';
                     document.getElementById('validStkr').value = '';
@@ -1005,7 +1009,8 @@
                     //var correctionFee = this.correctionFee;
                     document.getElementById('old_pass').value = '';
                     document.getElementById('paytype').value = '';
-
+                    var webDesa = document.getElementById('webfile');
+                    webDesa.disabled = false;
 
                     this.webfileData = false;
                     this.submitBtn = false;
