@@ -504,7 +504,7 @@ class ForeignPassportController extends Controller
 
     }
     public function ForeignwebfileDataStore(Request $r){
-        $datas = $r->all();
+        // return $datas = $r->all();
         $curDT = Date('Y-m-d H:i:s');
         $arrTemp = [];
         $succArr = [];
@@ -598,7 +598,7 @@ class ForeignPassportController extends Controller
             }
         }
 
-        foreach($arrTemp as $item){
+        foreach($arrTemp as $key => $item){
             
             $is_save = DB::select(
                 'CALL GetForeignDATAIN(
@@ -646,7 +646,8 @@ class ForeignPassportController extends Controller
                     array_push($succArr,$item['webfile']);
                 }
                 else{
-                    array_push($rejectArr,$item['webfile']);
+                    $rejectArr[$key]['webfile'] = $item['webfile'];
+                    $rejectArr[$key]['status'] = $status;
                 }
 
 
@@ -657,18 +658,33 @@ class ForeignPassportController extends Controller
             Session::forget('successArr');
             Session::push('tempArr', $arrTemp);
             Session::push('successArr', $succArr);
-            return response()->json(['save'=>'yes','saveCount'=>$saveCount,'status'=>'Data Saved Successfully']);
+            $slip = Tbl_ivac_service::where('Service','Foreign Passport')->first();
+            if($slip->slip_copy > 0){
+                $is_slip = 'yes';
+            }
+            else{
+                $is_slip = 'no';
+            }
+            return response()->json(['save'=>'yes','is_slip'=>$is_slip,'saveCount'=>$saveCount,'status'=>'Data Saved Successfully']);
         }
         else if(count($succArr) < 1){
-
-            return response()->json(['save'=>'no','saveCount'=>$saveCount,'store_id'=>'','status'=>$status,'rejectArr'=>$rejectArr]);
+            $is_slip = 'no';
+            return response()->json(['save'=>'no','is_slip'=>$is_slip,'saveCount'=>$saveCount,'store_id'=>'','status'=>$status,'rejectArr'=>$rejectArr]);
         }
         else{
+            $slip = Tbl_ivac_service::where('Service','Foreign Passport')->first();
+            if($slip->slip_copy > 0){
+                $is_slip = 'yes';
+            }
+            else{
+                $is_slip = 'no';
+            }
             Session::forget('tempArr');
             Session::forget('successArr');
             Session::push('tempArr', $arrTemp);
             Session::push('successArr', $succArr);
-            return response()->json(['save'=>'notall','saveCount'=>$saveCount,'status'=>'Some Data Couldn\'t Saved','rejectArr'=>$rejectArr]);
+            $resMsg = 'Total Data Saved: '.count($succArr).' '.' Fail: '.count($rejectArr);
+            return response()->json(['save'=>'notall','is_slip'=>$is_slip,'saveCount'=>$saveCount,'status'=>$resMsg,'rejectArr'=>$rejectArr]);
         }
 
     }
@@ -865,7 +881,7 @@ class ForeignPassportController extends Controller
                 // $datas['stickers'] = Tbl_sticker::all();
                 $datas['visa_types'] = Tbl_visa_type::all();
                 $datas['center_name'] = Tbl_center_info::where('active',1)->first();
-                $datas['ivac_svc_fee'] = Tbl_ivac_service::where('Service', 'Regular Passport')->first();
+                $datas['ivac_svc_fee'] = Tbl_ivac_service::where('Service', 'Foreign Passport')->first();
 
                 $datas['tdd_list'] = Tbl_visa_type::all();
                 $corFee = Tbl_ivac_service::select('corrFee','Service')->where('Service','Foreign Passport')->first();

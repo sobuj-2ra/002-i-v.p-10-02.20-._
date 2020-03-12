@@ -439,6 +439,12 @@ class CounterController extends Controller
                 ]);
 
                 $slip = Tbl_ivac_service::where('Service','Regular Passport')->first();
+                if($slip->slip_copy > 0){
+                    $is_slip = 'yes';
+                }
+                else{
+                    $is_slip = 'no';
+                }
                 $barcodeType = Tbl_setup::where('item_name','Barcode')->first();
                 if($barcodeType->item_value == 'Passport'){
                     $BarcodeData = $request->passport;
@@ -473,10 +479,10 @@ class CounterController extends Controller
                     's_center_web'=>$center_info->center_web,
                     's_info'=>$center_info->center_info,
                 ]);
-                return response()->json(['save'=>'yes','saveCount'=>$saveCount,'store_id'=>$request->webfile,'status'=>$status]);
+                return response()->json(['save'=>'yes','is_slip'=>$is_slip,'saveCount'=>$saveCount,'store_id'=>$request->webfile,'status'=>$status]);
             }
             else{
-                return response()->json(['save'=>'no','saveCount'=>$saveCount,'store_id'=>'','status'=>$status]);
+                return response()->json(['save'=>'no','is_slip'=>$is_slip,'saveCount'=>$saveCount,'store_id'=>'','status'=>$status]);
             }
 
 
@@ -527,9 +533,12 @@ class CounterController extends Controller
         if(isset($dataArr[0]['center_name'])){
             $center_name = $dataArr[0]['center_name'];
         }
-        $center_info = Tbl_center_info::where('center_name',$center_name)->first();
-        $del_time = $center_info->del_time;
-        $center_web = $center_info->center_web;
+        $centerData = Tbl_center_info::where('center_name',$center_name)->first();
+        $del_time = $centerData->del_time;
+        $center_web = $centerData->center_web;
+        $center_phone = $centerData->center_phone;
+        $center_fax = $centerData->center_fax;
+        $center_info = $centerData->center_info;
         $barcodeType = Tbl_setup::where('item_name','Barcode')->first();
         if($barcodeType->item_value == 'Passport'){
             $BarcodePrint = 'Passport';
@@ -538,7 +547,7 @@ class CounterController extends Controller
             $BarcodePrint = 'Webfile';
         }
         $slipCopy = Tbl_ivac_service::where('Service','Foreign Passport')->first();
-        return view('foreign.foreign_pass_receive_print',compact('valid_data','dataArr','del_time','center_web','BarcodePrint','slipCopy'));
+        return view('foreign.foreign_pass_receive_print',compact('valid_data','dataArr','del_time','center_web','center_phone','center_fax','center_info','barcodeType','BarcodePrint','slipCopy'));
     }
 
     public function regularPassReprint(){

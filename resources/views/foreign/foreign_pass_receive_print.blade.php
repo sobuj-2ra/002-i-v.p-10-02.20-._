@@ -80,19 +80,26 @@
                         <tr>
                             <td colspan=2 style='margin: 105px 0'>
                                 <div class="topborder"></div>
+                                <strong>User :</strong> {{$data['user_id']}}<br/>
+                                <strong>Counter :</strong> {{$data['counter_id']}}<br/>
                                 <strong>Name :</strong> {{$data['name']}}<br/>
                                 <strong>Contact :</strong> {{$data['contact']}}<br/>
                                 <strong>Passport :</strong> {{$data['passportNo']}}<br/>
-                                <strong>Web file No: :</strong> {{$data['webfile']}}<br/>
-                                <strong>Nationality :</strong> {{$data['nationality']}}<br/>
-                                <strong>date of Checking: :</strong> {{$data['date_of_checking']}}<br/>
-                                <strong>Remarks :</strong> {{$data['remark2']}}<br/>
+                                <strong>Web file No :</strong> {{$data['webfile']}}<br/>
+                                <strong>Visa Type :</strong> {{$data['visa_type']}}<br/>
+                                <strong>Phone :</strong> {{$data['contact']}}<br/>
                                 <strong>Visa fee :</strong> {{$data['visa_fee']}}<br/>
                                 <strong>Fax trans. charge :</strong> {{$data['fax_trans_charge']}}<br/>
                                 <strong>icwf :</strong> {{$data['icwf']}}<br/>
-                                <strong>Visa app. charge: :</strong> {{$data['visa_app_charge']}}<br/>
-                                <strong>Total Amount :</strong> {{$data['total_amount']}}<br/>
-                                <strong>Sticker :</strong> {{$data['validStkr']}}<br/>
+                                <strong>Visa app. charge :</strong> {{$data['visa_app_charge']}}<br/>
+                                <strong>Processing fee :</strong> {{$data['proc_fee']}}<br/>
+                                <strong>Special fee :</strong> {{$data['sp_fee']}}<br/>
+                                <strong>Corr fee :</strong> {{$data['corr_fee']}}<br/>
+                                <strong>Total Amount :</strong> {{$data['total_amount']+$data['corr_fee']+$data['sp_fee']+$data['proc_fee']}}<br/>
+                                <strong>Payment :</strong> {{$data['paytype']}}<br/>
+                                <strong>Center Phone :</strong> {{$center_phone}}<br/>
+                                <strong>Fax :</strong> {{$center_fax}}<br/>
+                                <strong>Info :</strong> {{$center_info}}<br/>
                                 {{-- <strong>Receiving Date :</strong> {{$data['receive_date']}}<br/> --}}
 
                                 <strong>Delivery on or after:  </strong>{{  date('d-m-Y', strtotime($data['tddDelDateValue']))}}

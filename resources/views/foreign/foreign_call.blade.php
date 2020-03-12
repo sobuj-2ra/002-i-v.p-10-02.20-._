@@ -253,7 +253,7 @@
                                                                         </div>
                                                                         <div class="col-md-2">
                                                                             <div class="form-group">
-                                                                                <input @keyup="SpecialCharValidationFunc" @blur="checkGratisStkrFunc" type="number" name="gratisStrkNum[]" :id="'gratisStrkNum'+i" :data-id="i" class="form-control input_values" placeholder="Gratis Sticker" style="display: none"    autocomplete="off">
+                                                                                <input @keyup="SpecialCharValidationFunc" @blur="checkGratisStkrFunc" type="number" name="gratisStrkNum[]" :id="'gratisStrkNum'+i" :data-id="i" class="form-control input_values doubleGratisStkr" placeholder="Gratis Sticker" style="display: none"    autocomplete="off">
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -269,7 +269,7 @@
                                                                                 </span>
                                                                                 <span :id="'webfile_p'+i" >
                                                                                     <label for=""></label>
-                                                                                    <p><input @keyup.enter="webfileSubmit" name="webfile[]" :id="'webfile'+i" :data-id="i" class="form-control input_values" placeholder="Enter Webfile" required autocomplete="off" ></p>
+                                                                                    <p><input @keyup.enter="webfileSubmit" name="webfile[]" :id="'webfile'+i" :data-id="i" class="form-control input_values webfile_double" placeholder="Enter Webfile" required autocomplete="off" ></p>
                                                                                     {{-- <p v-show="passportSearch">Passport: <input  name="PassportNo2" id="PassportNo2" style="width:200px" required autocomplete="off" class="input_values"></p> --}}
                                                                                 </span>
                                                                                 <span :id="'webfile2_p'+i" style="display: none" >
@@ -498,8 +498,8 @@
                                                                 </div>
                                                             </div>
                                                             <div class="webfile-not-found">
-                                                                <h3 v-if="webfileDataNull" class="text-center">Opps! No Data Found</h3>
-                                                                <h3 v-if="webfileDataNull" class="text-center"></h3>
+                                                                <h3  :id="'reswebnull_msg'+i" class="text-center"></h3>
+                                                                <h3  class="text-center"></h3>
                                                             </div>
                                                             <div class="webfile-not-found">
                                                                 <h3 v-if="storeResStatus" class="text-center">@{{ storeResMsg }}</h3>
@@ -540,7 +540,7 @@
                                                 </div>
                                                 <div class="col-md-12">
                                                     <h2 v-if="storeResStatusf" id="data_store_msg" style="text-align:center">@{{storeResMsg}}</h2> 
-                                                <p class="text-center" v-for="failsd in failToSaveArr" style="font-weight:bold;color:red;">@{{failsd}}</p>   
+                                                <p class="text-center" v-for="failsd in failToSaveArr" style="font-weight:bold;color:red;">@{{failsd.webfile}} : @{{failsd.status}}</p>   
                                                 </div>
                                         </div>
                                     </div>
@@ -573,7 +573,6 @@
                 tokenNumber:'',
                 test:'',
                 webfileData:false,
-                webfileDataNull:false,
                 webfilePreloader:false,
                 passportSearch:false,
                 webfileUC:'',
@@ -734,12 +733,29 @@
                     var validStkr = document.getElementById(id_name).value;
                     validStkr = Number(validStkr);
                     var is_alert_run = true;
-                   
+                    var is_alert_run = true;
+                    var checkvaligratisstkrserver = false;
+                    var obj = {};
+                    $(".doubleGratisStkr").each(function(){
+                        if(obj.hasOwnProperty(this.value)) {
+                            if(checkvaligratisstkrserver == false){
+                                checkvaligratisstkrserver = true;
+                                alert("You can not enter duplicate Gratis Sticker No. " + this.value);
+                                document.getElementById(id_name).value = '';
+                            }
+                        } 
+                        else {
+                            obj[this.value] = this.value;
+                        }
+                    });
+
                     axios.get('check_gratis_sticker_axios',{params:{'validStkr':validStkr}})
                     .then(function(res){
                         if(res.data.validStatus == 'No'){
-                            document.getElementById(id_name).value = '';
-                            alert("This Gratis Stiker number already exists !");
+                            if(checkvaligratisstkrserver == false){
+                                document.getElementById(id_name).value = '';
+                                alert("This Gratis Sticker number already exists !");
+                            }
                         };
                     })
                     .catch(function(error){
@@ -752,8 +768,22 @@
                     var id_index = event.target.getAttribute('data-id');
                     var validStkr = document.getElementById(id_name).value;
                     validStkr = Number(validStkr);
+                    var checkvalistkrserver = false;
                     var validStikerType = document.getElementById('sticker_type').value;
                     var is_alert_run = true;
+                    var obj = {};
+                    $(".doubleStkr").each(function(){
+                        if(obj.hasOwnProperty(this.value)) {
+                            if(checkvalistkrserver == false){
+                                checkvalistkrserver = true;
+                                alert("You can not enter duplicate Sticker No. " + this.value);
+                                document.getElementById(id_name).value = '';
+                            }
+                        } 
+                        else {
+                            obj[this.value] = this.value;
+                        }
+                    });
                     if(validStikerType == ''){
                         $('#sticker_type').focus();
                         document.getElementById(id_name).value = '';
@@ -780,8 +810,10 @@
                         axios.get('check_valid_sticker_axios',{params:{'validSticker':validStkr,'validStikerType':validStikerType}})
                         .then(function(res){
                             if(res.data.validStatus == 'No'){
-                                document.getElementById(id_name).value = '';
-                                alert("This Stiker number already exists !");
+                                if(checkvalistkrserver == false){
+                                    document.getElementById(id_name).value = '';
+                                    alert("This Sticker number already exists !");
+                                }
                             };
                         })
                         .catch(function(error){
@@ -835,8 +867,10 @@
                     }
                 },
                 webfileSubmit:function(event) {
+
+
+                    var id_name = event.target.getAttribute('id');
                     var id_index = event.target.getAttribute('data-id');
-                    this.webfileDataNull = false;
                     this.webfileData = false;
                     this.submitBtn = false;
                     this.cleanBtn = false;
@@ -849,6 +883,7 @@
                     this.correctionShow = false;
                     this.corItem = [];
                     this.corAllSelected = false;
+                    document.getElementById('reswebnull_msg'+id_index).innerText = '';
                     document.getElementById('visa_type'+id_index).value = '';
                     document.getElementById('name'+id_index).value = '';
                     document.getElementById('passportNo'+id_index).value = '';
@@ -874,6 +909,22 @@
                     this.txnNumber = '';
                     this.txnDate = '';
                     this.ttdDelDate = '';
+
+                    var checkDoubleWebfile = true;
+                    var obj = {};
+                    $(".webfile_double").each(function(){
+                        if(obj.hasOwnProperty(this.value)) {
+                            if(checkDoubleWebfile == true){
+                                checkDoubleWebfile = false;
+                                alert("You can not enter duplicate Webfile No. " + this.value);
+                                document.getElementById(id_name).value = '';
+                            }
+                        } 
+                        else {
+                            obj[this.value] = this.value;
+                        }
+                    });
+
                     document.getElementById('old_pass'+id_index).value = '';
                     document.getElementById('paytype'+id_index).value = '';
                     var service_type = document.getElementById('service_type').value;
@@ -889,39 +940,57 @@
                     var stkrNumST = Number(this.stkr_str);
                     var stkrNumEND = Number(this.stkr_end);
                     if (service_type == '') {
-                        $('#service_type').focus();
-                        alert('Please Select Service Type');
+                        if(checkDoubleWebfile == true){
+                            $('#service_type').focus();
+                            alert('Please Select Service Type');
+                        }
                     }
                     else if (selectedToken == '') {
-                        alert('Please Select Token');
+                        if(checkDoubleWebfile == true){
+                            alert('Please Select Token');
+                        }
                     }
                     else if (sticker == '') {
-                        $('#sticker_type').focus();
-                        alert('Please Select Sticker Type')
+                        if(checkDoubleWebfile == true){
+                            $('#sticker_type').focus();
+                            alert('Please Select Sticker Type')
+                        }
                     }
                     else if (stkrNumST == '' || stkrNumEND == '') {
-                        $('#sticker_no_from').focus();
-                        alert('Please Input Sticker Starting and Ending Number');
+                        if(checkDoubleWebfile == true){
+                            $('#sticker_no_from').focus();
+                            alert('Please Input Sticker Starting and Ending Number');
+                        }
                     }
                     else if (stkrNumST >= stkrNumEND) {
-                        $('#sticker_no_from').focus();
-                        alert('Please Input Valid Sticker Number');
+                        if(checkDoubleWebfile == true){
+                            $('#sticker_no_from').focus();
+                            alert('Please Input Valid Sticker Number');
+                        }
                     }
                     else if(gratiseYes.checked === false && gratiseNo.checked === false){
-                        $('#gratiseYes'+id_index).focus();
-                        alert('Please Select GRATIS status');
+                        if(checkDoubleWebfile == true){
+                            $('#gratiseYes'+id_index).focus();
+                            alert('Please Select GRATIS status');
+                        }
                     }
                     else if(validStkr == ''){
                         // $('#validStkr'+id_index).focus();
-                        alert('Please Enter Sticker Number');
+                        if(checkDoubleWebfile == true){
+                            alert('Please Enter Sticker Number');
+                        }
                     }
                     else if(gratiseYes.checked === true && gratiseNo.checked === false && gratisStrkNum == ''){
-                        $('#gratisStrkNum'+id_index).focus();
-                        alert('Please Input GRATIS No.');
+                        if(checkDoubleWebfile == true){
+                            $('#gratisStrkNum'+id_index).focus();
+                            alert('Please Input GRATIS No.');
+                        }
                     }
                     else if(validStkr < stkrNumST || validStkr > stkrNumEND){
-                        $('#sticker_no_from'+id_index).focus();
-                        alert('Please Enter Valid Sticker No.');
+                        if(checkDoubleWebfile == true){
+                            $('#sticker_no_from'+id_index).focus();
+                            alert('Please Enter Valid Sticker No.');
+                        }
                     }
                     else {
                         var webfile = document.getElementById('webfile'+id_index).value;
@@ -947,12 +1016,12 @@
                                         var webfileData = res.data.webfileData;
                                         if (!webfileData == '') {
                                             _this.webfileData = true;
-                                            _this.webfileDataNull = false;
                                             _this.submitBtn = true;
                                             _this.cleanBtn = true;
                                             $('#rejected_button_show'+id_index).show();
                                             $('#clear_button_item'+id_index).show();
 
+                                            document.getElementById('reswebnull_msg'+id_index).innerText = '';
                                             document.getElementById('webfile'+id_index).value = res.data.webfileData.WebFile_no;
                                             $('#webfile_p'+id_index).hide();
                                             $('#webfile_disable'+id_index).show();
@@ -997,10 +1066,11 @@
 
                                         }
                                         else {
-                                            _this.webfileDataNull = true;
+                                            
                                             _this.webfileData = false;
                                             _this.submitBtn = false;
                                             _this.cleanBtn = false;
+                                            document.getElementById('reswebnull_msg'+id_index).innerText = 'No Data Found in Appointment List';
                                             document.getElementById('webfile'+id_index).value = '';
                                         }
                                         _this.webfilePreloader = false;
@@ -1021,17 +1091,18 @@
                                 $('#webfileNo2'+id_index).focus();
                                 document.getElementById('passportNo'+id_index).value = webfileDataIn;
                                 document.getElementById('webfileNo2'+id_index).value = '';
+                                document.getElementById('reswebnull_msg'+id_index).innerText = '';
                                 this.passportSearch = true;
                                 this.styleIndex = '1';
                                 // document.getElementById('PassportNo2').value = webfileDataIn;
                                 this.cleanBtn = true;
                                 this.submitBtn = false;
-                                this.webfileDataNull = false;
                             }
                         }
                     }
                 },
                 webfileSubmit2: function(event) {
+                    var id_name = event.target.getAttribute('id');
                     var id_index = event.target.getAttribute('data-id');
 
                     this.storeResStatus = false,
@@ -1056,6 +1127,21 @@
                     document.getElementById('tddDelDateValue'+id_index).value = '';
                     document.getElementById('sp_fee'+id_index).value = '';
 
+                    
+                    var checkDoubleWebfile = true;
+                    var obj = {};
+                    $(".webfile_double").each(function(){
+                        if(obj.hasOwnProperty(this.value)) {
+                            if(checkDoubleWebfile == true){
+                                checkDoubleWebfile = false;
+                                alert("You can not enter duplicate Webfile No. " + this.value);
+                                document.getElementById(id_name).value = '';
+                            }
+                        } 
+                        else {
+                            obj[this.value] = this.value;
+                        }
+                    });
 
                     var service_type = document.getElementById('service_type').value;
                     var gratiseYes = document.getElementById('gratiseYes'+id_index);
@@ -1070,35 +1156,53 @@
                     var stkrNumST = Number(this.stkr_str);
                     var stkrNumEND = Number(this.stkr_end);
                     if (service_type == '') {
-                        $('#service_type').focus();
-                        alert('Please Select Service Type');
+                        if(checkDoubleWebfile == true){
+                            $('#service_type').focus();
+                            alert('Please Select Service Type');
+                        }
                     }
                     else if (selectedToken == '') {
-                        alert('Please Select Token');
+                        if(checkDoubleWebfile == true){
+                            alert('Please Select Token');
+                        }
                     }
                     else if (sticker == '') {
-                        $('#sticker_type').focus();
-                        alert('Please Select Sticker Type')
+                        if(checkDoubleWebfile == true){
+                            $('#sticker_type').focus();
+                            alert('Please Select Sticker Type')
+                        }
                     }
                     else if (stkrNumST == '' || stkrNumEND == '') {
-                        $('#sticker_no_from').focus();
-                        alert('Please Input Sticker Starting and Ending Number');
+                        if(checkDoubleWebfile == true){
+                            $('#sticker_no_from').focus();
+                            alert('Please Input Sticker Starting and Ending Number');
+                        }
                     }
                     else if (stkrNumST >= stkrNumEND) {
-                        alert('Please Input Valid Sticker Number');
+                        if(checkDoubleWebfile == true){
+                            alert('Please Input Valid Sticker Number');
+                        }
                     }
                     else if(gratiseYes.checked === false && gratiseNo.checked === false){
-                        alert('Please Select a GRATIS');
+                        if(checkDoubleWebfile == true){
+                            alert('Please Select a GRATIS');
+                        }
                     }
                     else if(validStkr == ''){
-                        alert('Please Enter Sticker Number');
+                        if(checkDoubleWebfile == true){
+                            alert('Please Enter Sticker Number');
+                        }
                     }
                     else if(gratiseYes.checked === true && gratiseNo.checked === false && gratisStrkNum == ''){
-                        $('#gratisStrkNum'+id_index).focus();
-                        alert('Please Input GRATIS No.');
+                        if(checkDoubleWebfile == true){
+                            $('#gratisStrkNum'+id_index).focus();
+                            alert('Please Input GRATIS No.');
+                        }
                     }
                     else if(validStkr < stkrNumST || validStkr > stkrNumEND){
-                        alert('Please Enter Valid Sticker No.');
+                        if(checkDoubleWebfile == true){
+                            alert('Please Enter Valid Sticker No.');
+                        }
                     }
                     else {
                         var webfileNo2 = document.getElementById('webfileNo2'+id_index).value;
@@ -1129,9 +1233,9 @@
                                         var webfileData = res.data.webfileData;
                                         if (!webfileData == '') {
                                             _this.webfileData = true;
-                                            _this.webfileDataNull = false;
                                             _this.submitBtn = true;
                                             _this.cleanBtn = true;
+                                            document.getElementById('reswebnull_msg'+id_index).innerText = '';
                                             document.getElementById('webfile'+id_index).value = webfileNo2;
                                             document.getElementById('webfileNo2'+id_index).value = '';
                                             $('#webfile_p'+id_index).show();
@@ -1182,11 +1286,11 @@
                                             _this.specialCharBlock();
                                         }
                                         else {
-                                            _this.webfileDataNull = true;
                                             _this.webfileData = false;
                                             _this.submitBtn = false;
                                             _this.cleanBtn = false;
 
+                                            document.getElementById('reswebnull_msg'+id_index).innerText = 'No Data Found in Appointment List';
                                             document.getElementById('webfile').value = '';
 
                                         }
@@ -1459,23 +1563,6 @@
                         
                         if(webfile != '' && showPass != ''){
 
-                            // if(DoubleValidStkrArr.length > 1){
-                            //     var obj = {};
-                            //     $(".doubleStkr").each(function(){
-                            //         if(obj.hasOwnProperty(this.value)) {
-                            //             if(is_alert_already ==  true){
-                            //                 is_alert_already = false;
-                            //                 this.not_all_data_valid = false;
-                            //                 this.submitModalShow = false;
-                            //                 $('#validStkr'+id_index).focus();
-                            //                 alert("there is a duplicate value " + this.value);
-                            //             }
-                            //         } 
-                            //         else {
-                            //             obj[this.value] = this.value;
-                            //         }
-                            //     });
-                            // }
                             if(validStkrF < inputTSt || validStkr2F > InputTE)
                             {   
                                 if(is_alert_already ==  true){
@@ -1691,18 +1778,21 @@
                             document.getElementById('book_rcvpt_no').value = '';
                             _this.storeResStatusf = true;
                             _this.storeResMsg = res.data.status;
-                            console.log(res);
+                            // console.log(res);
                             var saves = res.data.save;
+                            var is_slip = res.data.is_slip;
                             if(saves == 'yes'){
                                 document.getElementById('total_save_count').innerText = res.data.saveCount;
-                                window.open('foreign-pass-receive-print', '_blank');
-                                
+                                if(is_slip == 'yes'){
+                                    window.open('foreign-pass-receive-print', '_blank');
+                                }
                             }
                             else if(saves == 'notall'){
                                 document.getElementById('total_save_count').innerText = res.data.saveCount;
                                 _this.failToSaveArr = res.data.rejectArr;
-                                window.open('foreign-pass-receive-print', '_blank');
-                                
+                                if(is_slip == 'yes'){
+                                    window.open('foreign-pass-receive-print', '_blank');
+                                }
                             }
                             else if(saves == 'no'){
                                 _this.failToSaveArr = res.data.rejectArr;

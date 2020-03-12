@@ -75,21 +75,17 @@
                     <strong>Name:</strong> {{ $appServed->Applicant_name}} <br/>
                     <strong>Passport:</strong> {{ $appServed->Passport}} <br/>
                     <strong>Webfile No:</strong> {{ $appServed->WebFile_no}} <br/>
-                    <strong>Processing fee:</strong> {{ $appServed->proc_fee}} <br/>
                     <strong>Visa Type:</strong> {{ $appServed->Visa_type}} <br/>
                     <strong>Phone :</strong> {{ $appServed->Contact}} <br/>
-                    <strong>Nationality:</strong> {{ $fpServed->nationality}} <br/>
-                    <strong>date of Checking:</strong> {{ $fpServed->date_of_checking}} <br/>
-                    <strong>Remarks:</strong> {{ $fpServed->remarks}} <br/>
                     <strong>Visa fee:</strong> {{ $fpServed->visa_fee}} <br/>
                     <strong>Fax trans. charge:</strong> {{ $fpServed->fax_trans_charge}} <br/>
                     <strong>icwf:</strong> {{ $fpServed->icwf}} <br/>
                     <strong>Visa app. charge:</strong> {{ $fpServed->visa_app_charge}} <br/>
+                    <strong>Processing fee:</strong> {{ $appServed->proc_fee}} <br/>
                     <strong>Special fee:</strong> {{ $appServed->sp_fee}}<br />
                     <strong>Corr fee:</strong> {{ $appServed->corrFee}} <br/>
                     <strong>Total:</strong> {{ $fpServed->total_amount+$appServed->proc_fee+$appServed->sp_fee+$appServed->corrFee}} <br />
                     <strong>Payment:</strong> {{ $appServed->Pmethod}} <br/>
-                    <strong>Gratis/Non-Gratis Sticker:</strong> {{ $fpServed->strk_no}} <br/>
                     <strong>Center Phone:</strong> {{$center->center_phone}} <br/>
                     <strong>Fax:</strong> {{$center->center_fax}} <br/>
                     <strong>Info:</strong> {{$center->center_info}} <br/>

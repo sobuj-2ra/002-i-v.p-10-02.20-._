@@ -970,13 +970,16 @@
                             console.log(res);
                             var last_id = res.data.store_id;
                             var saves = res.data.save;
+                            var is_slip = res.data.is_slip;
                             if(saves == 'yes'){
 //                            _this.selectedTokenQty = '';
 //                            _this.selectedTokenval = '';
                                 document.getElementById('total_save_count').innerText = res.data.saveCount;
                                 if(last_id == ''){
                                 }else{
-                                    window.open('pass-receive-print/'+last_id, '_blank');
+                                    if(is_slip == 'yes'){
+                                        window.open('pass-receive-print/'+last_id, '_blank');
+                                    }
                                 }
                             }
 

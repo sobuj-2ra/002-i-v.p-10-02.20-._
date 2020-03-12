@@ -72,7 +72,7 @@
                                             <label for="from_date"><i>SELECT DATE:</i></label>
                                             <input type="text" value="<?php echo date('d-m-Y'); ?>" class="form-control datepicker" name="from_date" data-date-format="dd/mm/yyyy" required autocomplete="off">
                                         </div>
-                                        <label><i>TO DATE:</i></label> <input type="checkbox" id="checkmulholi" @click="multyHolidayCheck">
+                                        <label><i>TO DATE:</i></label> <input name="checkbox" value="yes" type="checkbox" id="checkmulholi" @click="multyHolidayCheck">
                                         
                                         <div v-show="mul_holiday" class="form-group">
                                             <input id="todate_mul_value" type="text" value="<?php echo date('d-m-Y'); ?>" class="form-control datepicker" name="to_date" data-date-format="dd/mm/yyyy" required autocomplete="off">

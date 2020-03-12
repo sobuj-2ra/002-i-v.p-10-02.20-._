@@ -1,12 +1,12 @@
 @extends('admin.master')
 <!--Page Title-->
 @section('page-title')
-    Appointment Import Data
+    Appointment Data Import 
 @endsection
 
 <!--Page Header-->
 @section('page-header')
-    Appointment List Import Data
+    Appointment List Data Import 
 @endsection
 
 <!--Page Content Start Here-->
@@ -32,10 +32,10 @@
                                 <input type="text" class="form-control datepicker" name="date" data-date-format="dd/mm/yyyy" autocomplete="off" placeholder="Date" required>
                             </div>
                             <div class="form-group">
-                                <label for="to_date"><i>CHOICE IMPORT FILE:</i></label>
+                                <label for="to_date"><i>CHOOSE IMPORT FILE:</i></label>
                                 <input type="file" class="form-control" name="import_file" required>
                             </div>
-                            <hr>
+                            <hr> 
                             <div class="footer-box">
                                 <button type="reset" class="btn btn-danger">RESET</button>
                                 <button type="submit" id="submit" class="btn btn-info pull-right">IMPORT FILE</button>

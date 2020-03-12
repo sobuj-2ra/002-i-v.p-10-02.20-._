@@ -1078,10 +1078,11 @@ class ManageSettingController extends Controller
   }
 
   public function holidayDateStore(Request $r){
-    //return $r->all();
+    // return $r->all();
     $curDateTime = Date('Y-m-d H:i:s');
     $description = $r->description;
-    if($r->from_date != $r->to_date){
+    if($r->checkbox == 'yes'){
+      
       $from_date = Date('Y-m-d',strtotime($r->from_date));
       $to_date = Date('Y-m-d',strtotime($r->to_date));
       $date_from = strtotime($from_date);
@@ -1100,12 +1101,12 @@ class ManageSettingController extends Controller
       $msg = true;
     }
     else{
-      $to_date = Date('Y-m-d',strtotime($r->from_date));
-      $dbl_check = DB::table('tbl_holiday')->whereDate('date',$to_date)->get();
+      $from_date = Date('Y-m-d',strtotime($r->from_date));
+      $dbl_check = DB::table('tbl_holiday')->whereDate('date',$from_date)->get();
       if(count($dbl_check) < 1){
 
         DB::table('tbl_holiday')->insert([
-              'date'=>$to_date,
+              'date'=>$from_date,
               'description'=>$description,
               'entry_date'=>$curDateTime
           ]);
