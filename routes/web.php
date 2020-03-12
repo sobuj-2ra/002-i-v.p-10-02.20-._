@@ -582,4 +582,9 @@ Route::get('/operation/rejection-reason/destroy/{id}', 'ManageSettingController@
 Route::get('/operation/regular-service-search', 'ManageSettingController@regularServiceSearch');
 Route::post('/operation/regular-service-search', 'ManageSettingController@regularServiceSearchGet');
 
+//  FOREIGN STATUS CHANGES //
+Route::get('operation/change-status/foreign','ManageSettingController@changeForeignStatus');
+Route::post('operation/change-status/foreign/edit','ManageSettingController@changeForeignStatusEdit');
+Route::post('operation/change-status/foreign/update','ManageSettingController@changeForeignStatusUpdate');
+
 });

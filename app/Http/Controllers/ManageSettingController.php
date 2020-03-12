@@ -19,6 +19,7 @@ use App\Tbl_visa_type;
 use App\Tbl_visacheck;
 use App\Tbl_correctionfee;
 use App\Tbl_rejectcause;
+use App\Tbl_fp_served;
 use App\Tbl_portName;
 use DateTime;
 use Session;
@@ -383,9 +384,10 @@ class ManageSettingController extends Controller
     }
   }
 
-  public function changeStatus(){
 
-    return view('admin_operation.change_status');
+   ///  Reguale Passport Change Status ////
+  public function changeStatus(){
+    return view('admin_operation.change_status.regular_status.change_status');
   }
 
   public function changeStatusEdit(Request $r){
@@ -412,11 +414,14 @@ class ManageSettingController extends Controller
           else if($status == 'EXPIRED'){
             $resArr =  ['PENDING','REJECTED','RETURN','BACK REJECTED'];
           }
-          return view('admin_operation.change_status_edit',compact('statusArr','webfileData','resArr'));
+          return view('admin_operation.change_status.regular_status.change_status_edit',compact('statusArr','webfileData','resArr'));
+        }
+        else{
+          return redirect('operation/change-status')->with(['msg'=>'Not Data Found in Appointment List','status'=>'warning']);
         }
     }
     else{
-      return redirect('operation/change-status')->with(['msg'=>'Webfile Not Found','status'=>'warning']);
+      return redirect('operation/change-status')->with(['msg'=>'Not Data Found in Appointment List','status'=>'warning']);
     }
   }
 
@@ -1129,6 +1134,180 @@ class ManageSettingController extends Controller
       return redirect('/setting/holiday')->with(['message'=>'Data Couldn\'t Delete','status'=>'alert-danger']);
     }
   }
+
+
+
+  ///// CHANGE STATUS FOREIGN PASSPORT //////
+
+  public function changeForeignStatus(){
+    return view('admin_operation.change_status.foreign_status.foreign_pass_chenge_status');
+  }
+
+  public function changeForeignStatusEdit(Request $r){
+    $webfileData = Tbl_appointmentlist::where('WebFile_no',$r->webfile)->first();
+    if($webfileData){
+        $status = $webfileData->Presence_Status;
+        if($status){
+          $statusArr = ['ACCEPTED','PENDING','REJECTED','RETURN','BACK REJECTED','EXPIRED'];
+          if($status == 'ACCEPTED'){
+            $resArr = ['PENDING','REJECTED','RETURN','BACK REJECTED'];
+          }
+          else if($status == 'PENDING'){
+            $resArr = ['REJECTED'];
+          }
+          else if($status == 'BACK REJECTED'){
+            $resArr = ['PENDING','RETURN'];
+          }
+          else if($status == 'REJECTED'){
+            $resArr = ['PENDING','RETURN'];
+          }
+          else if($status == 'RETURN'){
+            $resArr = ['REJECTED','PENDING'];
+          }
+          else if($status == 'EXPIRED'){
+            $resArr =  ['PENDING','REJECTED','RETURN','BACK REJECTED'];
+          }
+          return view('admin_operation.change_status.foreign_status.foreign_pass_chenge_status_edit',compact('statusArr','webfileData','resArr'));
+        }
+        else{
+          return redirect('operation/change-status/foreign')->with(['msg'=>'Not Data Found in Appointment List','status'=>'danger']);
+        }
+    }
+    else{
+      return redirect('operation/change-status/foreign')->with(['msg'=>'Not Data Found in Appointment List','status'=>'danger']);
+    }
+  }
+
+  public function hit_changeForeignStatusFunc_AppServeDel($web,$oldST,$presST,$del){
+      if($del == 1){
+        $user_id = Auth::user()->user_id;
+        $curDateTime = Date('Y-m-d H:i:s');
+
+        Tbl_appointmentlist::where('WebFile_no',$web)->update(['Presence_Status'=>$presST]);
+        Tbl_appointmentserved::where('WebFile_no',$web)->delete();
+        Tbl_fp_served::where('web_file_no',$web)->delete();
+        $delOp = new Tbl_del_operation;
+        $delOp->webfile = $web;
+        $delOp->old_data = $oldST;
+        $delOp->action_by = $user_id;
+        $delOp->action_time = $curDateTime;
+        $delOp->remark = 'Status Changse';
+        $delOp->service_type = 'Foreign Passport';
+        $is_save = $delOp->save();
+        if($is_save){
+          return redirect('operation/change-status/foreign')->with(['msg'=>'Data Updated Successfully','status'=>'success']);
+        }
+        else{
+          return redirect('operation/change-status/foreign')->with(['msg'=>'Data Updated Successfully','status'=>'success']);
+        }
+      }
+      else{
+        $user_id = Auth::user()->user_id;
+        $curDateTime = Date('Y-m-d H:i:s');
+
+        Tbl_appointmentlist::where('WebFile_no',$web)->update(['Presence_Status'=>$presST]);
+        // Tbl_appointmentserved::where('WebFile_no',$web)->delete();
+        $delOp = new Tbl_del_operation;
+        $delOp->webfile = $web;
+        $delOp->old_data = $oldST;
+        $delOp->action_by = $user_id;
+        $delOp->action_time = $curDateTime;
+        $delOp->remark = 'Status Changse';
+        $delOp->service_type = 'Foreign Passport';
+        $is_save = $delOp->save();
+        if($is_save){
+          return redirect('operation/change-status/foreign')->with(['msg'=>'Data Updated Successfully','status'=>'success']);
+        }
+        else{
+          return redirect('operation/change-status/foreign')->with(['msg'=>'Data Updated Successfully','status'=>'success']);
+        }
+      }
+  }
+
+
+  public function changeForeignStatusUpdate(Request $r)
+  {
+      $user_id = Auth::user()->user_id;
+      $curDateTime = Date('Y-m-d H:i:s');
+      $webfile =  $r->webfile;
+      $status =  $r->old_status;
+      $p_status =  $r->present_status;
+      if($status == 'ACCEPTED')
+      {
+        if($p_status == 'PENDING'){
+          return $this->hit_changeForeignStatusFunc_AppServeDel($webfile,$status,$p_status,$del=1);
+        }
+        else if($p_status == 'BACK REJECTED'){
+          return $this->hit_changeForeignStatusFunc_AppServeDel($webfile,$status,$p_status,$del=1);
+        }
+        else if($p_status == 'RETURN'){
+          $this->hit_webfile_ssl_api($webfile);
+          return $this->hit_changeForeignStatusFunc_AppServeDel($webfile,$status,$p_status,$del=1);
+          
+        }
+        else if($p_status == 'REJECTED'){
+          return $this->hit_changeForeignStatusFunc_AppServeDel($webfile,$status,$p_status,$del=1);
+        }
+      }
+      else if($status == 'PENDING')
+      {
+          if($p_status == 'REJECTED')
+          {
+            return $this->hit_changeForeignStatusFunc_AppServeDel($webfile,$status,$p_status,$del=0);
+          }
+      }
+      else if($status == 'BACK REJECTED')
+      {
+
+          if($p_status == 'PENDING'){
+            return $this->hit_changeForeignStatusFunc_AppServeDel($webfile,$status,$p_status,$del=0);
+          }
+          
+          else if($p_status == 'RETURN'){
+            $this->hit_webfile_ssl_api($webfile);
+            return $this->hit_changeForeignStatusFunc_AppServeDel($webfile,$status,$p_status,$del=0);
+            
+          }
+        
+      }
+      else if($status == 'RETURN')
+      {
+            if($p_status == 'PENDING'){
+              return $this->hit_changeForeignStatusFunc_AppServeDel($webfile,$status,$p_status,$del=0);
+            }
+            else if($p_status == 'REJECTED'){
+              return $this->hit_changeForeignStatusFunc_AppServeDel($webfile,$status,$p_status,$del=0);
+            }
+            
+      }
+      else if($status == 'REJECTED')
+      {
+            if($p_status == 'PENDING'){
+              return $this->hit_changeForeignStatusFunc_AppServeDel($webfile,$status,$p_status,$del=0);
+            }
+            else if($p_status == 'RETURN'){
+              $this->hit_webfile_ssl_api($webfile);
+              return $this->hit_changeForeignStatusFunc_AppServeDel($webfile,$status,$p_status,$del=0);
+              
+            }
+            
+      }
+      else if($status == 'EXPIRED')
+      {
+          if($p_status == 'PENDING'){
+            return $this->hit_changeForeignStatusFunc_AppServeDel($webfile,$status,$p_status,$del=0);
+          }
+          else if($p_status == 'BACK REJECTED'){
+            return $this->hit_changeForeignStatusFunc_AppServeDel($webfile,$status,$p_status,$del=0);
+          }
+          else if($p_status == 'RETURN'){
+            $this->hit_webfile_ssl_api($webfile);
+            return $this->hit_changeForeignStatusFunc_AppServeDel($webfile,$status,$p_status,$del=0);
+          }
+      }
+  }
+
+
 
 
 

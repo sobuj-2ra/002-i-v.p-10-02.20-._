@@ -735,19 +735,26 @@
                     var is_alert_run = true;
                     var is_alert_run = true;
                     var checkvaligratisstkrserver = false;
-                    var obj = {};
-                    $(".doubleGratisStkr").each(function(){
-                        if(obj.hasOwnProperty(this.value)) {
-                            if(checkvaligratisstkrserver == false){
-                                checkvaligratisstkrserver = true;
-                                alert("You can not enter duplicate Gratis Sticker No. " + this.value);
-                                document.getElementById(id_name).value = '';
+                    var gratisYes = document.getElementById('gratiseYes'+id_index);
+                    if(gratisYes.checked === true){
+                        var obj = {};
+                        $(".doubleGratisStkr").each(function(){
+                            
+                            if(obj.hasOwnProperty(this.value)) {
+                                if(checkvaligratisstkrserver == false){
+                                    checkvaligratisstkrserver = true;
+                                    document.getElementById(id_name).value = '';
+                                    alert("You can not enter duplicate Gratis Sticker No. " + this.value);
+                                }
+                                else{
+                                    checkvaligratisstkrserver = false;
+                                }
+                            } 
+                            else {
+                                obj[this.value] = this.value;
                             }
-                        } 
-                        else {
-                            obj[this.value] = this.value;
-                        }
-                    });
+                        });
+                    }
 
                     axios.get('check_gratis_sticker_axios',{params:{'validStkr':validStkr}})
                     .then(function(res){
@@ -1046,11 +1053,13 @@
                                                     if (ssldata[2] == '') {
                                                         document.getElementById('sslres_msg'+id_index).innerText = ssldata[3] + ' ' + ssldata[4];
                                                         document.getElementById('proc_fee_res'+id_index).innerText = ssldata[6];
+                                                        document.getElementById('total_fee_disable'+id_index).value = ssldata[6];
                                                         document.getElementById('proc_fee_res_value'+id_index).value = ssldata[6];
                                                     }
                                                     else if (!ssldata[1] == '0') {
                                                         document.getElementById('sslres_msg'+id_index).innerText = 'Already checked ' + ssldata[1] + ' on ' + ssldata[2] + ' amount ' + ssldata[6];
                                                         document.getElementById('proc_fee_res'+id_index).innerText = ssldata[6];
+                                                        document.getElementById('total_fee_disable'+id_index).value = ssldata[6];
                                                         document.getElementById('proc_fee_res_value'+id_index).value = ssldata[6];
                                                     }
 
@@ -1265,11 +1274,13 @@
                                                 if (ssldata[2] == '') {
                                                     document.getElementById('sslres_msg'+id_index).innerText = ssldata[3] + ' ' + ssldata[4];
                                                     document.getElementById('proc_fee_res'+id_index).innerText = ssldata[6];
+                                                    document.getElementById('total_fee_disable'+id_index).innerText = ssldata[6];
                                                     document.getElementById('proc_fee_res_value'+id_index).value = ssldata[6];
                                                 }
                                                 else if (!ssldata[1] == '0') {
                                                     document.getElementById('sslres_msg'+id_index).innerText = 'Already checked ' + ssldata[1] + ' on ' + ssldata[2] + ' amount ' + ssldata[6];
                                                     document.getElementById('proc_fee_res'+id_index).innerText = ssldata[6];
+                                                    document.getElementById('total_fee_disable'+id_index).value = ssldata[6];
                                                     document.getElementById('proc_fee_res_value'+id_index).value = ssldata[6];
                                                 }
 
@@ -1483,7 +1494,6 @@
                     document.getElementById('old_pass'+id_index).value = '';
                     document.getElementById('tddDelDateId'+id_index).innerText = '';
                     document.getElementById('tddDelDateValue'+id_index).value = '';
-                    document.getElementById('cor_item_fee_value'+id_index).value = '';
                     document.getElementById('sp_fee'+id_index).value = '';
                     for(var j=0; j < this.correctionList.length; j++){
                         var single_select_all = document.getElementById("signle-cor-item"+id_index+j);

@@ -504,7 +504,10 @@ class ForeignPassportController extends Controller
 
     }
     public function ForeignwebfileDataStore(Request $r){
-        // return $datas = $r->all();
+        Session::forget('tempArr');
+        Session::forget('successArr');
+        
+        $datas = $r->all();
         $curDT = Date('Y-m-d H:i:s');
         $arrTemp = [];
         $succArr = [];
@@ -571,9 +574,26 @@ class ForeignPassportController extends Controller
                 $arrTemp[$index]['corr_fee'] = $corrFee;
                 $arrTemp[$index]['rupee_rate'] = $rupee_r;
                 $arrTemp[$index]['receive_date'] = $curDT;
-
                 $arrTemp[$index]['remark'] = $datas['txn_date'][$index].'-'.$datas['proc_fee'][$index].'|' ;
                 $arrTemp[$index]['remark2'] = $datas['duration'][$index] . '/' . $datas['entry_type'][$index] . '/' . $datas['visa_type'][$index];
+               $vFee = $datas['visa_fee'][$index];
+               if($vFee == ''){
+                    $vFee = 0;
+               }
+               $faxFee = $datas['fax_trans_charge'][$index];
+               if($faxFee == ''){
+                    $faxFee = 0;
+               }
+               $icwf = $datas['icwf'][$index];
+               if($icwf == ''){
+                    $icwf = 0;
+               }
+               $appcharge = $datas['visa_app_charge'][$index];
+               if($appcharge == ''){
+                    $appcharge = 0;
+               }
+                $fpTotalAmount = $vFee+$faxFee+$icwf+$appcharge;
+
                 if($datas[$index.'gratis_status1'][0] == 'no'){
                     if(isset($datas['sticker_type'][$index]) && !empty($datas['sticker_type'][$index])) {
                         $arrTemp[$index]['stkr_with_no'] = $datas['sticker_type'][$index] . '-' . $datas['validStkr'][$index];
@@ -587,8 +607,8 @@ class ForeignPassportController extends Controller
                 }
 
                 if($datas['total_amount'][$index] != 0) {
-                    $arrTemp[$index]['total_amount'] = $datas['total_amount'][$index];
-                    $arrTemp[$index]['total_rupee'] = $rupee_r * $datas['total_amount'][$index];
+                    $arrTemp[$index]['total_amount'] = $fpTotalAmount;
+                    $arrTemp[$index]['total_rupee'] = $rupee_r * $fpTotalAmount;
                 }else if ($datas['total_amount'][$index] == 0 || $datas['total_amount'][$index] == '0') {
                     $arrTemp[$index]['total_amount'] = " ";
                     $arrTemp[$index]['total_rupee'] = " ";

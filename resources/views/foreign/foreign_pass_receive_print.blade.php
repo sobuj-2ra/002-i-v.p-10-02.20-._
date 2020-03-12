@@ -67,8 +67,8 @@
                             <td><span class=pull-right>@php echo date("h:i:s A"); @endphp</span></td>
                         </tr>
                         <tr>
-                            <td><hr style="font-weight: bold;color: #000;margin: 0px !important;border: 1px solid #000;"> <span style="font-size:18px;font-weight:bold"></span></td>
-                            <td><hr style="font-weight: bold;color: #000;margin: 0px !important;border: 1px solid #000;"><span></span></td>
+                            <td><hr style="font-weight: bold;color: #000;margin: 0px !important;border: 1px solid #000;"> <span style="font-size:18px;font-weight:bold">{{$data['sticker_type']}}<span style="font-size: 16px;">{{$data['validStkr']}}</span></span></td>
+                            <td><hr style="font-weight: bold;color: #000;margin: 0px !important;border: 1px solid #000;"><span style="height:20px;display: inline-block"></span></td>
                         </tr>
                         <tr>
                             <td colspan=2 class="text-center">

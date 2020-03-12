@@ -1,12 +1,12 @@
 @extends('admin.master')
 <!--Page Title-->
 @section('page-title')
-Change Status
+Regular Passport Change Status
 @endsection
 
 <!--Page Header-->
 @section('page-header')
-Change Status
+Regular Passport Change Status
 
 @endsection
 
