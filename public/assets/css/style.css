@@ -466,7 +466,7 @@ left:0;
 height:100%;
 width:100%;
 top:0;
-z-index: 5;
+z-index: 99999;
 background: #eeeeeea6;
 margin-top: -10px;
 }
@@ -478,7 +478,7 @@ left:0;
 height:100%;
 width:100%;
 top:0;
-z-index: 9;
+z-index: 999999;
 background: #ecf0f5;
 margin-top: -10px;
 }

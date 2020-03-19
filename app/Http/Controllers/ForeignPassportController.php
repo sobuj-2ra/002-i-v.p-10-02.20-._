@@ -56,6 +56,7 @@ class ForeignPassportController extends Controller
             $datas['counter_services'] = explode(',',$counter->svc_name);
         }
 
+        $datas['allNationality'] = DB::table('tbl_nationality')->get();
 
         $datas['user_id'] = Auth::user()->user_id;
         // $datas['stickers'] = Tbl_sticker::all();
@@ -533,7 +534,7 @@ class ForeignPassportController extends Controller
                     $corItemF = null;
                     $corrFee = 0;
                 }
-
+                $DateOfCheck = Date('Y-m-d H:i:s', strtotime($datas['date_of_checking'][$index]));
 
                 $arrTemp[$index]['webfile'] = $datas['webfile'][$index];
                 $arrTemp[$index]['passportNo'] = $datas['passportNo'][$index];
@@ -544,13 +545,14 @@ class ForeignPassportController extends Controller
                 $arrTemp[$index]['validStkr'] = $datas['validStkr'][$index];
                 $arrTemp[$index]['entry_type'] = $datas['entry_type'][$index];
                 $arrTemp[$index]['duration'] = $datas['duration'][$index];
-                $arrTemp[$index]['date_of_checking'] = $datas['date_of_checking'][$index];
+                $arrTemp[$index]['date_of_checking'] = $DateOfCheck;
                 $arrTemp[$index]['visa_fee'] = $datas['visa_fee'][$index];
                 $arrTemp[$index]['fax_trans_charge'] = $datas['fax_trans_charge'][$index];
                 $arrTemp[$index]['icwf'] = $datas['icwf'][$index];
                 $arrTemp[$index]['visa_app_charge'] = $datas['visa_app_charge'][$index];
                 $arrTemp[$index]['old_pass'] = $datas['old_pass'][$index];
                 $arrTemp[$index]['paytype'] = $datas['paytype'][$index];
+                $arrTemp[$index]['total_amount_print'] = $datas['total_amount'][$index];
                 $arrTemp[$index]['proc_fee'] = $datas['proc_fee'][$index];
                 $arrTemp[$index]['sp_fee'] = $datas['sp_fee'][$index];
                 $arrTemp[$index]['tddDelDateValue'] = $datas['tddDelDateValue'][$index];
@@ -617,58 +619,79 @@ class ForeignPassportController extends Controller
 
             }
         }
-
+        $k = 0;
         foreach($arrTemp as $key => $item){
-            
-            $is_save = DB::select(
-                'CALL GetForeignDATAIN(
-                    "'.$item['webfile'].'",
-                    "'.$item['name'].'",
-                    "'.$item['passportNo'].'",
-                    "'.$item['counter_id'].'",
-                    "'.$item['selected_token'].'",
-                    "'.$item['sticker_type'].'",
-                    "'.$item['validStkr'].'",
-                    "'.$item['paytype'].'",
-                    "'.$item['remark'].'",
-                    "'.$item['txn_number'].'",
-                    "'.$item['user_id'].'",
-                    "'.$item['receive_date'].'",
-                    "'.$item['tddDelDateValue'].'",
-                    "'.$item['visa_type'].'",
-                    "'.$item['contact'].'",
-                    "'.$item['old_pass'].'",
-                    "'.$item['corr_fee'].'",
-                    "'.$item['correction'].'",
-                    "'.$item['center_name'].'",
-                    "'.$item['proc_fee'].'",
-                    "'.$item['sp_fee'].'",
-                    "'.$item['gratis'].'",
-                    "'.$item['stkr_with_no'].'",
-                    "'.$item['book_rcvpt_no'].'",
-                    "'.$item['book_no'].'",
-                    "'.$item['nationality'].'",
-                    "'.$item['remark2'].'",
-                    "'.$item['visa_fee'].'",
-                    "'.$item['fax_trans_charge'].'",
-                    "'.$item['icwf'].'",
-                    "'.$item['visa_app_charge'].'",
-                    "'.$item['total_amount'].'",
-                    "'.$item['total_rupee'].'",
-                    "'.$item['rupee_rate'].'",
-                    "'.$item['date_of_checking'].'",
-                    "'.'region'.'"
-                    )'
-            );
-                $saveCount = $is_save[0]->COUNT;
-                $status = $is_save[0]->REPLY;
-                if($status == 'Data Saved Successfully'){
-                    array_push($succArr,$item['webfile']);
+            if($k == 0){
+                $is_valid = Tbl_fp_served::where('book_no',$item['book_no'])
+                    ->where('receive_no',$item['book_rcvpt_no'])
+                    ->where('center',$item['center_name'])
+                    ->count();
+                if($is_valid == 0){
+                    $k = 0;
                 }
                 else{
-                    $rejectArr[$key]['webfile'] = $item['webfile'];
-                    $rejectArr[$key]['status'] = $status;
+                    $k = 1;
                 }
+            }
+
+            if($k == 0){
+                $is_save = DB::select(
+                    'CALL GetForeignDATAIN(
+                        "'.$item['webfile'].'",
+                        "'.$item['name'].'",
+                        "'.$item['passportNo'].'",
+                        "'.$item['counter_id'].'",
+                        "'.$item['selected_token'].'",
+                        "'.$item['sticker_type'].'",
+                        "'.$item['validStkr'].'",
+                        "'.$item['paytype'].'",
+                        "'.$item['remark'].'",
+                        "'.$item['txn_number'].'",
+                        "'.$item['user_id'].'",
+                        "'.$item['receive_date'].'",
+                        "'.$item['tddDelDateValue'].'",
+                        "'.$item['visa_type'].'",
+                        "'.$item['contact'].'",
+                        "'.$item['old_pass'].'",
+                        "'.$item['corr_fee'].'",
+                        "'.$item['correction'].'",
+                        "'.$item['center_name'].'",
+                        "'.$item['proc_fee'].'",
+                        "'.$item['sp_fee'].'",
+                        "'.$item['gratis'].'",
+                        "'.$item['stkr_with_no'].'",
+                        "'.$item['book_rcvpt_no'].'",
+                        "'.$item['book_no'].'",
+                        "'.$item['nationality'].'",
+                        "'.$item['remark2'].'",
+                        "'.$item['visa_fee'].'",
+                        "'.$item['fax_trans_charge'].'",
+                        "'.$item['icwf'].'",
+                        "'.$item['visa_app_charge'].'",
+                        "'.$item['total_amount'].'",
+                        "'.$item['total_rupee'].'",
+                        "'.$item['rupee_rate'].'",
+                        "'.'region'.'",
+                        "'.$item['date_of_checking'].'"
+                        )'
+                );
+                    $saveCount = $is_save[0]->COUNT;
+                    $status = $is_save[0]->REPLY;
+                    if($status == 'Data Saved Successfully'){
+                        array_push($succArr,$item['webfile']);
+                    }
+                    else{
+                        $rejectArr[$key]['webfile'] = $item['webfile'];
+                        $rejectArr[$key]['status'] = $status;
+                    }
+
+            }
+            else{
+                $rejectArr[$key]['webfile'] = $item['webfile'];
+                $rejectArr[$key]['status'] = 'Duplicate Money Receipt Number';
+            }
+
+
 
 
         }

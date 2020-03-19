@@ -555,6 +555,9 @@ class ManageSettingController extends Controller
           if($p_status == 'PENDING'){
             return $this->hit_changeStatusFunc_AppServeDel($webfile,$status,$p_status,$del=0);
           }
+          else if($p_status == 'REJECTED'){
+            return $this->hit_changeStatusFunc_AppServeDel($webfile,$status,$p_status,$del=0);
+          }
           else if($p_status == 'BACK REJECTED'){
             return $this->hit_changeStatusFunc_AppServeDel($webfile,$status,$p_status,$del=0);
           }
@@ -1295,6 +1298,9 @@ class ManageSettingController extends Controller
       else if($status == 'EXPIRED')
       {
           if($p_status == 'PENDING'){
+            return $this->hit_changeForeignStatusFunc_AppServeDel($webfile,$status,$p_status,$del=0);
+          }
+          else if($p_status == 'REJECTED'){
             return $this->hit_changeForeignStatusFunc_AppServeDel($webfile,$status,$p_status,$del=0);
           }
           else if($p_status == 'BACK REJECTED'){

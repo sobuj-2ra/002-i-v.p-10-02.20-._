@@ -38,15 +38,19 @@
                                         <div class="col-lg-12">
                                             {!! Form::open(['url' => 'service/store','id' => 'applicant_form']) !!}
                                             <div class="form-group">
+                                                <label for="">Enter service name</label>
                                                 <input class="form-control" name="services" placeholder="Enter service name" required="required" autocomplete="off">
                                             </div>
                                             <div class="form-group">
+                                                <label for="">Enter number of slip copy</label>
                                                 <input class="form-control" name="slip_copy" placeholder="Enter number of slip copy" autocomplete="off">
                                             </div>
                                             <div class="form-group">
+                                                <label for="">Enter Service Fee</label>
                                                 <input class="form-control" name="Svc_fee" placeholder="Enter Service Fee" required="required" autocomplete="off">
                                             </div>
                                             <div class="form-group">
+                                                <label for="">Enter Lead Time</label>
                                                 <input class="form-control" name="LeadTime" placeholder="Enter Lead Time" required="required" autocomplete="off">
                                             </div>
                                             <button type="submit" class="btn btn-primary">Submit</button>

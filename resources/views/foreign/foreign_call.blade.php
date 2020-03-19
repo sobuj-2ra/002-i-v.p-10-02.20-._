@@ -15,9 +15,7 @@
         .alert-item:focus{
             border:1px solid red;
         }
-        .reject_button-here {
-            margin-top: 5px;
-        }
+        
     </style>
     @if(isset($counter_no) && $counter_no > 0)
         <div id="page-header">
@@ -65,6 +63,8 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="main_part countercall-area" >
+                        <div v-show="webfilePreloader" class="webfile-preloader"><img class="preloader" src="{{asset("public/assets/img/preloader.gif")}}" alt=""></div>
+
                         <br>
                         @if(Session::has('message'))
                             <div class="row">
@@ -124,7 +124,6 @@
                             </div>
                             <div class="col-md-10" >
                                 <div class="calltoken-area-center">
-                                    <div v-show="webfilePreloader" class="webfile-preloader"><img class="preloader" src="{{asset("public/assets/img/preloader.gif")}}" alt=""></div>
                                     <div class="row">
                                         <div class="col-md-12">
                                             <div class="calltoken-right-content">
@@ -143,9 +142,9 @@
                                                                             @endforeach
                                                                         </select>
                                                                     </td>
-                                                                    <td><input v-model="stkr_str" id="sticker_no_from" name="sticker_no_from" type="number" style="width:65px" class="input_values" required autocomplete="off"> </td>
+                                                                    <td><input v-model="stkr_str" id="sticker_no_from" name="sticker_no_from" type="text" style="width:65px" class="input_values" required autocomplete="off"> </td>
                                                                     <td> To: </td>
-                                                                    <td><input v-model="stkr_end"  id="sticker_no_to" name="sticker_no_to" type="number"  style="width:65px" class="input_values" required autocomplete="off"> </td>
+                                                                    <td><input v-model="stkr_end"  id="sticker_no_to" name="sticker_no_to" type="text"  style="width:65px" class="input_values" required autocomplete="off"> </td>
                                                                     
                                                                 </tr>
                                                             </table>
@@ -302,7 +301,14 @@
                                                                         <div class="col-md-4">
                                                                             <div class="form-group">
                                                                                 <label for=""></label>
-                                                                                <input class="form-control input_values" name="nationality[]" :id="'nationality'+i" :data-id="i" placeholder="Nationality" autocomplete="off" required>
+                                                                                <select class="form-control input_values" name="nationality[]" :id="'nationality'+i" :data-id="i"  >
+                                                                                    <option value="">Nationality</option>
+                                                                                    @if($allNationality)
+                                                                                        @foreach($allNationality as $item)
+                                                                                            <option value="{{$item->country}}">{{$item->country}}</option>
+                                                                                        @endforeach
+                                                                                    @endif
+                                                                                </select>
                                                                             </div>
                                                                         </div>
                                                                         <div class="col-md-4">
@@ -350,26 +356,28 @@
                                                                     </div>
                                                                     <div id="show">
                                                                         <div class="row">
-                                                                            <div class="col-md-4">
+                                                                            <div class="col-md-3">
                                                                                 <div class="input-group">
                                                                                 <input @keyup="TotalFeeFunc"   type="text" class="form-control input_values" name="visa_fee[]" :id="'visaFee'+i" :data-id="i" placeholder="Visa Fee" required autocomplete="off">
                                                                                     <span class="input-group-addon">Taka</span>
                                                                                 </div>
-                                                                                {{--<div class="form-group">--}}
-                                                                                {{--<input class="form-control" name="visa_fee" id="visaFee"--}}
-                                                                                {{--placeholder="Visa Fee" required>--}}
-                                                                                {{--</div>--}}
                                                                             </div>
-                                                                            <div class="col-md-4">
+                                                                            <div class="col-md-3">
                                                                                 <div class="input-group">
                                                                                     <input @keyup="TotalFeeFunc"   class="form-control input_values" name="fax_trans_charge[]" :id="'faxCharge'+i" :data-id="i" placeholder="Fax Trans. Charge" required>
                                                                                     <span class="input-group-addon">Taka</span>
                                                                                 </div>
                                                                             </div>
-                                                                            <div class="col-md-4">
+                                                                            <div class="col-md-3">
                                                                                 <div class="input-group">
                                                                                     <input @keyup="TotalFeeFunc"  class="form-control input_values" name="icwf[]" :id="'icwf'+i" :data-id="i" placeholder="ICWF"
                                                                                         required>
+                                                                                    <span class="input-group-addon">Taka</span>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-3">
+                                                                                <div class="input-group">
+                                                                                    <input @keyup="TotalFeeFunc" class="form-control input_values" name="visa_app_charge[]" :id="'appCharge'+i" :data-id="i" placeholder="Visa App. Charge">
                                                                                     <span class="input-group-addon">Taka</span>
                                                                                 </div>
                                                                             </div>
@@ -380,12 +388,41 @@
                                                                     <div class="row ">
                                                                         <div class="col-md-8">
                                                                             <div class="row">
-                                                                                <div class="col-md-6">
-                                                                                    <div class="input-group">
-                                                                                        <input @keyup="TotalFeeFunc" class="form-control input_values" name="visa_app_charge[]" :id="'appCharge'+i" :data-id="i" placeholder="Visa App. Charge">
-                                                                                        <span class="input-group-addon">Taka</span>
+                                                                                <div class="col-md-4">
+                                                                                    <div class="form-group">
+                                                                                        <label :for="'paytype'+i">Payment Type</label>
+                                                                                        <select @change="paytypeOnchangeFunc" name="paytype[]" :id="'paytype'+i" :data-id="i" class="form-control input_values" >
+                                                                                            <option>Pay Type</option>
+                                                                                        </select>
                                                                                     </div>
                                                                                 </div>
+                                                                                <div class="col-md-4" :id="'pay_type_fee_group'+i">
+                                                                                    <span >
+                                                                                        <div class="form-group" >
+                                                                                            <label for="">Proc Fee &nbsp;</label><label :for="'proc_fee'+i" :id="'proc_fee_res'+i"></label>
+                                                                                            <input type="hidden" :id="'proc_fee_res_value'+i" name="proc_fee[]" class="input_values" >
+                                                                                            <input @keyup="TotalFeeFunc" :id="'sp_fee'+i" :data-id="i" name="sp_fee[]" class="form-control input_values" type="text" value=""  autocomplete="off" placeholder="SP Fee">
+                                                                                        </div>
+                                                                                    </span>
+                                                                                </div>
+                                                                                <div class="col-md-5" :id="'remark_for_waive'+i" style="display: none">
+                                                                                    <div class="form-group" >
+                                                                                        <label for="">Remark</label>
+                                                                                        <input :id="'remark_waive'+i" :data-id="i" name="remark_waive[]" class="form-control input_values" type="text" value=""  autocomplete="off" placeholder="Enter Remark">
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-md-2">
+                                                                                    <div  class="form-group" >
+                                                                                        <label for="">Corr Fee</label>
+                                                                                        <input class="form-control" :id="'cor_item_fee_value'+i" style="display: none;" type="button" value="{{$getCorFee}}">
+                                                                                        <input class="form-control" :id="'cor_item_fee_value2'+i"  type="button" value="0" disabled>
+                                                                                        <input class="form-control input_values" name="corr_fee[]"  type="hidden" value="{{$getCorFee}}">
+                                                                                    </div>
+                                                                                </div>
+                                                                                
+                                                                            </div>
+                                                                            <div class="row">
+                                                                                
                                                                                 <div class="col-md-3">
                                                                                     <div class="form-group">
                                                                                         <input class="form-control"  :id="'total_fee_disable'+i" :data-id="i"  placeholder="Total Amount" disabled>
@@ -397,45 +434,17 @@
                                                                                         <input @keyup="oldPassQtyFunc" required class="form-control input_values" name="old_pass[]" :id="'old_pass'+i" :data-id="i" placeholder="Old Passport Qty">
                                                                                     </div>
                                                                                 </div>
-                                                                                
-                                                                            </div>
-                                                                            <div class="row">
-                                                                                
-                                                                                <div class="col-md-3">
-                                                                                    <div class="form-group">
-                                                                                        <label :for="'paytype'+i">Pay Method</label>
-                                                                                        <select name="paytype[]" :id="'paytype'+i" :data-id="i" class="form-control input_values" >
-                                                                                            <option>Pay Type</option>
-                                                                                        </select>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-md-3">
-                                                                                    <div class="form-group">
-                                                                                        <label :for="'proc_fee'+i" :id="'proc_fee_res'+i">Proc Fee</label>
-                                                                                        <input type="hidden" :id="'proc_fee_res_value'+i" name="proc_fee[]" class="input_values">
-                                                                                        <input :id="'sp_fee'+i" :data-id="i" name="sp_fee[]" class="form-control input_values" type="text" value=""  autocomplete="off">
-                                                                                        
-                                                                                    </div>
-                                                                                </div>
+                                                                               
                                                                                 <div class="col-md-2">
                                                                                     <div  class="form-group" >
-                                                                                        <label for="">Corr Fee</label>
-                                                                                        <input class="form-control" :id="'cor_item_fee_value'+i" style="display: none;" type="button" value="{{$getCorFee}}">
-                                                                                        <input class="form-control" :id="'cor_item_fee_value2'+i"  type="button" value="0" disabled>
-                                                                                        <input class="form-control input_values" name="corr_fee[]"  type="hidden" value="{{$getCorFee}}">
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-md-2">
-                                                                                    <div  class="form-group" >
-                                                                                        <label for=""></label>
                                                                                         <div :id="'rejected_button_show'+i" class="reject_button-here" style="display:none">
-                                                                                            <button @click="rejectBtnFunc" class="btn btn-danger" data-toggle="modal" data-target="#rejectModal"  style="margin-left:20px;">Reject</button>
+                                                                                            <button type="button" class="btn btn-danger" data-toggle="modal" :data-target="'#rejectModal'+i" style="margin-left:20px;">Reject</button>
                                                                                         </div>
+
                                                                                     </div>
                                                                                 </div>
                                                                                 <div class="col-md-2">
-                                                                                    <div  class="form-group" >
-                                                                                        <label for=""></label>
+                                                                                    <div  class="form-group">
                                                                                         <div :id="'clear_button_item'+i" style="display:none">
                                                                                             <button @click="clearAddMoreItemFunc" class="btn btn-warning"  :id="'clearAddMoreItem'+i" :data-id="i" style="margin-left:20px;">Clear</button>
                                                                                         </div>
@@ -444,31 +453,34 @@
                                                                                 
                                                                                 <br>
                                                                                 <br>
+                                                                                <!-- Button trigger modal -->
                                                                                 
-                                                                                    <div v-show="webfileData" class="reject-area">
-                                                                                       
-                                                                                        <!-- Modal -->
-                                                                                        <div v-show="rejectModalShow" class="custom-modal-area">
-                                                                                            <div class="custom-modal">
-                                                                                                <div class="custom-modal-header">
-                                                                                                    <p>SELECT REJECT CAUSES</p>
-                                                                                                </div>
-                                                                                                <div class="custom-modal-body">
-                                                                                                    <div  class="reject-cause-area">
-                                                                                                        <p><input id="reject-select-all" @click="selectRejectAllFunc" v-model="selectRejectAll" type="checkbox"> <label for="reject-select-all">SELECT ALL</label></p>
-                                                                                                        <div class="reject-box">
-                                                                                                            <p v-for="item in rejectCauseData"><input :id="item.Sl"  type="checkbox" v-model="rejectItem" :value="item.reason"> <label :for="item.Sl">@{{ item.reason }}</label></p>
-                                                                                                        </div>
+                                                                                    <!-- Modal -->
+                                                                                    <div class="modal fade" :id="'rejectModal'+i" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                                                        <div class="modal-dialog" role="document">
+                                                                                        <div class="modal-content">
+                                                                                            <div class="modal-header">
+                                                                                            <span class="modal-title" id="exampleModalLabel"><span style="font-weight:bold;">SELECT REJECT CAUSES</span></span>
+                                                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                                                <span aria-hidden="true">&times;</span>
+                                                                                            </button>
+                                                                                            </div>
+                                                                                            <div class="modal-body">
+                                                                                                <div  class="reject-cause-area">
+                                                                                                    <p><input id="reject-select-all" @click="selectRejectAllFunc" v-model="selectRejectAll" type="checkbox"> <label for="reject-select-all">SELECT ALL</label></p>
+                                                                                                    <div class="reject-box">
+                                                                                                        <p v-for="item in rejectCauseData"><input :id="item.Sl"  type="checkbox" v-model="rejectItem" :value="item.reason"> <label :for="item.Sl">@{{ item.reason }}</label></p>
                                                                                                     </div>
-        
-                                                                                                </div>
-                                                                                                <div class="custom-modal-footer">
-                                                                                                    <button @click="rejectSubmitFunc" :id="'rejectsubmit'+i" :data-id="i" class="btn btn-danger float-left">Reject</button>
-                                                                                                    <button @click="rejectModalShow = !rejectModalShow" class="btn btn-warning float-right">Cancel</button>
                                                                                                 </div>
                                                                                             </div>
+                                                                                            <div class="modal-footer">
+                                                                                            <button  type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                                                            <button @click="rejectSubmitFunc" :id="'rejectsubmit'+i" :data-id="i" type="button" class="btn btn-danger">Reject</button>
+                                                                                            </div>
+                                                                                        </div>
                                                                                         </div>
                                                                                     </div>
+                                                                                
                                                                                 </div>
 
                                                                                 <div class="col-md-12">
@@ -555,6 +567,7 @@
         <input type="hidden" id="start_no"  value="{{@$book_no->start_no}}">
         <input type="hidden" id="end_no"  value="{{@$book_no->end_no}}">
     </div>
+
 
     <script>
         var app = new Vue({
@@ -739,19 +752,20 @@
                     if(gratisYes.checked === true){
                         var obj = {};
                         $(".doubleGratisStkr").each(function(){
-                            
-                            if(obj.hasOwnProperty(this.value)) {
-                                if(checkvaligratisstkrserver == false){
-                                    checkvaligratisstkrserver = true;
-                                    document.getElementById(id_name).value = '';
-                                    alert("You can not enter duplicate Gratis Sticker No. " + this.value);
+                            if(this.value != ''){
+                                if(obj.hasOwnProperty(this.value)) {
+                                    if(checkvaligratisstkrserver == false){
+                                        checkvaligratisstkrserver = true;
+                                        document.getElementById(id_name).value = '';
+                                        alert("You can not enter duplicate Gratis Sticker No. " + this.value);
+                                    }
+                                    else{
+                                        checkvaligratisstkrserver = false;
+                                    }
+                                } 
+                                else {
+                                    obj[this.value] = this.value;
                                 }
-                                else{
-                                    checkvaligratisstkrserver = false;
-                                }
-                            } 
-                            else {
-                                obj[this.value] = this.value;
                             }
                         });
                     }
@@ -780,15 +794,17 @@
                     var is_alert_run = true;
                     var obj = {};
                     $(".doubleStkr").each(function(){
-                        if(obj.hasOwnProperty(this.value)) {
-                            if(checkvalistkrserver == false){
-                                checkvalistkrserver = true;
-                                alert("You can not enter duplicate Sticker No. " + this.value);
-                                document.getElementById(id_name).value = '';
+                        if(this.value != ''){
+                            if(obj.hasOwnProperty(this.value)) {
+                                if(checkvalistkrserver == false){
+                                    checkvalistkrserver = true;
+                                    alert("You can not enter duplicate Sticker No. " + this.value);
+                                    document.getElementById(id_name).value = '';
+                                }
+                            } 
+                            else {
+                                obj[this.value] = this.value;
                             }
-                        } 
-                        else {
-                            obj[this.value] = this.value;
                         }
                     });
                     if(validStikerType == ''){
@@ -811,7 +827,7 @@
                     }
                     else if(this.stkr_str > validStkr || this.stkr_end < validStkr){
                         document.getElementById(id_name).value = '';
-                        alert("Stiker No must be between " + this.stkr_str + " and " + this.stkr_end + "");
+                        alert("Sticker No must be between " + this.stkr_str + " and " + this.stkr_end + "");
                     }
                     else{
                         axios.get('check_valid_sticker_axios',{params:{'validSticker':validStkr,'validStikerType':validStikerType}})
@@ -896,7 +912,7 @@
                     document.getElementById('passportNo'+id_index).value = '';
                     document.getElementById('proc_fee_res_value'+id_index).value = '';
                     document.getElementById('passport_show'+id_index).innerText = '';
-                    document.getElementById('nationality'+id_index).innerText = '';
+                    document.getElementById('nationality'+id_index).value = '';
                     document.getElementById('duration'+id_index).value = '';
                     document.getElementById('entry_type'+id_index).value = '';
                     document.getElementById('visaFee'+id_index).innerText = '';
@@ -920,15 +936,17 @@
                     var checkDoubleWebfile = true;
                     var obj = {};
                     $(".webfile_double").each(function(){
-                        if(obj.hasOwnProperty(this.value)) {
-                            if(checkDoubleWebfile == true){
-                                checkDoubleWebfile = false;
-                                alert("You can not enter duplicate Webfile No. " + this.value);
-                                document.getElementById(id_name).value = '';
+                        if(this.value != ''){
+                            if(obj.hasOwnProperty(this.value)) {
+                                if(checkDoubleWebfile == true){
+                                    checkDoubleWebfile = false;
+                                    alert("You can not enter duplicate Webfile No. " + this.value);
+                                    document.getElementById(id_name).value = '';
+                                }
+                            } 
+                            else {
+                                obj[this.value] = this.value;
                             }
-                        } 
-                        else {
-                            obj[this.value] = this.value;
                         }
                     });
 
@@ -963,16 +981,27 @@
                             alert('Please Select Sticker Type')
                         }
                     }
-                    else if (stkrNumST == '' || stkrNumEND == '') {
+                    else if (stkrNumST == '') {
                         if(checkDoubleWebfile == true){
                             $('#sticker_no_from').focus();
-                            alert('Please Input Sticker Starting and Ending Number');
+                            alert('Please Input Sticker Starting  Number');
+                        }
+                    }
+                    else if (stkrNumEND == '') {
+                        if(checkDoubleWebfile == true){
+                            $('#sticker_no_to').focus();
+                            alert('Please Input Sticker Ending Number');
                         }
                     }
                     else if (stkrNumST >= stkrNumEND) {
                         if(checkDoubleWebfile == true){
                             $('#sticker_no_from').focus();
                             alert('Please Input Valid Sticker Number');
+                        }
+                    }
+                    else if (book_rcvpt_no == '') {
+                        if(checkDoubleWebfile == true){
+                            alert('Please Input Receipt Number');
                         }
                     }
                     else if(gratiseYes.checked === false && gratiseNo.checked === false){
@@ -1053,13 +1082,13 @@
                                                     if (ssldata[2] == '') {
                                                         document.getElementById('sslres_msg'+id_index).innerText = ssldata[3] + ' ' + ssldata[4];
                                                         document.getElementById('proc_fee_res'+id_index).innerText = ssldata[6];
-                                                        document.getElementById('total_fee_disable'+id_index).value = ssldata[6];
+                                                        // document.getElementById('total_fee_disable'+id_index).value = ssldata[6];
                                                         document.getElementById('proc_fee_res_value'+id_index).value = ssldata[6];
                                                     }
                                                     else if (!ssldata[1] == '0') {
                                                         document.getElementById('sslres_msg'+id_index).innerText = 'Already checked ' + ssldata[1] + ' on ' + ssldata[2] + ' amount ' + ssldata[6];
                                                         document.getElementById('proc_fee_res'+id_index).innerText = ssldata[6];
-                                                        document.getElementById('total_fee_disable'+id_index).value = ssldata[6];
+                                                        // document.getElementById('total_fee_disable'+id_index).value = ssldata[6];
                                                         document.getElementById('proc_fee_res_value'+id_index).value = ssldata[6];
                                                     }
 
@@ -1122,7 +1151,7 @@
                     this.corItem = [];
                     this.corAllSelected = false;
                     document.getElementById('passport_show'+id_index).innerText = '';
-                    document.getElementById('nationality'+id_index).innerText = '';
+                    document.getElementById('nationality'+id_index).value = '';
                     document.getElementById('duration'+id_index).value = '';
                     document.getElementById('entry_type'+id_index).value = '';
                     document.getElementById('visaFee'+id_index).innerText = '';
@@ -1140,15 +1169,17 @@
                     var checkDoubleWebfile = true;
                     var obj = {};
                     $(".webfile_double").each(function(){
-                        if(obj.hasOwnProperty(this.value)) {
-                            if(checkDoubleWebfile == true){
-                                checkDoubleWebfile = false;
-                                alert("You can not enter duplicate Webfile No. " + this.value);
-                                document.getElementById(id_name).value = '';
+                        if(this.value != ''){
+                            if(obj.hasOwnProperty(this.value)) {
+                                if(checkDoubleWebfile == true){
+                                    checkDoubleWebfile = false;
+                                    alert("You can not enter duplicate Webfile No. " + this.value);
+                                    document.getElementById(id_name).value = '';
+                                }
+                            } 
+                            else {
+                                obj[this.value] = this.value;
                             }
-                        } 
-                        else {
-                            obj[this.value] = this.value;
                         }
                     });
 
@@ -1181,15 +1212,26 @@
                             alert('Please Select Sticker Type')
                         }
                     }
-                    else if (stkrNumST == '' || stkrNumEND == '') {
+                    else if (stkrNumST == '') {
                         if(checkDoubleWebfile == true){
                             $('#sticker_no_from').focus();
-                            alert('Please Input Sticker Starting and Ending Number');
+                            alert('Please Input Sticker Starting  Number');
+                        }
+                    }
+                    else if (stkrNumEND == '') {
+                        if(checkDoubleWebfile == true){
+                            $('#sticker_no_to').focus();
+                            alert('Please Input Sticker Ending Number');
                         }
                     }
                     else if (stkrNumST >= stkrNumEND) {
                         if(checkDoubleWebfile == true){
                             alert('Please Input Valid Sticker Number');
+                        }
+                    }
+                    else if (book_rcvpt_no == '') {
+                        if(checkDoubleWebfile == true){
+                            alert('Please Input Receipt Number');
                         }
                     }
                     else if(gratiseYes.checked === false && gratiseNo.checked === false){
@@ -1274,13 +1316,13 @@
                                                 if (ssldata[2] == '') {
                                                     document.getElementById('sslres_msg'+id_index).innerText = ssldata[3] + ' ' + ssldata[4];
                                                     document.getElementById('proc_fee_res'+id_index).innerText = ssldata[6];
-                                                    document.getElementById('total_fee_disable'+id_index).innerText = ssldata[6];
+                                                    // document.getElementById('total_fee_disable'+id_index).innerText = ssldata[6];
                                                     document.getElementById('proc_fee_res_value'+id_index).value = ssldata[6];
                                                 }
                                                 else if (!ssldata[1] == '0') {
                                                     document.getElementById('sslres_msg'+id_index).innerText = 'Already checked ' + ssldata[1] + ' on ' + ssldata[2] + ' amount ' + ssldata[6];
                                                     document.getElementById('proc_fee_res'+id_index).innerText = ssldata[6];
-                                                    document.getElementById('total_fee_disable'+id_index).value = ssldata[6];
+                                                    // document.getElementById('total_fee_disable'+id_index).value = ssldata[6];
                                                     document.getElementById('proc_fee_res_value'+id_index).value = ssldata[6];
                                                 }
 
@@ -1327,6 +1369,33 @@
                         }
                     }
                 },
+                paytypeOnchangeFunc:function(event){
+                    // var id = event.target.getAttribute('id');
+                    var id_index = event.target.getAttribute('data-id');
+                    var paytype = document.getElementById('paytype'+id_index).value;
+                    if(paytype == 'WAIVE'){
+                        $('#pay_type_fee_group'+id_index).hide();
+                        $('#remark_for_waive'+id_index).show();
+
+                        var sp_fee = document.getElementById('sp_fee'+id_index).value;
+                        sp_fee = Number(sp_fee);
+                        var total_fee = document.getElementById('total_fee_disable'+id_index).value;
+                        total_fee = Number(total_fee);
+                        var netTotal = total_fee-sp_fee;
+
+                        document.getElementById('total_fee_disable'+id_index).value = netTotal;
+                        document.getElementById('total_fee'+id_index).value = netTotal;
+
+                        document.getElementById('sp_fee'+id_index).value = '';
+                    }
+                    else{
+                        document.getElementById('remark_waive'+id_index).value = '';
+                        $('#pay_type_fee_group'+id_index).show();
+                        $('#remark_for_waive'+id_index).hide();
+                    }
+                    
+                        // this.TotalFeeFunc();
+                },
                 oldPassQtyFunc:function(event){
                     var id_name = event.target.getAttribute('id');
                     $("#"+id_name).on("keypress keyup blur", function (event) {
@@ -1336,7 +1405,7 @@
                         }
                     });
                 },
-                TotalFeeFunc:function(event){
+                TotalFeeFunc:function(even){
                     var id = event.target.getAttribute('id');
                     var id_index = event.target.getAttribute('data-id');
                     var id_name = event.target.getAttribute('id');
@@ -1352,13 +1421,29 @@
                     var faxCharge = document.getElementById('faxCharge'+id_index).value;
                     var icwf = document.getElementById('icwf'+id_index).value;
                     var appChange = document.getElementById('appCharge'+id_index).value;
-                    var totalFeeSum = Number(visaFee)+Number(faxCharge)+Number(icwf)+Number(appChange);
+                    var sp_fee = document.getElementById('sp_fee'+id_index).value;
+                    var corfee = 0;
+
+
+                    for(var j=0; j < this.correctionList.length; j++){
+                        var single_select_all = document.getElementById("signle-cor-item"+id_index+j);
+                        if(single_select_all.checked === true){
+                            // single_select_all.checked = false;
+                            corfee = document.getElementById('cor_item_fee_value'+id_index).value;
+                        }
+
+                    }
+
+
+
+                    var totalFeeSum = Number(visaFee)+Number(faxCharge)+Number(icwf)+Number(appChange)+Number(sp_fee)+Number(corfee);
                     document.getElementById('total_fee_disable'+id_index).value = totalFeeSum;
                     document.getElementById('total_fee'+id_index).value = totalFeeSum;
                     // $('#total_fee_disable'+id_index).val() = totalFeeSum;
                     // this.totalFeeValue = Number(this.vasa_feeF)+Number(this.faxTnsChargeFee)+Number(this.icwfFee)+Number(this.visaAppChargeFee);
                 },
                 corrSelectAllFunc: function (event) {
+                    this.TotalFeeFunc();
                     var id_name = event.target.getAttribute('id');
                     var id_index = event.target.getAttribute('data-id');
                     var corSelectAll = document.getElementById(id_name);
@@ -1395,9 +1480,11 @@
                             }
                         }
                     }
+                    this.TotalFeeFunc(id_index,id_name); 
 
                 },
                 correctionFeeFunc: function(event){
+                    this.TotalFeeFunc();
                     var id_name = event.target.getAttribute('id');
                     var id_index = event.target.getAttribute('data-id');
                     var is_cor_fee = false;
@@ -1423,7 +1510,7 @@
                     var id_name = event.target.getAttribute('id');
                     var id_index = event.target.getAttribute('data-id');
                     var curBoxShow = document.getElementById(id_name);
-
+                    this.TotalFeeFunc();
                     if(curBoxShow.checked === true){
                         $('#correction-box'+id_index).show();
                         $('#correction-box-select-all'+id_index).show();
@@ -1433,7 +1520,6 @@
                         $('#correction-box'+id_index).hide();
                         $('#correction-box-select-all'+id_index).hide();
                         document.getElementById(id_name).checked = false;
-
                         for(var j=0; j < this.correctionList.length; j++){
                             var single_select_all = document.getElementById("signle-cor-item"+id_index+j);
                             if(single_select_all.checked === true){
@@ -1443,6 +1529,7 @@
                             }
                         }
                         document.getElementById("correction-all-select"+id_index).checked = false;
+                        this.TotalFeeFunc();
 
                     }
                     
@@ -1470,35 +1557,48 @@
                 },
 
                 clearAddMoreItemFunc: function (event) {
-                    var id_name = event.target.getAttribute('id');
-                    var id_index = event.target.getAttribute('data-id');
-                    $('#webfile_p'+id_index).show();
-                    $('#webfile_disable'+id_index).hide();
-                    document.getElementById('webfile'+id_index).value = '';
-                    document.getElementById('webfile_disable_value'+id_index).value = '';
-                    document.getElementById('name'+id_index).value = '';
-                    document.getElementById('passport_show'+id_index).innerText = '';
-                    document.getElementById('contact'+id_index).value = '';
-                    document.getElementById('passportNo'+id_index).value = '';
-                    document.getElementById('paytype'+id_index).value = '';
-                    document.getElementById('visa_type'+id_index).value = '';
-                    document.getElementById('nationality'+id_index).value = '';
-                    document.getElementById('duration'+id_index).value = '';
-                    document.getElementById('entry_type'+id_index).value = '';
-                    document.getElementById('visaFee'+id_index).value = '';
-                    document.getElementById('faxCharge'+id_index).value = '';
-                    document.getElementById('icwf'+id_index).value = '';
-                    document.getElementById('appCharge'+id_index).value = '';
-                    document.getElementById('total_fee'+id_index).value = '';
-                    document.getElementById('total_fee_disable'+id_index).value = '';
-                    document.getElementById('old_pass'+id_index).value = '';
-                    document.getElementById('tddDelDateId'+id_index).innerText = '';
-                    document.getElementById('tddDelDateValue'+id_index).value = '';
-                    document.getElementById('sp_fee'+id_index).value = '';
-                    for(var j=0; j < this.correctionList.length; j++){
-                        var single_select_all = document.getElementById("signle-cor-item"+id_index+j);
-                        if(single_select_all.checked === true){
-                            single_select_all.checked = false;
+                    var is_confirm =  confirm('Are you sure! You want to clear this data');
+                    if(is_confirm == true){
+                        var id_name = event.target.getAttribute('id');
+                        var id_index = event.target.getAttribute('data-id');
+                        $('#webfile_p'+id_index).show();
+                        $('#webfile_disable'+id_index).hide();
+                        document.getElementById('webfile'+id_index).value = '';
+                        document.getElementById('webfile_disable_value'+id_index).value = '';
+                        document.getElementById('name'+id_index).value = '';
+                        document.getElementById('passport_show'+id_index).innerText = '';
+                        document.getElementById('contact'+id_index).value = '';
+                        document.getElementById('passportNo'+id_index).value = '';
+                        document.getElementById('paytype'+id_index).value = '';
+                        document.getElementById('visa_type'+id_index).value = '';
+                        document.getElementById('nationality'+id_index).value = '';
+                        document.getElementById('duration'+id_index).value = '';
+                        document.getElementById('entry_type'+id_index).value = '';
+                        document.getElementById('visaFee'+id_index).value = '';
+                        document.getElementById('faxCharge'+id_index).value = '';
+                        document.getElementById('icwf'+id_index).value = '';
+                        document.getElementById('appCharge'+id_index).value = '';
+                        document.getElementById('total_fee'+id_index).value = '';
+                        document.getElementById('total_fee_disable'+id_index).value = '';
+                        document.getElementById('old_pass'+id_index).value = '';
+                        document.getElementById('tddDelDateId'+id_index).innerText = '';
+                        document.getElementById('tddDelDateValue'+id_index).value = '';
+                        document.getElementById('sp_fee'+id_index).value = '';
+                        document.getElementById('sslres_msg'+id_index).innerText = '';
+                        document.getElementById('proc_fee_res'+id_index).innerText = '0.00';
+                        $('#pay_type_fee_group'+id_index).show();
+                        $('#remark_for_waive'+id_index).hide();
+                        $('#cor_item_fee_value'+id_index).hide();
+                        $('#cor_item_fee_value2'+id_index).show();
+                        var if_check_cor = document.getElementById('correction-box-show'+id_index);
+                        if(if_check_cor.checked === true){
+                            $('#correction-box-show'+id_index).trigger({ type: "click" });
+                        }
+                        for(var j=0; j < this.correctionList.length; j++){
+                            var single_select_all = document.getElementById("signle-cor-item"+id_index+j);
+                            if(single_select_all.checked === true){
+                                single_select_all.checked = false;
+                            }
                         }
                     }
                 },
@@ -1569,7 +1669,14 @@
                         var icwf = document.getElementById('icwf'+id_index).value;
                         var appCharge = document.getElementById('appCharge'+id_index).value;
                         var paytype = document.getElementById('paytype'+id_index).value;
+                        var remark_waive = document.getElementById('remark_waive'+id_index).value;
                         var old_pass = document.getElementById('old_pass'+id_index).value;
+                        var proc_fee_res_value = document.getElementById('proc_fee_res_value'+id_index).value;
+                        proc_fee_res_value = Number(proc_fee_res_value);
+                        var sp_fee = document.getElementById('sp_fee'+id_index).value;
+                        var curSvcFee = document.getElementById('curSvcFee').value;
+                        sp_fee = Number(sp_fee);
+                        sp_proc_total = proc_fee_res_value+sp_fee;
                         
                         if(webfile != '' && showPass != ''){
 
@@ -1679,16 +1786,14 @@
                                         $('#icwf'+id_index).focus();
                                         alert('Please Enter ICWF '+id_index);
                                     }
-                                    
-                                    else if(old_pass == ''){   
-                                        if(is_alert_already ==  true){
-                                            is_alert_already = false;
-                                            this.not_all_data_valid = false;
-                                            this.submitModalShow = false;
-                                            $('#old_pass'+id_index).focus();
-                                            alert('Please Enter Old Passport Qty '+id_index);
-                                        }
+                                    else if(appCharge == ''){
+                                        is_alert_already = false;
+                                        this.not_all_data_valid = false;
+                                        this.submitModalShow = false;
+                                        $('#appCharge'+id_index).focus();
+                                        alert('Please Enter visa app charge'+id_index);
                                     }
+                                    
                                     else if(paytype == ''){   
                                         if(is_alert_already ==  true){
                                             is_alert_already = false;
@@ -1698,18 +1803,36 @@
                                             alert('Please Select Payment Type '+id_index);
                                         }
                                     }
+                                    else if(paytype != 'WAIVE' && sp_proc_total < curSvcFee){   
+                                        if(is_alert_already ==  true){
+                                            is_alert_already = false;
+                                            this.not_all_data_valid = false;
+                                            this.submitModalShow = false;
+                                            $('#sp_fee'+id_index).focus();
+                                            alert('Payment must be '+curSvcFee+' Taka');
+                                        }
+                                    }
+                                    else if(paytype == 'WAIVE' && remark_waive == ''){   
+                                        if(is_alert_already ==  true){
+                                            is_alert_already = false;
+                                            this.not_all_data_valid = false;
+                                            this.submitModalShow = false;
+                                            $('#remark_waive'+id_index).focus();
+                                            alert('Please fillup the remark field');
+                                        }
+                                    }
+                                    else if(old_pass == ''){   
+                                        if(is_alert_already ==  true){
+                                            is_alert_already = false;
+                                            this.not_all_data_valid = false;
+                                            this.submitModalShow = false;
+                                            $('#old_pass'+id_index).focus();
+                                            alert('Please Enter Old Passport Qty '+id_index);
+                                        }
+                                    }
                                     
                                     else{
                                         this.is_all_data_valid = true;
-                                    }
-                                }
-                                else if(old_pass == ''){   
-                                    if(is_alert_already ==  true){
-                                        is_alert_already = false;
-                                        this.not_all_data_valid = false;
-                                        this.submitModalShow = false;
-                                        $('#old_pass'+id_index).focus();
-                                        alert('Please Enter Old Passport Qty '+id_index);
                                     }
                                 }
                                 else if(paytype == ''){   
@@ -1719,6 +1842,33 @@
                                         this.submitModalShow = false;
                                         $('#paytype'+id_index).focus();
                                         alert('Please Select Payment Type '+id_index);
+                                    }
+                                }
+                                else if(paytype != 'WAIVE' && sp_proc_total < curSvcFee){   
+                                    if(is_alert_already ==  true){
+                                        is_alert_already = false;
+                                        this.not_all_data_valid = false;
+                                        this.submitModalShow = false;
+                                        $('#sp_fee'+id_index).focus();
+                                        alert('Payment must be '+curSvcFee+' Taka');
+                                    }
+                                }
+                                else if(paytype == 'WAIVE' && remark_waive == ''){   
+                                        if(is_alert_already ==  true){
+                                            is_alert_already = false;
+                                            this.not_all_data_valid = false;
+                                            this.submitModalShow = false;
+                                            $('#remark_waive'+id_index).focus();
+                                            alert('Please fillup the remark field');
+                                        }
+                                    }
+                                else if(old_pass == ''){   
+                                    if(is_alert_already ==  true){
+                                        is_alert_already = false;
+                                        this.not_all_data_valid = false;
+                                        this.submitModalShow = false;
+                                        $('#old_pass'+id_index).focus();
+                                        alert('Please Enter Old Passport Qty '+id_index);
                                     }
                                 }
                                 
@@ -1858,6 +2008,7 @@
                         .then(function (res) {
                             _this.webfilePreloader = false;
                             console.log(res);
+                            $("[data-dismiss=modal]").trigger({ type: "click" });
                             if (res.data.status = 'yes') {
                                 if(_this.addMoreButtonArr.length <= 1){
                                     _this.addMoreButtonArr = [];

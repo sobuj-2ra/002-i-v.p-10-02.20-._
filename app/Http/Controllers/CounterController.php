@@ -144,7 +144,7 @@ class CounterController extends Controller
                 if($ssldata != ''){
                     if($onlinePay == 'Yes'){
                         $sslnotrun = '';
-                        $paytype = ['<option value=""></option>\',<option value="Cash/Manual">Cash/Manual</option>','<option value="ONLINE" selected>ONLINE</option>','<option value="WAIVE">WAIVE</option>'];
+                        $paytype = ['<option value="ONLINE" selected>ONLINE</option>'];
                     }
                     else{
                         $sslnotrun = '';
@@ -260,7 +260,13 @@ class CounterController extends Controller
     }
 
     public function foreignRejectSubmit(Request $request){
-        $rejectCause = implode(',',$request->rejectedCauses);
+        // return $request->all();
+        if($request->rejectedCauses != ''){
+            $rejectCause = implode(',',$request->rejectedCauses);
+        }
+        else{
+            $rejectCause = '';
+        }
         $curDT = Date('Y-m-d H:i:s');
         $userId = Auth::user()->user_id;
 
@@ -601,29 +607,16 @@ class CounterController extends Controller
 
 
     public function readAtCenterStoreData(Request $request){
-        
-        $datas = $request->all();
-        $user_id = Auth::user()->user_id;
+        // return $request;
+        $passport = $request->passport;
+        $remark = $request->remark;
         $curDate = Date('Y-m-d H:i:s');
-        $selDate = strtotime($datas['selected_date']);
-        $selectedDate = Date('Y-m-d',$selDate);
-        $arrTemp = [];
-        $succArr = [];
-        $rejectArr = [];
+        $selectedDate = Date('Y-m-d H:i:s',strtotime($request->selected_date.$curTime = Date('H:i:s')));
+        $user_id = Auth::user()->user_id;
+ 
 
 
-
-        foreach($request->passport as $index=>$row)
-        {
-            $arrTemp[$index]['passport'] = $datas['passport'][$index];
-            $arrTemp[$index]['remark'] = $datas['remark'][$index];
-        }
-
-
-
-        foreach($arrTemp as $i=>$item)
-        {
-            $is_update = Tbl_appointmentserved::where('Passport',$item['passport'])->orderby('Service_Date','DESC')->take(1)->update([
+            $is_update = Tbl_appointmentserved::where('Passport',$passport)->orderby('Service_Date','DESC')->take(1)->update([
                 'ReadyCenterby' => $user_id,
                 'ReadyCentertime' => $selectedDate,
                 'status' => '2',
@@ -631,41 +624,35 @@ class CounterController extends Controller
             ]);
             if($is_update)
             {
-                $succArr[$i]['password'] = $item['passport'];
-                $succArr[$i]['remark'] = $item['remark'];
+                $statusMsg = 'Data Inserted Successfully';
+                $status = 'yes';
             }
             else
             {
-                $rejectArr[$i]['passport'] = $item['passport'];
-                $rejectArr[$i]['remark'] = $item['remark'];
-            }
-        }
-        foreach ($rejectArr as $reItem){
-            Tbl_fail_ready_del::create([
-                    'passport' =>  $reItem['passport'],
+                Tbl_fail_ready_del::create([
+                    'passport' =>  $passport,
                     'del_by' =>  $user_id,
                     'del_time' =>  $selectedDate,
                     'DelRed' => 'ReadyCenter',
-                    'DelRemark' => $reItem['remark'],
+                    'DelRemark' => $remark,
                 ]);
-        }
+                $statusMsg = 'Could not find this passport in DB';
+                $status = 'no';
 
-
-
+            }
+        
         $total_fail_data = Tbl_fail_ready_del::where('del_by',$user_id)
             ->where('DelRed','ReadyCenter')
-            ->whereDate('del_time', $curDate)
+            ->whereDate('del_time', Date('Y-m-d'))
             ->get();
         $total_fail_data = count($total_fail_data);
-
-        $total_save = Tbl_appointmentserved::whereDate('ReadyCentertime', $curDate)
+        $total_save = Tbl_appointmentserved::whereDate('ReadyCentertime', Date('Y-m-d'))
                     ->where('ReadyCenterby',$user_id)
                     ->get();
         $total_save = count($total_save);
-        $recent_saved = count($succArr);
-        $recent_failed = count($rejectArr);
 
-        return response()->json(['reject'=>$rejectArr,'total_save'=>$total_save,'total_fail'=>$total_fail_data,'rec_save'=>$recent_saved,'rec_fail'=>$recent_failed]);
+        
+        return response()->json(['status'=>$status,'total_save'=>$total_save,'total_fail'=>$total_fail_data,'statusMsg'=>$statusMsg]);
     }
 
 
@@ -691,74 +678,50 @@ class CounterController extends Controller
     }
 
     public function deliveryCenterStoreData(Request $request){
-        $datas = $request->all();
-        $user_id = Auth::user()->user_id;
+        $passport = $request->passport;
+        $remark = $request->remark;
         $curDate = Date('Y-m-d H:i:s');
-        $curTime = Date('H:i:s');
-        $selDateR = $datas['selected_date'].$curTime;
-        $selDate = strtotime($selDateR);
-        $selectedDate = Date('Y-m-d',$selDate);
-        $selectedDateTime = Date('Y-m-d H:i:s',$selDate);
-        $arrTemp = [];
-        $succArr = [];
-        $rejectArr = [];
+        $selectedDate = Date('Y-m-d H:i:s',strtotime($request->selected_date.$curTime = Date('H:i:s')));
+        $user_id = Auth::user()->user_id;
 
 
 
-        foreach($request->passport as $index=>$row)
+        $is_update = Tbl_appointmentserved::where('Passport',$passport)->orderby('Service_Date','DESC')->take(1)->update([
+            'DelFinalBy' => $user_id,
+            'DelFinaltime' => $selectedDate,
+            'DelRemark' => $remark,
+            'status' => '2'
+        ]);
+        if($is_update)
         {
-            $arrTemp[$index]['passport'] = $datas['passport'][$index];
-            $arrTemp[$index]['remark'] = $datas['remark'][$index];
+            $statusMsg = 'Data Inserted Successfully';
+            $status = 'yes';
         }
-
-
-
-        foreach($arrTemp as $i=>$item)
+        else
         {
-            $is_update = Tbl_appointmentserved::where('Passport',$item['passport'])->orderby('Service_Date','DESC')->take(1)->update([
-                'DelFinalBy' => $user_id,
-                'DelFinaltime' => $selectedDateTime,
-                'DelRemark' => $item['remark'],
-                'status' => '2'
-            ]);
-            if($is_update)
-            {
-                $succArr[$i]['password'] = $item['passport'];
-                $succArr[$i]['remark'] = $item['remark'];
-            }
-            else
-            {
-                $rejectArr[$i]['passport'] = $item['passport'];
-                $rejectArr[$i]['remark'] = $item['remark'];
-            }
-        }
-        foreach ($rejectArr as $reItem){
             Tbl_fail_ready_del::create([
-                'passport' =>  $reItem['passport'],
+                'passport' =>  $passport,
                 'del_by' =>  $user_id,
-                'del_time' =>  $selectedDateTime,
+                'del_time' =>  $selectedDate,
                 'DelRed' => 'Delivery',
-                'DelRemark' => $reItem['remark'],
+                'DelRemark' => $remark,
             ]);
+            $statusMsg = 'Could not find this passport in DB';
+            $status = 'no';
+
         }
-
-
 
         $total_fail_data = Tbl_fail_ready_del::where('del_by',$user_id)
             ->where('DelRed','Delivery')
-            ->whereDate('del_time', $selectedDate)
-            ->get();
-        $total_fail_data = count($total_fail_data);
+            ->whereDate('del_time', Date('Y-m-d'))
+            ->count();
 
-        $total_save = Tbl_appointmentserved::whereDate('DelFinaltime', $selectedDate)
+        $total_save = Tbl_appointmentserved::whereDate('DelFinaltime', Date('Y-m-d'))
             ->where('DelFinalBy',$user_id)
-            ->get();
-        $total_save = count($total_save);
-        $recent_saved = count($succArr);
-        $recent_failed = count($rejectArr);
+            ->count();
 
-        return response()->json(['reject'=>$rejectArr,'total_save'=>$total_save,'total_fail'=>$total_fail_data,'rec_save'=>$recent_saved,'rec_fail'=>$recent_failed]);
-    }
+            return response()->json(['status'=>$status,'total_save'=>$total_save,'total_fail'=>$total_fail_data,'statusMsg'=>$statusMsg]);
+        }
 
 
 

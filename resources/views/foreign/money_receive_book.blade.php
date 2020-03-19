@@ -1,12 +1,12 @@
 @extends('admin.master')
 <!--Page Title-->
 @section('page-title')
-    Receive Foreign Passport
+    Money Receipt Book Entry
 @endsection
 
 <!--Page Header-->
 @section('page-header')
-    Receive Foreign Passport
+    Money Receipt Book Entry
 @endsection
 
 <!--Page Content Start Here-->
@@ -31,20 +31,24 @@
                         <div class="col-md-4 change_passport_body"
                              style="width: 30%;padding-left: 33px;border-top: none;">
                             <p class="form_title_center bg-info">
-                                <i>Money Receive Book Entry</i>
+                                <i>Money Receipt Book Entry</i>
                             </p>
                             {!! Form::open(['url' => 'book/store','id' => 'applicant_form']) !!}
                             <div class="form-group">
+                                <label for="">Center Name</label>
                                 <input class="form-control" name="center" placeholder="center_name" required="required" autocomplete="off" value="{{$center}}" disabled>
                                 <input type="hidden" class="form-control" name="center_name" placeholder="center" required="required" autocomplete="off" value="{{$center}}">
                             </div>
                             <div class="form-group">
+                                <label for="">Enter Book No.</label>
                                 <input class="form-control" name="book_no" placeholder="Enter Book No." required="required" autocomplete="off">
                             </div>
                             <div class="form-group">
+                                <label for="">Enter Start Receipt Number</label>
                                 <input class="form-control" name="start_no" placeholder="Enter Start Receipt Number" required="required" autocomplete="off">
                             </div>
                             <div class="form-group">
+                                <label for="">Enter End Receipt Number</label>
                                 <input class="form-control" name="end_no" placeholder="Enter End Receipt Number" required="required" autocomplete="off">
                             </div>
                             <button type="submit" class="btn btn-primary">Submit</button>

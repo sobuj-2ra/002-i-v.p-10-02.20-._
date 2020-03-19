@@ -893,13 +893,13 @@ class PDFController extends Controller
         }
 
         $name = 'port-endorsement-summary-' . $from . '-to-' . $to;
-        if ($type == 3) {
+        if($type == 3) {
             $rankings = collect($data['print_data']);
             $results = $rankings->chunk(24);
 
             $pdf = PDF::loadView('portendorsement.pdf_receive_summary', compact('results', 'from', 'to', 'ServiceType', 'user_id')); //load view page
             return $pdf->download($name . '.pdf'); // download pdf file
-        } elseif ($type == 2 || $type == 1) {
+        }elseif($type == 2 || $type == 1) {
             $excel_array[] = array('SL', 'Date', 'Quantity');
             $i = 0;
             foreach ($printData as $val) {

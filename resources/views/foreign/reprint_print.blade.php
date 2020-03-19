@@ -76,7 +76,7 @@
                     <strong>Passport:</strong> {{ $appServed->Passport}} <br/>
                     <strong>Webfile No:</strong> {{ $appServed->WebFile_no}} <br/>
                     <strong>Visa Type:</strong> {{ $appServed->Visa_type}} <br/>
-                    <strong>Phone :</strong> {{ $appServed->Contact}} <br/>
+                    <strong>Contact :</strong> {{ $appServed->Contact}} <br/>
                     <strong>Visa fee:</strong> {{ $fpServed->visa_fee}} <br/>
                     <strong>Fax trans. charge:</strong> {{ $fpServed->fax_trans_charge}} <br/>
                     <strong>icwf:</strong> {{ $fpServed->icwf}} <br/>
@@ -84,12 +84,12 @@
                     <strong>Processing fee:</strong> {{ $appServed->proc_fee}} <br/>
                     <strong>Special fee:</strong> {{ $appServed->sp_fee}}<br />
                     <strong>Corr fee:</strong> {{ $appServed->corrFee}} <br/>
-                    <strong>Total:</strong> {{ $fpServed->total_amount+$appServed->proc_fee+$appServed->sp_fee+$appServed->corrFee}} <br />
+                    <strong>Total Amount (received in cash) : BDT</strong> {{ $fpServed->total_amount+$appServed->sp_fee+$appServed->corrFee}} <br />
                     <strong>Payment:</strong> {{ $appServed->Pmethod}} <br/>
                     <strong>Center Phone:</strong> {{$center->center_phone}} <br/>
                     <strong>Fax:</strong> {{$center->center_fax}} <br/>
                     <strong>Info:</strong> {{$center->center_info}} <br/>
-                    <strong>Delivery on or after:  </strong>{{  date('d-m-Y', strtotime($appServed->appx_Del_Date))}}
+                    <strong>Delivery on or after:  </strong>{{  date('d-M-Y', strtotime($appServed->appx_Del_Date))}}
                     <span class="float-right">{{$center->del_time}}</span>
                     </br>
                     <div class="topborder"></div>

@@ -12,6 +12,24 @@ Ready at Center
 
 <!--Page Content Start Here-->
 @section('page-content')
+<style>
+    #passfieldId{
+        margin-bottom:10px;
+        height: 30px;
+        width: 190px;
+        border-radius: 5px;
+        border: 1px solid #777;
+        padding: 0px 5px;
+    }
+    #remark_field_id{
+        margin-bottom:10px;
+        height: 30px;
+        width: 250px;
+        border-radius: 5px;
+        border: 1px solid #777;
+        padding: 0px 5px;
+    }
+</style>
     @php
         $curDate = Date('d-m-Y');
     @endphp
@@ -28,74 +46,38 @@ Ready at Center
                     <!-- Code Here.... -->
 
                         <div class="row">
-                            <div class="col-md-9">
+                            <div class="col-md-12">
                                 <div v-show="webfilePreloader" class="webfile-preloader"><img class="preloader" src="{{asset("public/assets/img/preloader.gif")}}" alt=""></div>
 
-                                <div class="col-md-12">
+                                <div class="col-md-8 col-md-offset-2">
                                     <div class="readyat-data-info-area">
-                                        {{--{{Hash::make('password')}}--}}
-                                        <span>Select Date: <input name="selected_date" class="datepicker datepicker_style input_values" style="width:120px" type="text" value="{{$curDate}}"></span>
-                                        <div class="float-right">
-                                            <span>Total Saved: <b>@{{ total_save }}</b></span> &nbsp;&nbsp;&nbsp;&nbsp;
-                                            <span>Total Data Not Found: <b>@{{ total_failed}}</b></span><br>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="readyat-content-area">
-                                    <div class="readyat-list-show">
-                                        <table class="table table-responsive">
-                                            <thead>
-                                                <tr>
-                                                    <th>Sl</th>
-                                                    <th>Passport Number <span><b>( @{{ totalCount }} )</b></span></th>
-                                                    <th>Remarks</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr v-for="(item, index) in readyatArr">
-                                                    <td>@{{ index+1 }}</td>
-                                                    <td>@{{ item.passport }} <input class="input_values" type="hidden" :value="item.passport" name="passport[]"></td>
-                                                    <td>@{{ item.remark }} <input type="hidden" class="input_values" :value="item.remark" name="remark[]"></td>
-                                                    <input type="hidden" class="input_values" name="_token" value="{!! csrf_token() !!}">
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                                <div class="readyat-center-section">
-                                    <div class="row">
-                                        <div class="col-md-10 col-md-offset-1">
-                                            <div class="readyat-top-left">
-
-                                                Passport: <input @keyup.enter="passportEnterFunc" v-model="passInputVal" id="passfieldId" type="text" style="margin-bottom:10px;" placeholder="Press Enter"> <input @click="remarkParmitFunc" v-model="remarkParmitMod" type="checkbox"> <input @keyup.enter="passportEnterFunc" v-model="remarkInputVal" v-if="remarkParmitMod" type="text" id="remark_field_id" placeholder="Remarks ">
-                                                <spna class="float-right">Recent Saved: <b id="rec_save" style="color:green">0</b> &nbsp;&nbsp;Data Not Found: <b id="rec_fail" style="color:red">0</b></spna>
-                                                <br>
-                                                <input @click="passReadySubFunc" type="button" style="margin-left:60px;" class="btn btn-primary" value="Save"> <input @click="clearDataFunc" type="reset" class="btn btn-danger" value="Clear">
+                                        <div class="panel panel-primary">
+                                            <div class="panel-heading">
+                                                <span>Select Date: <input name="selected_date" id="selected_date" class="datepicker " style="width:150px;color:black" type="text" value="{{$curDate}}"></span>
+                                                <div class="float-right">
+                                                    <span>Total Saved: <b>@{{ total_save }}</b></span> &nbsp;&nbsp;&nbsp;&nbsp;
+                                                    <span>Total Data Not Found: <b>@{{ total_failed}}</b></span><br>
+                                                </div>
+                                                
                                             </div>
+                                            <div class="panel-body">
+                                                <div class="readyat-top-left">
 
+                                                    Passport: <input @keyup.enter="passportEnterFunc" v-model="passInputVal" id="passfieldId" type="text"  placeholder="Press Enter"> <input @click="remarkParmitFunc" v-model="remarkParmitMod" type="checkbox"> <input @keyup.enter="passportEnterFunc" v-model="remarkInputVal" v-if="remarkParmitMod" type="text" id="remark_field_id" placeholder="Remarks ">
+                                                    
+                                                </div>
+                                            </div>
+                                            <div class="panel-footer">
+                                                <span v-if="resMsgSuccess" style="color:green;font-weight:bold;text-align:center">@{{resMsg}}</span>
+                                                <span v-if="resMsgFaild" style="color:red;font-weight:bold;text-align:center">@{{resMsg}}</span>
+                                            </div>
                                         </div>
-
+                                        {{--{{Hash::make('password')}}--}}
+                                        
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-3">
-                                <div class="recent_fail_data_area" style="background: #FFF">
-                                    <div style="background:#E5E7E9;width: 100%;text-align:center;border-left:5px solid #FFF;border-right:5px solid #FFF;">
-                                        <b>Recent</b><br>
-                                    <span style="color:red;font-weight:bold">Data Not Found (<b id="rec_fail2" style="color:red">0</b>)</span>
-                                    </div>
-                                    <table class="table table-responsive">
-                                        <tr>
-                                            <th>SL</th>
-                                            <th>Passport</th>
-                                        </tr>
-                                        <tr v-for="(itemF,i) in recentFData">
-                                            <td>@{{i+1}}</td>
-                                            <td>@{{itemF.passport}}</td>
-                                        </tr>
-                                    </table>
-                                </div>
-                            </div>
+                            
                         </div>
                         <br>
                     </div>
@@ -120,70 +102,81 @@ Ready at Center
                 remarkParmitMod:false,
                 remarkInputVal: '',
                 passInputVal: '',
-                readyatArr:[],
-                dataArr:[],
-                totalCount:0,
-                checkDouble:false,
                 total_save:0,
                 total_failed:0,
-                recentFData:[],
+                resMsgSuccess:false,
+                resMsgFaild:false,
+                resMsg:'',
 
             },
             methods:{
                 remarkParmitFunc: function(){
                     this.remarkParmitMod = true;
                     $('#remark_field_id').focus();
+                    this.remarkInputVal = '';
                 },
                 passportEnterFunc: function(){
+                    
                     var InVal = this.passInputVal.toUpperCase()
                     this.passInputVal = InVal.split(' ').join('');
                     this.remarkInputVal = this.remarkInputVal.toUpperCase()
                     var cuVal = this.passInputVal;
-
-
-                    if(cuVal != '')
-                    {
-                        this.checkDouble = false;
-                        var readyatArr = this.readyatArr;
-
-
-                        // check double data in loop //
-                        for(item in this.dataArr){
-                            if(this.dataArr[item] == this.passInputVal){
-                                this.checkDouble = true;
-                            }
-                        }
-
-
-                        // push another array for loop//
-                        this.dataArr.push(this.passInputVal);
-
-                        /// if all ok then push data in main array //
-                        if(this.checkDouble == false)
-                        {
-                            this.readyatArr.push(
-                                {
-                                    passport:this.passInputVal,
-                                    remark:this.remarkInputVal
-                                }
-                            );
-                        }
-                        else
-                        {
-                            alert('This Passport Already Taken');
-
-                        }
+                    var selected_date = document.getElementById('selected_date').value;
+                    // console.log(cuVal.length);
+                    if(cuVal == ''){
+                        $('#passfieldId').focus();
+                        alert('Please Input Passport No.');
+                    }
+                    else if(cuVal.length <= 3){
+                        $('#passfieldId').focus();
+                        alert('Please Input Valid Passport No.');
+                    }
+                    else if(this.remarkParmitMod == true && this.remarkInputVal == ''){
+                        // alert('sdfsd');
+                        this.remarkParmitMod = true;
+                        $('#remark_field_id').focus();
                     }
                     else{
-                        alert('Please input vlaue');
+                       var passport = this.passInputVal;
+                       var remark = this.remarkInputVal;
+                       this.webfilePreloader = true;
+                       _this = this;
+                        axios.post('ready-center-passport-datas',{passport:passport,remark:remark,selected_date:selected_date})
+                            .then(function(res){
+                                console.log(res);
+                                _this.webfilePreloader = false;
+                                _this.total_save = res.data.total_save;
+                                _this.total_failed = res.data.total_fail;
+                                _this.remarkParmitMod = false;
+                                _this.remarkInputVal = '';
+                                _this.passInputVal = '';
+                                $('#passfieldId').focus();
+                                _this.resMsg = res.data.statusMsg;
+                                if(res.data.status == 'yes'){
+                                    _this.resMsgSuccess = true;
+                                    _this.resMsgFaild = false;
+                                }
+                                else{
+                                    _this.resMsgFaild = true;
+                                    _this.resMsgSuccess = false;
+                                }
+                            })
+                            .catch(function(error){
+                                console.log(error);
+                                _this.webfilePreloader = false;
+                                _this.resMsg = 'OPPS! SERVER ERROR';
+                                _this.resMsgFaild = true;
+                                _this.resMsgSuccess = false;
+                            })
+                            
+                        $('#passfieldId').focus();
+                        // this.remarkParmitMod = false;
+                        // this.checkDouble = false;
+                        // this.remarkInputVal = '';
+                        // this.passInputVal = '';
                     }
+                   
 
-                    $('#passfieldId').focus();
-                    this.totalCount = this.readyatArr.length;
-                    this.remarkParmitMod = false;
-                    this.checkDouble = false;
-                    this.remarkInputVal = '';
-                    this.passInputVal = '';
                 },
                 clearDataFunc: function()
                 {
@@ -204,6 +197,9 @@ Ready at Center
                     else{
                         alert('Opps! Nothing to clear');
                     }
+                },
+                removeItemFunc:function(index){
+                    this.readyatArr.splice(index,1)
                 },
                 passReadySubFunc: function()
                 {
@@ -262,6 +258,7 @@ Ready at Center
             },
             created:function() {
                 var _this = this;
+                $('#passfieldId').focus();
                 axios.get('onload-readyat-center-datas',{params:{}})
                     .then(function (res) {
                         _this.webfilePreloader = false;

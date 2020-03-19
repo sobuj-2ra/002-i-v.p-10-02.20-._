@@ -39,15 +39,19 @@
                                             {!! Form::open(['url' => 'service/update','id' => 'applicant_form']) !!}
                                             <input type="hidden" name="sl" value="{{$edit_data->sl}}">
                                             <div class="form-group">
+                                                <label for="">Enter service name</label>
                                                 <input class="form-control" value="{{$edit_data->Service}}" name="services" placeholder="Enter service name" required="required" autocomplete="off">
                                             </div>
                                             <div class="form-group">
+                                                <label for="">Enter number of slip copy</label>
                                                 <input class="form-control" value="{{$edit_data->slip_copy}}" name="slip_copy" placeholder="Enter number of slip copy" autocomplete="off">
                                             </div>
                                             <div class="form-group">
+                                                <label for="">Enter Service Fee</label>
                                                 <input class="form-control" value="{{$edit_data->Svc_Fee}}" name="Svc_fee" placeholder="Enter Service Fee" required="required" autocomplete="off">
                                             </div>
                                             <div class="form-group">
+                                                <label for="">Enter Lead Time</label>
                                                 <input class="form-control" value="{{$edit_data->LeadTime}}" name="LeadTime" placeholder="Enter Lead Time" required="required" autocomplete="off">
                                             </div>
                                             <button type="submit" class="btn btn-primary">Update</button>
